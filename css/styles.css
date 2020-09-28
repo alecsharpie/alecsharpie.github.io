@@ -11,9 +11,41 @@ h1 {
   font-family: helvetica;
 }
 
+h2 {
+  position: relative;
+  font-size: 30px;
+  font-family: helvetica;
+}
+
+h4 {
+    display: block;
+    margin-block-start: 1.33em;
+    margin-block-end: 1.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    margin-top: 10px;
+    font-weight: bold;
+    float: left;
+}
+
+h5 {
+    display: block;
+    margin-block-start: 1.33em;
+    margin-block-end: 1.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    margin-top: 10px;
+    text-align: left;
+    font-weight: bold;
+
+}
+
 hr {
   padding-bottom: 10px;
+}
 
+ul {
+  float: left;
 }
 
 /*
@@ -35,6 +67,11 @@ color scheme 2
 /* */
 /* Class selectors */
 
+.container {
+    max-width: 1280px;
+    padding: 40px 120px;
+}
+
 .top-container {
   display: block;
   width: 100%;
@@ -44,11 +81,22 @@ color scheme 2
   text-align: center;
 }
 
-.center {
-  position: absolute;
-  left: 35%;
-  top: 30px;
-  width: 300px;
+.about-me {
+  height: 150px;
+  background-color: #f1f3f4;
+}
+
+.experience-info {
+  float: left;
+  padding-bottom: 15px;
+}
+
+.experience-description {
+  text-align: left;
+}
+
+.experience-split {
+  width: 33%;
 }
 
 .density_plot {
@@ -81,6 +129,12 @@ color scheme 2
   margin: 100px auto 100px auto;
   text-align: left;
   line-height: 2;
+}
+
+.portrait-img {
+  width: 35%;
+  margin-left: 35%;
+  margin-top: 10%;
 }
 
 .like-img {
