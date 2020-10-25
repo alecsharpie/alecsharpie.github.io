@@ -2,6 +2,7 @@
 body {
   margin: 0;
   text-align: center;
+  background-color: #f1f3f4;
 }
 
 
@@ -12,20 +13,20 @@ h1 {
 }
 
 h2 {
+  color: #204051;
   position: relative;
-  font-size: 30px;
+  font-size: 34px;
   font-family: helvetica;
 }
 
 h4 {
-    display: block;
     margin-block-start: 1.33em;
     margin-block-end: 1.33em;
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     margin-top: 10px;
     font-weight: bold;
-    float: left;
+    text-align: left;
 }
 
 h5 {
@@ -67,9 +68,12 @@ color scheme 2
 /* */
 /* Class selectors */
 
-.container {
-    max-width: 1280px;
-    padding: 40px 120px;
+.middle-container {
+   display: inline-block;
+    max-width: 80%;
+    padding: 40px 40px 40px 40px;
+    margin-left: 40px;
+    align: center;
 }
 
 .top-container {
@@ -88,18 +92,31 @@ color scheme 2
 
 .experience-info {
   float: left;
+  display:block;
   padding-bottom: 15px;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 
 .experience-description {
   text-align: left;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 
 .experience-split {
   width: 33%;
+  margin-bottom: 30px;
+  border-color: #79bac1;
 }
 
-.density_plot {
+.projects-split {
+  width: 33%;
+  margin-bottom: 30px;
+  border-color: #79bac1;
+}
+
+.density-plot {
   position: absolute;
   top: 30px;
   left: 30px;
@@ -124,70 +141,46 @@ color scheme 2
   top: 40%;
 }
 
-.skill-row {
-  width: 50%;
-  margin: 100px auto 100px auto;
+.project-row {
+  display: inline-block;
+  width: 80%;
   text-align: left;
   line-height: 2;
 }
 
+.project-title{
+  margin-bottom: 20px;
+}
+
 .portrait-img {
-  width: 35%;
+  width: 30%;
   margin-left: 35%;
   margin-top: 10%;
 }
 
-.like-img {
-  width: 25%;
+.left-img {
+  width: 30%;
   margin-right: 30px;
   float: left;
 }
 
-.star-img {
-  width: 25%;
+.right-img {
+  width: 30%;
   margin-left: 30px;
   float: right;
 }
 
-.btn {
-  background: #F63D3D;
-  background-image: -webkit-linear-gradient(top, #F63D3D, #811616);
-  background-image: -moz-linear-gradient(top, #F63D3D, #811616);
-  background-image: -ms-linear-gradient(top, #F63D3D, #811616);
-  background-image: -o-linear-gradient(top, #F63D3D, #811616);
-  background-image: linear-gradient(to bottom, #F63D3D, #811616);
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  border-radius: 20px;
-  height: 14px;
-  line-height: 14px;
-  color: #FFFFFF;
-  font-family: Open Sans;
-  width: 185px;
-  font-size: 20px;
-  font-weight: 900;
-  padding: 12px;
-  box-shadow: 1px 1px 6px 0px #000000;
-  -webkit-box-shadow: 1px 1px 6px 0px #000000;
-  -moz-box-shadow: 1px 1px 6px 0px #000000;
-  text-shadow: 1px 1px 6px #000000;
-  border: solid #762C2C 1px;
-  text-decoration: none;
+.blank-seperator{
+  width: 25px;
   display: inline-block;
-  cursor: pointer;
-  text-align: center;
 }
 
-.btn:hover {
-  border: solid #ED3333 1px;
-  background: #811616;
-  background-image: -webkit-linear-gradient(top, #811616, #F63D3D);
-  background-image: -moz-linear-gradient(top, #811616, #F63D3D);
-  background-image: -ms-linear-gradient(top, #811616, #F63D3D);
-  background-image: -o-linear-gradient(top, #811616, #F63D3D);
-  background-image: linear-gradient(to bottom, #811616, #F63D3D);
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  border-radius: 20px;
-  text-decoration: none;
+.link-project-info {
+  margin-bottom: 15px;
+}
+
+.skill-row {
+  width: 61.8%;
+  text-align: left;
+  line-height: 2;
 }
