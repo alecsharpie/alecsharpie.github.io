@@ -1,6 +1,5 @@
 /* Tag selectors */
 body {
-  margin: 0;
   text-align: center;
   background-color: #f1f3f4;
 }
@@ -14,9 +13,9 @@ h1 {
 
 h2 {
   color: #204051;
-  position: relative;
   font-size: 34px;
   font-family: helvetica;
+  text-align: center;
 }
 
 h4 {
@@ -68,6 +67,16 @@ color scheme 2
 /* */
 /* Class selectors */
 
+.about-me-container {
+  max-width: 1280px;
+  padding: 40px 180px;
+  margin: auto;
+}
+
+.about-me-center {
+  text-align: center;
+}
+
 .middle-container {
    display: inline-block;
     max-width: 80%;
@@ -86,7 +95,7 @@ color scheme 2
 }
 
 .about-me {
-  height: 150px;
+  height: 130px;
   background-color: #f1f3f4;
 }
 
@@ -119,7 +128,7 @@ color scheme 2
 .density-plot {
   position: absolute;
   top: 30px;
-  left: 30px;
+  left: 35px;
   right: 0;
   margin-left: auto;
   margin-right: auto;
@@ -153,19 +162,18 @@ color scheme 2
 }
 
 .portrait-img {
-  width: 30%;
-  margin-left: 35%;
-  margin-top: 10%;
+  width: 120px;
+  text-align: center;
 }
 
 .left-img {
-  width: 30%;
+  width: 120px;
   margin-right: 30px;
   float: left;
 }
 
 .right-img {
-  width: 30%;
+  width: 120px;
   margin-left: 30px;
   float: right;
 }
@@ -177,6 +185,19 @@ color scheme 2
 
 .link-project-info {
   margin-bottom: 15px;
+}
+
+.links-about-me {
+  display: block;
+  text-align: left;
+  margin-bottom: 10px;
+  margin-left: 20%;
+}
+
+.text-about-me {
+  text-align: left;
+  margin-bottom: 10px;
+  margin-left: 20%;
 }
 
 .skill-row {
