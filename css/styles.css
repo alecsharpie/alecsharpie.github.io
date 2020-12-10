@@ -99,11 +99,6 @@ color scheme 2
   background-color: #f1f3f4;
 }
 
-.skills-col {
-  height: 130px;
-  background-color: #f1f3f4;
-}
-
 .experience-info-box {
   float:left;
 }
@@ -217,8 +212,19 @@ color scheme 2
   margin-left: 20%;
 }
 
+.text-skills {
+  text-align: left;
+  margin-bottom: 10px;
+  margin-left: 20%;
+}
+
 .skill-row {
   width: 61.8%;
   text-align: left;
   line-height: 2;
+}
+
+.skills-col {
+  height: 130px;
+  background-color: #f1f3f4;
 }
