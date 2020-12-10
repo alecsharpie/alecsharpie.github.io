@@ -69,11 +69,11 @@ color scheme 2
 
 .about-me-container {
   max-width: 1280px;
-  padding: 40px 180px;
+  padding: 40px 10px;
   margin: auto;
 }
 
-.about-me-center {
+.center {
   text-align: center;
 }
 
@@ -99,9 +99,16 @@ color scheme 2
   background-color: #f1f3f4;
 }
 
+.skills-col {
+  height: 130px;
+  background-color: #f1f3f4;
+}
+
 .experience-info {
   float: left;
-  display:block;
+  display: block;
+  text-align: left;
+  font-size: 0.9em;
   padding-bottom: 15px;
   margin-right: 5px;
   margin-left: 5px;
@@ -193,6 +200,11 @@ color scheme 2
   margin-bottom: 10px;
   margin-left: 20%;
 }
+
+/*
+.about-actual-link {}
+
+*/
 
 .text-about-me {
   text-align: left;
