@@ -104,9 +104,14 @@ color scheme 2
   background-color: #f1f3f4;
 }
 
+.experience-info-box {
+  float:left;
+}
+
 .experience-info {
   float: left;
-  display: block;
+  display: inline-block;
+  position: relative;
   text-align: left;
   font-size: 0.9em;
   padding-bottom: 15px;
