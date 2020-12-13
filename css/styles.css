@@ -26,6 +26,7 @@ h4 {
     margin-top: 10px;
     font-weight: bold;
     text-align: left;
+    max-width: 230px;
 }
 
 h5 {
