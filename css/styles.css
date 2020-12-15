@@ -68,11 +68,32 @@ color scheme 2
 /* */
 /* Class selectors */
 
-.about-me-container {
-  max-width: 1280px;
-  padding: 40px 10px;
-  margin: auto;
+.about-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
+
+@media screen and (max-width:500px) {
+  .about-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+}
+
+.about-me {
+ min-width: 210px;
+ margin: 20px;
+ display: inline-block;
+ text-align: left;
+}
+
+.text-about-me {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+
 
 .center {
   text-align: center;
@@ -81,8 +102,7 @@ color scheme 2
 .middle-container {
    display: inline-block;
     max-width: 80%;
-    padding: 40px 40px 40px 40px;
-    margin-left: 40px;
+    padding: 20px 20px 20px 20px;
     align: center;
 }
 
@@ -93,11 +113,6 @@ color scheme 2
   background-color: #f1f3f4;
   position: relative;
   text-align: center;
-}
-
-.about-me {
-  height: 130px;
-  background-color: #f1f3f4;
 }
 
 .experience-info-box {
@@ -195,23 +210,6 @@ color scheme 2
   margin-bottom: 15px;
 }
 
-.links-about-me {
-  display: block;
-  text-align: left;
-  margin-bottom: 10px;
-  margin-left: 20%;
-}
-
-/*
-.about-actual-link {}
-
-*/
-
-.text-about-me {
-  text-align: left;
-  margin-bottom: 10px;
-  margin-left: 20%;
-}
 
 .list-skills {
   text-align: left;
