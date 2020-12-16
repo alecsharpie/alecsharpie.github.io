@@ -4,20 +4,6 @@ body {
   background-color: #f1f3f4;
 }
 
-
-h1 {
-  position: relative;
-  font-size: 30px;
-  font-family: helvetica;
-}
-
-h2 {
-  color: #204051;
-  font-size: 34px;
-  font-family: helvetica;
-  text-align: center;
-}
-
 h4 {
     margin-block-start: 1.33em;
     margin-block-end: 1.33em;
@@ -142,12 +128,6 @@ color scheme 2
   border-color: #79bac1;
 }
 
-.projects-split {
-  width: 33%;
-  margin-bottom: 30px;
-  border-color: #79bac1;
-}
-
 .density-plot {
   position: absolute;
   top: 30px;
@@ -173,43 +153,80 @@ color scheme 2
   top: 40%;
 }
 
+.section-title {
+  color: #204051;
+  font-size: 2.2em;
+  font-family: helvetica;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.section-split {
+  width: 100%;
+  margin-bottom: 30px;
+  border-color: #79bac1;
+  height:2px;
+}
+
+.projects-split {
+  width: 33%;
+  margin-bottom: 30px;
+  border-color: #79bac1;
+}
+
 .project-row {
-  display: inline-block;
+  min-height:200px;
+  display: block;
   width: 80%;
   text-align: left;
   line-height: 2;
 }
 
-.project-title{
-  margin-bottom: 20px;
-}
-
-.portrait-img {
-  width: 120px;
-  text-align: center;
-}
-
 .left-img {
-  width: 120px;
+  width: 200px;
   margin-right: 30px;
   float: left;
 }
 
 .right-img {
-  width: 120px;
+  width: 200px;
   margin-left: 30px;
   float: right;
 }
 
-.blank-seperator{
-  width: 25px;
-  display: inline-block;
+@media screen and (max-width:500px) {
+  .right-img {
+    display:block;
+    width: 200px;
+    margin-left: 30px;
+  }
+}
+
+.project-title{
+  display: block;
+  font-size: 1.5em;
+  margin: 0px;
+}
+
+.project-links{
+   display: flex;
+   flex-direction: row;
+   justify-content: : flex-start;
+}
+
+@media screen and (max-width:500px) {
+  .project-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: : flex-start;
+  }
 }
 
 .link-project-info {
-  margin-bottom: 15px;
+  display:block;
+  margin-right: 20px;
+  margin-bottom: 10px;
 }
-
 
 .list-skills {
   text-align: left;
@@ -246,4 +263,8 @@ color scheme 2
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+}
+
+.links-cool-stuff {
+  text-align:left;
 }
