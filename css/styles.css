@@ -162,7 +162,7 @@ color scheme 2
 }
 
 .section-split {
-  width: 100%;
+  width: 90%;
   margin-bottom: 30px;
   border-color: #79bac1;
   height:2px;
@@ -177,7 +177,6 @@ color scheme 2
 .project-row {
   min-height:200px;
   display: block;
-  width: 80%;
   text-align: left;
   line-height: 2;
 }
@@ -198,7 +197,9 @@ color scheme 2
   .right-img {
     display:block;
     width: 200px;
-    margin-left: 30px;
+    margin-left: 0px;
+    margin-right: 30px;
+    float: left;
   }
 }
 
@@ -267,4 +268,10 @@ color scheme 2
 
 .links-cool-stuff {
   text-align:left;
+  margin-bottom: 5px;
+}
+
+.reference-links{
+  padding-bottom: 10px;
+  font-size: 0.8em;
 }
