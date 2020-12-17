@@ -60,7 +60,7 @@ color scheme 2
   justify-content: space-evenly;
 }
 
-@media screen and (max-width:500px) {
+@media screen and (max-width:480px) {
   .about-container {
     display: flex;
     flex-direction: column;
@@ -193,7 +193,7 @@ color scheme 2
   float: right;
 }
 
-@media screen and (max-width:500px) {
+@media screen and (max-width:480px) {
   .right-img {
     display:block;
     width: 200px;
@@ -215,7 +215,7 @@ color scheme 2
    justify-content: : flex-start;
 }
 
-@media screen and (max-width:500px) {
+@media screen and (max-width:480px) {
   .project-links {
     display: flex;
     flex-direction: column;
@@ -268,10 +268,11 @@ color scheme 2
 
 .links-cool-stuff {
   text-align:left;
-  margin-bottom: 5px;
+  font-size: 0.9em;
+  margin-bottom: 10px;
 }
 
 .reference-links{
   padding-bottom: 10px;
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
