@@ -1,2 +1,2 @@
-# my_portfolio
- A static site to communicate my work experience and projects
+# My Portfolio
+ A static site to communicate my projects & experience.
