@@ -1,2 +1,5 @@
 # My Portfolio
- A static site to communicate my projects & experience.
+
+ A place to communicate my projects & experience.
+
+ [Here's a link](https://www.alecsharpie.me/)
