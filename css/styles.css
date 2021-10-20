@@ -55,9 +55,6 @@ color scheme 2 - in use!
 */
 
 
-/* */
-
-
 /* Class selectors */
 
 .about-container {
@@ -232,27 +229,33 @@ color scheme 2 - in use!
     }
 }
 
-.webapp-tag {
+.tag {
+    color: #f1f3f4;
+    font-size: 0.9em;
+    padding: 1px 1px 1px 1px;
+}
+
+.tag-box.webapp {
     margin: 5px 6px 13px 6px;
-    padding: 3px 7px 3px 7px;
+    padding: 0px 6px 0px 6px;
+    display: inline-block;
+    background-color: #204051;
+    border-radius: 4px;
+}
+
+.tag-box.dataset {
+    margin: 5px 6px 13px 6px;
+    padding: 0px 6px 0px 6px;
     display: inline-block;
     background-color: #2a7886;
     border-radius: 4px;
 }
 
-.dataset-tag {
+.tag-box.edu {
     margin: 5px 6px 13px 6px;
-    padding: 3px 7px 3px 7px;
+    padding: 0px 6px 0px 6px;
     display: inline-block;
-    background-color: #2a7886;
-    border-radius: 4px;
-}
-
-.education-tag {
-    margin: 5px 6px 13px 6px;
-    padding: 3px 7px 3px 7px;
-    display: inline-block;
-    background-color: #2a7886;
+    background-color: #512b58;
     border-radius: 4px;
 }
 
