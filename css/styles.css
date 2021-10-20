@@ -185,7 +185,7 @@ color scheme 2 - in use!
     min-height: 200px;
     display: block;
     text-align: left;
-    line-height: 2;
+    line-height: 1.8;
 }
 
 .left-img {
@@ -211,8 +211,8 @@ color scheme 2 - in use!
 }
 
 .project-title {
-    font-size: 1.5em;
-    margin: 0px;
+    font-size: 1.6em;
+    margin: 0px 30px 0px 0px;
 }
 
 .project-links {
@@ -230,38 +230,30 @@ color scheme 2 - in use!
 }
 
 .tag {
+    margin: 0px 4px 0px 4px;
+    display: inline-block;
     color: #f1f3f4;
-    font-size: 0.9em;
-    padding: 1px 1px 1px 1px;
+    font-size: 0.85em;
+    padding: 5px 7px 5px 7px;
+    line-height: 1 !important;
+    border-radius: 4px;
 }
 
-.tag-box.webapp {
-    margin: 5px 6px 13px 6px;
-    padding: 0px 6px 0px 6px;
-    display: inline-block;
+.tag.webapp {
     background-color: #204051;
-    border-radius: 4px;
 }
 
-.tag-box.dataset {
-    margin: 5px 6px 13px 6px;
-    padding: 0px 6px 0px 6px;
-    display: inline-block;
+.tag.dataset {
     background-color: #2a7886;
-    border-radius: 4px;
 }
 
-.tag-box.edu {
-    margin: 5px 6px 13px 6px;
-    padding: 0px 6px 0px 6px;
-    display: inline-block;
-    background-color: #512b58;
-    border-radius: 4px;
+.tag.edu {
+    background-color: #512b58
 }
 
 .link-project-info {
     margin-right: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
 
 .list-skills {
