@@ -51,6 +51,10 @@ color scheme 2 - in use!
 */
     /* Class selectors */
     
+    .seperator {
+        margin: 3px;
+    }
+    
     .about-container {
         display: flex;
         flex-direction: row;
@@ -107,16 +111,6 @@ color scheme 2 - in use!
         text-align: center;
     }
     
-    .experience-info {
-        float: left;
-        position: relative;
-        text-align: left;
-        font-size: 0.9em;
-        padding-bottom: 15px;
-        margin-right: 5px;
-        margin-left: 5px;
-    }
-    
     .experience-description {
         text-align: left;
         margin-right: 5px;
@@ -126,6 +120,7 @@ color scheme 2 - in use!
     .experience-split {
         width: 33%;
         margin-bottom: 30px;
+        margin-top: 30px;
         border-color: #79bac1;
     }
     
@@ -165,6 +160,7 @@ color scheme 2 - in use!
     .section-split {
         width: 90%;
         margin-bottom: 30px;
+        margin-top: 30px;
         border-color: #79bac1;
         height: 2px;
     }
@@ -172,6 +168,7 @@ color scheme 2 - in use!
     .projects-split {
         width: 33%;
         margin-bottom: 30px;
+        margin-top: 30px;
         border-color: #79bac1;
     }
     
@@ -209,10 +206,6 @@ color scheme 2 - in use!
             text-align: left;
             line-height: 1.8;
         }
-    }
-    
-    .project-block {
-        display: inline-grid;
     }
     
     .left-img {
@@ -279,6 +272,7 @@ color scheme 2 - in use!
     }
     
     .link-project-info {
+        text-align: left;
         margin-right: 20px;
         margin-bottom: 3px;
     }
