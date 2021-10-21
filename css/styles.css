@@ -235,7 +235,7 @@ color scheme 2 - in use!
         margin: 0px 30px 0px 0px;
     }
     
-    .project-links {
+    .flex-item {
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
@@ -271,7 +271,7 @@ color scheme 2 - in use!
         background-color: #512b58
     }
     
-    .link-project-info {
+    .info-link {
         text-align: left;
         margin-right: 20px;
         margin-bottom: 3px;
