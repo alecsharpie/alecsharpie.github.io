@@ -1,6 +1,7 @@
     /* Tag selectors */
     
     body {
+        font-family: "Open Sans", sans-serif;
         text-align: center;
         background-color: #f1f3f4;
     }
@@ -336,10 +337,6 @@ color scheme 2 - in use!
         height: 100px;
     }
     
-    body {
-        font-family: "Open Sans", sans-serif;
-    }
-    
     nav {
         width: 100%;
         background-color: #f1f3f4;
@@ -415,6 +412,7 @@ color scheme 2 - in use!
         padding-bottom: 5px;
         text-decoration: none;
         color: #204051;
+        font-size: 1.2em;
         text-transform: uppercase;
     }
     
