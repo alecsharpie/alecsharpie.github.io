@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Educational Resources</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="images/favicon.ico">
     <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
@@ -12,7 +13,14 @@
 </head>
 
 <body>
-    <p class="section-title">My Projects</p>
+    <nav>
+        <ul class="nav-bar">
+            <li class="nav-bar_item"><a href="#">Me</a></li>
+            <li class="nav-bar_item"><a href="educational_resources.html">Educational Resources</a></li>
+        </ul>
+    </nav>
+
+    <p class="section-title">Data Science Resources</p>
     <hr class="section-split" />
     <div class="middle-container">
         <div class="project-row-l">
@@ -41,57 +49,6 @@
                 </p>
                 <div class="flex-item">
                     <span class="tag edu">Educational</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/auckland_prison.png" alt="collab-rowing-image">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">NZ Prisons Analysis & Directory</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Sep 2021 - Oct 2021</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span><a href="https://share.streamlit.io/alecsharpie/nz-prisons/main/app.py">Web app</a></span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://storage.googleapis.com/dataset-sharing/data/prisons_info.csv">Dataset</a>
-        </span>
-                    </div>
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/nz-prisons">Github</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <p> A data driven, dynamic directory of New Zealand's prisons, and a visualization and analysis of Dept Corrections and Justice data.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                    <span class="tag dataset">Dataset</span>
                 </div>
             </div>
         </div>
@@ -127,7 +84,6 @@
                 <img class="right-img" src="images/collab_team_rowing.png" alt="collab-rowing-image">
             </div>
         </div>
-
         <hr class="projects-split" />
         <div class="project-row-l">
             <div class="flex-block">
@@ -161,48 +117,6 @@
         <hr class="projects-split" />
         <div class="project-row-r">
             <div class="flex-block">
-                <span class="project-title">Explore Melbourne's Foot Traffic</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Sept 2020 - Nov 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.shinyapps.io/where_to_walk/">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/where_to_walk">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">An R Shiny Web app built to help people understand how the time of the day, the day of the week, and the Covid-19 Lockdown influence the number of pedestrians throughout the City of Melbourne, Australia.
-                </p>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/where_to_walk.png" alt="where-to-walk-image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/school_school.png" alt="school-school-image">
-            </div>
-            <div class="flex-block">
                 <span class="project-title">School School - Educational Website</span>
 
                 <div class="flex-item">
@@ -228,89 +142,10 @@
                     <span class="tag edu">Educational</span>
                 </div>
             </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
             <div class="flex-block">
-                <span class="project-title">Support Black Owned Restaurants in LA</span>
-                <div class="flex-item">
+                <img class="right-img" src="images/school_school.png" alt="school-school-image">
+            </div>
 
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Jun 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.shinyapps.io/blackownedla/">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/shiny-blm">Github</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <p class="project-description">
-                        An interactive map to help people on instagram find and support black owned restaurants in Los Angeles.
-                    </p>
-                </div>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-            <div class="flex-block">
-                <img class="right-img" src="images/black_owned_la_map.png" alt="where-to-walk-image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/companion_data.png" alt="comapnion-dataset-image">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Companion Planting Dataset</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>May 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://storage.googleapis.com/dataset-sharing/data/companion_plants.json">Dataset</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="info-link">
-      <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-        <a class="project-link" href="https://github.com/alecsharpie/companion_planting_dataset">Github</a>
-      </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <p class="project-description">
-                        A data set containing info about the relationships between plants to help with companion planting. Scraped from Wikipedia, cleaned to only include relationships with references.
-                    </p>
-                </div>
-                <div class="flex-item">
-                    <span class="tag dataset">Dataset</span>
-                </div>
-            </div>
         </div>
         <hr class="projects-split" />
     </div>
