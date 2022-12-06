@@ -20,19 +20,72 @@
                     console.log(data);
 
                     // Get an array of the keys in the JSON object
-                    const keys = Object.keys(data);
+                    // const keys = Object.keys(data);
 
                     // Loop through the keys in the JSON object
-                    data.forEach(project => {
+                    data.forEach((project, index) => {
                         // Access the value of the key
-                        const value = project['title'];
+                        // const title = ;
+
+                        var img_block = `<div class="flex-block ">
+                        <img class="left-img" src=${project['image_path']} alt=${project['image_alt']}>
+                        </div>`;
+
+                        var title_block = `
+                        <span class="project-title ">${project['title']}</span>
+                        <span class="seperator "></span>`
+
+                        var date_block = `<div class="flex-item ">
+                        <div class="info-link ">
+                        <span class="iconify " data-icon="bi:calendar-week " data-inline="false "></span>
+                        <span class="seperator "> | </span>
+                        <span>Nov 2022</span>
+                        </div>
+                        </div>`
+
+                        var link_block = `<div class = "flex-item">
+                        <div class = "info-link">
+                        <span class = "iconify" data-icon = "octicon:mark-github-16" data-inline = "false"></span>
+                        <span class = "seperator" > | </span>
+                        <span>
+                            <a class = "project-link" href = "https://github.com/alecsharpie/nomo_nailbiting">Github</a>
+                        </span>
+                        </div>`;
+
+                        for (var key of Object.keys(project['links'])) {
+                            console.log(key + " -> " + project['links'][key])
+                        }
+
+                        var description_block = `<div class = "flex-item">
+                        <div>
+                        <p class = "project-description" > Take a photo with the webcam every 2 seconds, send a notification
+                        if nail biting is detected in the image.Powered by a CNN.The preprocessed dataset is available on huggingface. </p>
+                        </div>
+                        </div>`;
+
+                        var tag_block = `<div class = "flex-item">
+                        <span class = "tag edu">Code</span> <
+                        span class = "tag dataset">Dataset</span>
+                        </div>
+                        </div>`;
+
+                        var split_line = `<hr class="projects-split"/>`
+
+                        if (index % 2 == 0) {
+                            var final_html = `<div class="project-row-l">` + img_block + `<div class="flex-block">` + title_block + date_block + link_block + description_block + `</div>` + `</div>` + split_line;
+                        } else {
+                            var final_html = `<div class="project-row-r">` + `<div class="flex-block">` + title_block + date_block + link_block + description_block + `</div>` + img_block + `</div>` + split_line;
+                        }
+
+                        // var final_html = img_block + title_block + date_block;
 
                         // Use the property and value in your code
                         // Create a new div element
                         var div = document.createElement('div');
 
                         // Set the inner HTML of the div to some content
-                        div.innerHTML = `<p>Project ${value}!</p>`;
+                        // div.innerHTML = `<p>Project ${project['title']}!</p>`;
+                        div.innerHTML = final_html;
 
                         // Get a reference to the element with the id "project-container"
                         var container = document.getElementById('project-container');
@@ -43,61 +96,10 @@
                 }
 
             );
-
-
-        // var request = new XMLHttpRequest();
-
-        // request.open('GET', 'localhost:8000/projects.json', true);
-        // console.log(request);
-        // request.onload = function() {
-        //     if (request.status >= 200 && request.status < 400) {
-        //         console.log('success');
-        //         // Success!
-        //         var data = JSON.parse(request.responseText);
-        //         console.log(data);
-        //         for (var key in data) {
-        //             // if (data.hasOwnProperty(key)) {
-        //             //     var value = data[key];
-        //             //     var container = document.getElementById('container');
-        //             //     container.innerHTML += '<p>' + key + ': ' + value + '</p>';
-        //             // }
-
-        //             // Create a new div element
-        //             var div = document.createElement('div');
-
-        //             // Set the inner HTML of the div to some content
-        //             div.innerHTML = '<p>This is my new div element with content!</p>';
-
-        //             // Get a reference to the element with the id "project-container"
-        //             var container = document.getElementById('project-container');
-
-        //             // Append the new div to the container element
-        //             container.appendChild(div);
-
-        //         }
-
-        //     } else {
-        //         // We reached our target server, but it returned an error
-        //     }
-
-        // };
-
-        // request.onerror = function() {
-        //     // There was a connection error of some sort
-        // };
-
-
-
-        // console.log('hello world');
     </script>
 </head>
 
 <body>
-
-    <!-- <script>
-      /* https://www.youtube.com/watch?v=C3dfjyft_m4 */
-      fetch('data.json')
-    </script> -->
 
     <nav>
         <ul class="nav-bar">
@@ -195,13 +197,11 @@
                     <span class="tag dataset ">Dataset</span>
                 </div>
             </div>
-
-
         </div>
 
-        <div class=" project-row-l ">
-            <div class="flex-block ">
-                <img class="left-img " src="images/nomo_nailbiting.png " alt="The weights and biases learning curve, nail biting dataset samples ">
+        <div class="project-row-l">
+            <div class="flex-block">
+                <img class="left-img" src="images/nomo_nailbiting.png " alt="The weights and biases learning curve, nail biting dataset samples ">
             </div>
             <div class="flex-block ">
                 <span class="project-title ">Nail Biting - Detection & Alert</span>
