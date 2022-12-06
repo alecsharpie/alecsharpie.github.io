@@ -31,8 +31,7 @@
                         <img class="left-img" src=${project['image_path']} alt=${project['image_alt']}>
                         </div>`;
 
-                        var title_block = `
-                        <span class="project-title ">${project['title']}</span>
+                        var title_block = `<span class="project-title ">${project['title']}</span>
                         <span class="seperator "></span>`
 
                         var date_block = `<div class="flex-item ">
@@ -64,17 +63,17 @@
                         </div>`;
 
                         var tag_block = `<div class = "flex-item">
-                        <span class = "tag edu">Code</span> <
-                        span class = "tag dataset">Dataset</span>
+                        <span class = "tag edu">Code</span>
+                        <span class = "tag dataset">Dataset</span>
                         </div>
                         </div>`;
 
                         var split_line = `<hr class="projects-split"/>`
 
                         if (index % 2 == 0) {
-                            var final_html = `<div class="project-row-l">` + img_block + `<div class="flex-block">` + title_block + date_block + link_block + description_block + `</div>` + `</div>` + split_line;
+                            var final_html = `<div class="project-row-l">` + img_block + `<div class="flex-block">` + title_block + date_block + description_block + `</div>` + `</div>` + split_line;
                         } else {
-                            var final_html = `<div class="project-row-r">` + `<div class="flex-block">` + title_block + date_block + link_block + description_block + `</div>` + img_block + `</div>` + split_line;
+                            var final_html = `<div class="project-row-r">` + `<div class="flex-block">` + title_block + date_block + description_block + `</div>` + img_block + `</div>` + split_line;
                         }
 
                         // var final_html = img_block + title_block + date_block;
@@ -157,46 +156,7 @@
     <div class="middle-container">
 
         <div id='project-container'>
-            <div class="flex-block ">
-                <img class="left-img " src="images/nomo_nailbiting.png " alt="The weights and biases learning curve, nail biting dataset samples ">
-            </div>
-            <div class="flex-block ">
-                <span class="project-title ">Nail Biting - Detection & Alert</span>
-                <span class="seperator "></span>
-                <div class="flex-item ">
-                    <div class="info-link ">
-                        <span class="iconify " data-icon="bi:calendar-week " data-inline="false "></span>
-                        <span class="seperator "> | </span>
-                        <span>Nov 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item ">
-                    <div class="info-link ">
-                        <span class="iconify " data-icon="octicon:mark-github-16 " data-inline="false "></span>
-                        <span class="seperator "> | </span>
-                        <span>
-          <a class="project-link " href="https://github.com/alecsharpie/nomo_nailbiting ">Github</a>
-        </span>
-                    </div>
-                    <div class="info-link ">
-                        <span class="iconify " data-icon="bx:bx-data " data-inline="false "></span>
-                        <span class="seperator "> | </span>
-                        <span>
-          <a class="project-link " href="https://huggingface.co/datasets/alecsharpie/nailbiting_classification ">Dataset</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item ">
-                    <div>
-                        <p class="project-description "> Take a photo with the webcam every 2 seconds, send a notification if nail biting is detected in the image. Powered by a CNN. The preprocessed dataset is available on huggingface.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item ">
-                    <span class="tag edu ">Code</span>
-                    <span class="tag dataset ">Dataset</span>
-                </div>
-            </div>
+
         </div>
 
         <div class="project-row-l">
