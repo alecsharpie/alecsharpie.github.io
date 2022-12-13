@@ -196,6 +196,7 @@ color scheme 2 - in use!
     flex-direction: row;
     text-align: left;
     line-height: 1.8;
+    justify-content: start;
 }
 
 @media screen and (max-width:480px) {
@@ -205,6 +206,7 @@ color scheme 2 - in use!
         flex-direction: column;
         text-align: left;
         line-height: 1.8;
+        justify-content: start;
     }
 }
 
@@ -214,6 +216,7 @@ color scheme 2 - in use!
     flex-direction: row-reverse;
     text-align: left;
     line-height: 1.8;
+    justify-content: space-between;
 }
 
 @media screen and (max-width:480px) {
@@ -223,6 +226,7 @@ color scheme 2 - in use!
         flex-direction: column-reverse;
         text-align: left;
         line-height: 1.8;
+        justify-content: space-between;
     }
 }
 
@@ -245,9 +249,10 @@ color scheme 2 - in use!
     margin-right: 30px;
 }
 
-.flex-block {
-    align-self: auto;
-}
+
+/* .flex-block {
+    padding: 10px
+} */
 
 @media screen and (max-width:480px) {
     .right-img {
