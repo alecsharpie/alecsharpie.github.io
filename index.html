@@ -17,80 +17,148 @@
             .then(response => response.json()) // Parse the JSON data
             .then(data => {
                     // Use the data in your JavaScript code
-                    console.log(data);
+                    console.log(data['projects']);
 
                     // Get an array of the keys in the JSON object
                     // const keys = Object.keys(data);
 
                     // Loop through the keys in the JSON object
-                    data.forEach((project, index) => {
-                        // Access the value of the key
-                        // const title = ;
+                    data['projects'].forEach((project, index) => {
 
-                        var img_block = `<div class="flex-block ">
-                        <img class="left-img" src=${project['image_path']} alt=${project['image_alt']}>
-                        </div>`;
-
-                        var title_block = `<span class="project-title ">${project['title']}</span>
-                        <span class="seperator "></span>`
-
-                        var date_block = `<div class="flex-item ">
-                        <div class="info-link ">
-                        <span class="iconify " data-icon="bi:calendar-week " data-inline="false "></span>
-                        <span class="seperator "> | </span>
-                        <span>Nov 2022</span>
-                        </div>
-                        </div>`
-
-                        var link_block = `<div class = "flex-item">
-                        <div class = "info-link">
-                        <span class = "iconify" data-icon = "octicon:mark-github-16" data-inline = "false"></span>
-                        <span class = "seperator" > | </span>
-                        <span>
-                            <a class = "project-link" href = "https://github.com/alecsharpie/nomo_nailbiting">Github</a>
-                        </span>
-                        </div>`;
-
-                        for (var key of Object.keys(project['links'])) {
-                            console.log(key + " -> " + project['links'][key])
-                        }
-
-                        var description_block = `<div class = "flex-item">
-                        <div>
-                        <p class = "project-description" > Take a photo with the webcam every 2 seconds, send a notification
-                        if nail biting is detected in the image.Powered by a CNN.The preprocessed dataset is available on huggingface. </p>
-                        </div>
-                        </div>`;
-
-                        var tag_block = `<div class = "flex-item">
-                        <span class = "tag edu">Code</span>
-                        <span class = "tag dataset">Dataset</span>
-                        </div>
-                        </div>`;
-
-                        var split_line = `<hr class="projects-split"/>`
+                        // Create a new div element
+                        var row = document.createElement('div');
 
                         if (index % 2 == 0) {
-                            var final_html = `<div class="project-row-l">` + img_block + `<div class="flex-block">` + title_block + date_block + description_block + `</div>` + `</div>` + split_line;
+                            row.className = "project-row-l"
                         } else {
-                            var final_html = `<div class="project-row-r">` + `<div class="flex-block">` + title_block + date_block + description_block + `</div>` + img_block + `</div>` + split_line;
+                            row.className = "project-row-r"
                         }
 
-                        // var final_html = img_block + title_block + date_block;
 
-                        // Use the property and value in your code
-                        // Create a new div element
-                        var div = document.createElement('div');
+                        // IMAGE
 
-                        // Set the inner HTML of the div to some content
-                        // div.innerHTML = `<p>Project ${project['title']}!</p>`;
-                        div.innerHTML = final_html;
+                        var flexbox_img = document.createElement('div');
+                        flexbox_img.className = "flex-block";
+
+                        var project_img = document.createElement('img');
+                        project_img.className = "project-image";
+                        project_img.src = project['image_path'];
+                        project_img.alt = project['image_alt'];
+
+                        flexbox_img.appendChild(project_img)
+
+                        row.appendChild(flexbox_img)
+
+
+                        // TEXT
+
+                        var flexbox_text = document.createElement('div');
+                        flexbox_text.className = "flex-block";
+
+
+                        // Title
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<span class="project-title">${project['title']}</span>`;
+
+                        flexbox_text.append(flex_item)
+
+                        // Date
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        var date_block = document.createElement('div');
+                        date_block.className = "info-link";
+
+                        var date_html = `
+                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
+                        <span class="seperator"> | </span>
+                        <span>${project['date']}</span>
+                        `;
+                        date_block.innerHTML = date_html;
+
+                        flex_item.append(date_block)
+
+                        flexbox_text.append(flex_item)
+
+
+
+                        // Links
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        for (var key of Object.keys(project['links'])) {
+
+                            var link_block = document.createElement('div');
+                            link_block.className = "info-link";
+
+                            var link_html = `
+                            <span class="iconify" data-icon=${data['icons'][key]} data-inline="false"></span>
+                            <span class="seperator"> | </span>
+                            <span>
+                            <a class="project-link" href=${project['links'][key]}>${key}</a>
+                            </span>
+                            `;
+
+                            link_block.innerHTML = link_html;
+
+                            flex_item.append(link_block)
+
+                        }
+
+
+                        flexbox_text.append(flex_item);
+
+
+                        // Description
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<p class="project-description">${project['description']}`;
+
+                        flexbox_text.append(flex_item)
+
+
+                        // Tags
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        var tag_block = `
+                        <span class = "tag edu">Code</span>
+                        <span class = "tag dataset">Dataset</span>
+                        `;
+
+                        flex_item.innerHTML = tag_block;
+
+                        flexbox_text.append(flex_item)
+
+
+                        row.append(flexbox_text)
+
 
                         // Get a reference to the element with the id "project-container"
                         var container = document.getElementById('project-container');
 
                         // Append the new div to the container element
-                        container.appendChild(div);
+                        container.appendChild(row);
+
+
+                        // Split horizontal line
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<hr class="projects-split"/>`;
+
+
+                        container.appendChild(flex_item);
+
                     });
                 }
 
@@ -161,14 +229,14 @@
 
         <div class="project-row-l">
             <div class="flex-block">
-                <img class="left-img" src="images/nomo_nailbiting.png " alt="The weights and biases learning curve, nail biting dataset samples ">
+                <img class="left-img" src="images/nomo_nailbiting.png" alt="The weights and biases learning curve, nail biting dataset samples ">
             </div>
             <div class="flex-block ">
                 <span class="project-title ">Nail Biting - Detection & Alert</span>
                 <span class="seperator "></span>
                 <div class="flex-item ">
                     <div class="info-link ">
-                        <span class="iconify " data-icon="bi:calendar-week " data-inline="false "></span>
+                        <span class="iconify " data-icon="bi:calendar-week" data-inline="false "></span>
                         <span class="seperator "> | </span>
                         <span>Nov 2022</span>
                     </div>
@@ -182,7 +250,7 @@
         </span>
                     </div>
                     <div class="info-link ">
-                        <span class="iconify " data-icon="bx:bx-data " data-inline="false "></span>
+                        <span class="iconify " data-icon="bx:bx-data" data-inline="false "></span>
                         <span class="seperator "> | </span>
                         <span>
           <a class="project-link " href="https://huggingface.co/datasets/alecsharpie/nailbiting_classification ">Dataset</a>
@@ -358,7 +426,7 @@
         </div>
         <hr class="projects-split " />
         <div class="project-row-r ">
-            <div class="flex-block ">
+            <div class="flex-block">
                 <span class="project-title ">ConvRGB - Colour Feature extraction tool</span>
                 <div class="flex-item ">
 
@@ -407,7 +475,7 @@
                 <div class="flex-item ">
 
                     <div class="info-link ">
-                        <span class="iconify " data-icon="bx:bx-book-content "></span> <span class="seperator "> | </span>
+                        <span class="iconify " data-icon="bx:bx-book-content"></span> <span class="seperator "> | </span>
                         <span>
           <a class="project-link " href="https://alecsharpie.notion.site/Homemade-Electric-Drumkit-243394c94e3c4f05a7cc9a64f0ad8cb0 ">Article</a>
         </span>
