@@ -68,12 +68,14 @@ color scheme 2 - in use!
 }
 
 .about-container {
+    display: inline-block;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    padding: 20px 20px 20px 20px;
 }
 
-@media screen and (max-width:480px) {
+@media screen and (max-width:800px) {
     .about-container {
         display: flex;
         flex-direction: column;

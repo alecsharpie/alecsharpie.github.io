@@ -183,6 +183,59 @@
             ]
         }
     ],
+    "educational": [{
+            "title": "Batch Size & Learning Rate's effect on gradient descent visualised with learning curves",
+            "date": "Nov 2021",
+            "description": "Expand your understanding of the effect of batch size and learning rate on gradient descent.",
+            "links": {
+                "Article": "https://alecsharpie.notion.site/Batch-size-Learning-rate-b9dba5330d124306bcc8501ed4209e19"
+            },
+            "image_path": "batch_size_learning_rate.png",
+            "image_alt": "a poorly drawn pixel art image of a learning curve plot",
+            "tags": [
+                "Article"
+            ]
+        },
+        {
+            "title": "Git Collaborative Workflows Cheatsheet",
+            "date": "Sep 2021",
+            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it\n                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate \"full websites\".",
+            "links": {
+                "Article": "https://www.notion.so/alecsharpie/Git-Cheatcodes-be310d6314234c289449b59dc482ac00"
+            },
+            "image_path": "collab_team_rowing.png",
+            "image_alt": "a team of rowers collaborating together at sunset",
+            "tags": [
+                "Article"
+            ]
+        },
+        {
+            "title": "Meet your computer & build your first data laboratory",
+            "date": "Apr 2021",
+            "description": "A resource for computer & data newbies to set their computer up for basic data science. Tools: Python, Command Line, Jupyter notebooks. (currently for Mac only, to be cont.)",
+            "links": {
+                "Article": "https://alecsharpie.notion.site/Setting-up-your-data-laboratory-c08cf796fecd418e88a22de9fb16b98f"
+            },
+            "image_path": "chick_hatching_data_setup.png",
+            "image_alt": "a cartoon emoji of a baby chick hatching out of an egg",
+            "tags": [
+                "Article"
+            ]
+        },
+        {
+            "title": "School School - Educational Website",
+            "date": "2019 - 2020",
+            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it\n                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate \"full websites\".",
+            "links": {
+                "Down for maintenance": "http://www.alecsharpie.me/educational-resources.html"
+            },
+            "image_path": "school_school.png",
+            "image_alt": "a vector illustration of a pencil bent into an S shape",
+            "tags": [
+                "Article"
+            ]
+        }
+    ],
     "icons": {
         "Models": "carbon:machine-learning-model",
         "Github": "octicon:mark-github-16",
@@ -192,4 +245,5 @@
         "Playlist": "fluent:megaphone-loud-24-regular",
         "Tweet": "akar-icons:twitter-fill"
     }
+
 }
