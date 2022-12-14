@@ -33,7 +33,7 @@ fetch('projects.json')
 
                 var project_img = document.createElement('img');
                 project_img.className = "project-image";
-                project_img.src = project['image_path'];
+                project_img.src = 'images/project-icons/' + project['image_path'];
                 project_img.alt = project['image_alt'];
 
                 flexbox_img.appendChild(project_img)
@@ -62,7 +62,7 @@ fetch('projects.json')
                 flex_item.className = "flex-item";
 
                 var date_block = document.createElement('div');
-                date_block.className = "info-link";
+                date_block.className = "date";
 
                 date_block.innerHTML = `
                   <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
@@ -83,16 +83,22 @@ fetch('projects.json')
 
                 for (var key of Object.keys(project['links'])) {
 
-                    var link_block = document.createElement('div');
-                    link_block.className = "info-link";
+                    var link_click = document.createElement('a');
+                    link_click.href = `${project['links'][key]}`;
+
+                    var link_block = document.createElement('span');
+                    link_block.className = "info-link-button";
 
                     link_block.innerHTML = `
-                      <span class="iconify" data-icon=${data['icons'][key]} data-inline="false"></span>
-                      <span class="seperator"> | </span>
-                      <a class="link" href=${project['links'][key]}>${key}</a>
+                      <span class="iconify inline" data-icon=${data['icons'][key]} data-inline="false"></span>
+                      <p class='inline'>${key}</p>
                       `;
 
-                    flex_item.append(link_block)
+                    // <span class="seperator inline"> | </span>
+
+                    link_click.append(link_block)
+
+                    flex_item.append(link_click)
 
                 }
 
@@ -109,16 +115,33 @@ fetch('projects.json')
 
                 flexbox_text.append(flex_item)
 
-
                 // Tags
 
                 var flex_item = document.createElement('div');
                 flex_item.className = "flex-item";
 
-                flex_item.innerHTML = `
-                  <span class = "tag edu">Code</span>
-                  <span class = "tag dataset">Dataset</span>
-                  `;
+                // using for...of
+                for (let i of project['tags']) {
+
+                    var tag = document.createElement('span');
+
+                    tag.classList.add("tag");
+
+                    tag.classList.add(`${i.toLowerCase().replace(/\s+/g, '')}`);
+
+                    tag.innerHTML = `${i}`;
+
+                    flex_item.append(tag)
+
+                }
+
+                // var flex_item = document.createElement('div');
+                // flex_item.className = "flex-item";
+
+                // flex_item.innerHTML = `
+                //   <span class = "tag edu">Code</span>
+                //   <span class = "tag dataset">Dataset</span>
+                //   `;
 
                 flexbox_text.append(flex_item)
 

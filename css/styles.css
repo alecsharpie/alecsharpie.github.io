@@ -58,6 +58,10 @@ color scheme 2 - in use!
 
 /* Class selectors */
 
+.links-about-me {
+    size: 20em;
+}
+
 .seperator {
     margin-left: 2px;
     margin-right: 2px;
@@ -324,7 +328,11 @@ nav .nav-bar .nav-bar_item a:after {
     background-color: #2a7886;
 }
 
-.tag.edu {
+.tag.education {
+    background-color: #512b58
+}
+
+.tag.code {
     background-color: #512b58
 }
 
@@ -332,11 +340,91 @@ nav .nav-bar .nav-bar_item a:after {
     background-color: #79bac1
 }
 
-.info-link {
+.date {
     text-align: left;
     margin-right: 20px;
     margin-bottom: 3px;
 }
+
+.info-link-button {
+    background-color: #f1f3f4;
+    border: 1px solid #204051;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #204051;
+    padding: 2px 5px;
+    margin: 5px 10px 5px 0px;
+    text-align: center;
+    display: block;
+    white-space: nowrap;
+}
+
+.info-link-button:hover {
+    background-color: #204051;
+    color: #f1f3f4;
+}
+
+
+/* CSS */
+
+
+/*
+.button-23 {
+    background-color: #FFFFFF;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #222222;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    margin: 0;
+    outline: none;
+    padding: 13px 23px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    touch-action: manipulation;
+    transition: box-shadow .2s, -ms-transform .1s, -webkit-transform .1s, transform .1s;
+    user-select: none;
+    -webkit-user-select: none;
+    width: auto;
+}
+
+.button-23:focus-visible {
+    box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
+    transition: box-shadow .2s;
+}
+
+.button-23:active {
+    background-color: #F7F7F7;
+    border-color: #000000;
+    transform: scale(.96);
+}
+
+.button-23:disabled {
+    border-color: #DDDDDD;
+    color: #DDDDDD;
+    cursor: not-allowed;
+    opacity: 1;
+} */
+
+
+/* .button {
+  background-color: #1c87c9;
+  border: 2px;
+  color: #204051;
+  padding: 20px 34px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin: 4px 2px;
+  cursor: pointer;
+} */
 
 .list-skills {
     text-align: left;
@@ -469,6 +557,10 @@ nav .nav-bar .nav-bar_item a {
     text-transform: uppercase;
 }
 
+a:hover {
+    text-decoration: none;
+}
+
 nav .nav-bar .nav-bar_item a:after {
     content: "";
     position: absolute;
@@ -487,4 +579,9 @@ nav .nav-bar .nav-bar_item a:hover:after {
 .link {
     color: #204051;
     text-decoration: none;
+}
+
+.inline {
+    display: inline-block;
+    margin: 0px;
 }
