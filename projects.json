@@ -75,7 +75,6 @@
             "description": "A twitter post called for music recommendations, they were good tunes so I scraped the thread for links, this playlist is the result",
             "links": {
                 "Dataset": "https://docs.google.com/spreadsheets/d/1_YDOV9iPE4gIu1OBkExq4Tf4zP7cfSJVG7y9K70G-pg/edit#gid=1766961698",
-                "Playlist": "https://www.youtube.com/watch?v=ZychufQciUY&list=TLGGE-G7ad6M_MowMTA4MjAyMg",
                 "Tweet": "https://twitter.com/RichDecibels/status/1553673739795054592"
             },
             "image_path": "images/twitter_playlist.png",
@@ -92,7 +91,7 @@
                 "Github": "https://github.com/alecsharpie/conv_rgb"
             },
             "image_path": "images/all_rgb_colours.png",
-            "image_alt": "an image generated with an AI image gen model, the prompt was 'a generation of all rgb colors, computer graphics, image'",
+            "image_alt": "an image generated with an AI model, 'a generation of all rgb colors, computer graphics, image'",
             "tags": [
                 "Code"
             ]
