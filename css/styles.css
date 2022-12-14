@@ -215,7 +215,7 @@ nav .nav-bar .nav-bar_item a:after {
     border-color: #79bac1;
 }
 
-.project-row-l {
+.project-row-left {
     min-height: 200px;
     display: flex;
     flex-direction: row;
@@ -225,7 +225,7 @@ nav .nav-bar .nav-bar_item a:after {
 }
 
 @media screen and (max-width:480px) {
-    .project-row-l {
+    .project-row-left {
         min-height: 200px;
         display: flex;
         flex-direction: column;
@@ -235,7 +235,7 @@ nav .nav-bar .nav-bar_item a:after {
     }
 }
 
-.project-row-r {
+.project-row-right {
     min-height: 200px;
     display: flex;
     flex-direction: row-reverse;
@@ -245,7 +245,7 @@ nav .nav-bar .nav-bar_item a:after {
 }
 
 @media screen and (max-width:480px) {
-    .project-row-r {
+    .project-row-right {
         min-height: 200px;
         display: flex;
         flex-direction: column-reverse;
