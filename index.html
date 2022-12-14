@@ -13,14 +13,157 @@
     <!-- <script src="https://code.iconify.design/iconify-icon/1.0.2/iconify-icon.min.js"></script> -->
     <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        // Retrieve the contents of the JSON file
+        fetch('projects.json')
+            .then(response => response.json()) // Parse the JSON data
+            .then(data => {
+                    // Use the data in your JavaScript code
+                    console.log(data['projects']);
+
+                    // Get an array of the keys in the JSON object
+                    // const keys = Object.keys(data);
+
+                    // Loop through the keys in the JSON object
+                    data['projects'].forEach((project, index) => {
+
+                        // Create a new div element
+                        var row = document.createElement('div');
+
+                        if (index % 2 == 0) {
+                            row.className = "project-row-l"
+                        } else {
+                            row.className = "project-row-r"
+                        }
+
+
+                        // IMAGE
+
+                        var flexbox_img = document.createElement('div');
+                        flexbox_img.className = "flex-block";
+
+                        var project_img = document.createElement('img');
+                        project_img.className = "project-image";
+                        project_img.src = project['image_path'];
+                        project_img.alt = project['image_alt'];
+
+                        flexbox_img.appendChild(project_img)
+
+                        row.appendChild(flexbox_img)
+
+
+                        // TEXT
+
+                        var flexbox_text = document.createElement('div');
+                        flexbox_text.className = "flex-block";
+
+
+                        // Title
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<span class="project-title">${project['title']}</span>`;
+
+                        flexbox_text.append(flex_item)
+
+                        // Date
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        var date_block = document.createElement('div');
+                        date_block.className = "info-link";
+
+                        date_block.innerHTML = `
+                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
+                        <span class="seperator"> | </span>
+                        <span>${project['date']}</span>
+                        `;
+
+                        flex_item.append(date_block)
+
+                        flexbox_text.append(flex_item)
+
+
+
+                        // Links
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        for (var key of Object.keys(project['links'])) {
+
+                            var link_block = document.createElement('div');
+                            link_block.className = "info-link";
+
+                            link_block.innerHTML = `
+                            <span class="iconify" data-icon=${data['icons'][key]} data-inline="false"></span>
+                            <span class="seperator"> | </span>
+                            <span>
+                            <a class="project-link" href=${project['links'][key]}>${key}</a>
+                            </span>
+                            `;
+
+                            flex_item.append(link_block)
+
+                        }
+
+
+                        flexbox_text.append(flex_item);
+
+
+                        // Description
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<p class="project-description">${project['description']}`;
+
+                        flexbox_text.append(flex_item)
+
+
+                        // Tags
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `
+                        <span class = "tag edu">Code</span>
+                        <span class = "tag dataset">Dataset</span>
+                        `;
+
+                        flexbox_text.append(flex_item)
+
+
+                        row.append(flexbox_text)
+
+
+                        // Get a reference to the element with the id "project-container"
+                        var container = document.getElementById('project-container');
+
+                        // Append the new div to the container element
+                        container.appendChild(row);
+
+
+                        // Split horizontal line
+
+                        var flex_item = document.createElement('div');
+                        flex_item.className = "flex-item";
+
+                        flex_item.innerHTML = `<hr class="projects-split"/>`;
+
+
+                        container.appendChild(flex_item);
+
+                    });
+                }
+
+            );
+    </script>
 </head>
 
 <body>
-
-    <!-- <script>
-      /* https://www.youtube.com/watch?v=C3dfjyft_m4 */
-      fetch('data.json')
-    </script> -->
 
     <nav>
         <ul class="nav-bar">
@@ -75,588 +218,57 @@
     </div>
     <p class="section-title">My Projects</p>
     <hr class="section-split" />
+
     <div class="middle-container">
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">This Website Does Not Exist - AI Web Developer</span>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Dec 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="carbon:machine-learning-model"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://huggingface.co/alecsharpie">Models</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/thiswebsitedoesnotexist">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it
-                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate "full websites".</p>
-                </p>
-                <div class="flex-item">
-                    <span class="tag edu">Code</span>
-                    <span class="tag experiment">Experiment</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/codegen_screenshot.png" alt="a screenshot of css code generated by an LLM">
-            </div>
+        <div class="project-container" id="project-container">
         </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/nomo_nailbiting.png" alt="The weights and biases learning curve, nail biting dataset samples">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Nail Biting - Detection & Alert</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Nov 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/nomo_nailbiting">Github</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://huggingface.co/datasets/alecsharpie/nailbiting_classification">Dataset</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description"> Take a photo with the webcam every 2 seconds, send a notification if nail biting is detected in the image. Powered by a CNN. The preprocessed dataset is available on huggingface.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag edu">Code</span>
-                    <span class="tag dataset">Dataset</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">Latent Space Museum</span>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Sep 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://www.latentspacemuseum.com">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/latent_space_game">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">A place to explore text-to-image art generations. Synthesised Images arranged by CLIP or Colour into a 2D world. HTML5 game served with FastAPI in a docker container.
-                </p>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/lsm_screenshot.png" alt="A screenshot from the game play of the latent space museum">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/leader_bias_visual.png" alt="a graph comparing the presence of gender in image gen models">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Bias in Image generation models</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Aug 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-book-content" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.notion.site/Gender-Bias-TTI-models-e2893a3e17ad41809113ba72925b8cfa">Article</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description"> Comparing gender bias in recent text to image models. Creating a dataset across Midjourney, Stable diffusion, Dalle2, Craiyon & Google images
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag experiment">Experiment</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">Pysimulacra - python wrapper for SAC AI art Dataset</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Aug 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/pysimulacra">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">Built to help make Image Generation data more accessible. SQL -> pandas wrapper.
-                </p>
-                <div class="flex-item">
-                    <span class="tag edu">Code</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/pysimulacra_erd.png" alt="SAC dataset Relations diagram">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/twitter_playlist.png" alt="tweet screenshot saying good tunes">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Collaborative Playlist</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Aug 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://docs.google.com/spreadsheets/d/1_YDOV9iPE4gIu1OBkExq4Tf4zP7cfSJVG7y9K70G-pg/edit#gid=1766961698">Dataset</a>
-        </span>
-                    </div>
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="fluent:megaphone-loud-24-regular" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://www.youtube.com/watch?v=ZychufQciUY&list=TLGGE-G7ad6M_MowMTA4MjAyMg">Playlist</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="akar-icons:twitter-fill" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span><a href="https://twitter.com/RichDecibels/status/1553673739795054592">Tweet</a></span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <p class="project-description"> A twitter post called for music recommendations, they were good tunes so I scraped the thread for links, this playlist is the result
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag dataset">Dataset</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">ConvRGB - Colour Feature extraction tool</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Jun 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/conv_rgb">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">Python package with a convolutional model & palette algorithm to extract RGB features from given image/s.
-                </p>
-                <div class="flex-item">
-                    <span class="tag edu">Code</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/all_rgb_colours.png" alt="a generation of all rgb colors, computer graphics, image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/drumkit_wiring.png" alt="a close up of some wires in a breadboard for a raspberry pi">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Homemade Electric Drumkit</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>May 2022</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-book-content"></span> <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.notion.site/Homemade-Electric-Drumkit-243394c94e3c4f05a7cc9a64f0ad8cb0">Article</a>
-        </span>
-                    </div>
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/pi_drumkit">Github</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description"> Experimenting with an electric drum using a raspberry pi and accelerometers.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag experiment">Experiment</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">WakeTimes - Simple Timezone Matching</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Nov 2021</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://www.waketimes.info">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/wakematch">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">Built to help people across different timezones organise their communication schedule.
-                </p>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/waketimes_overlap_image.png" alt="waketimes-graph-image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/auckland_prison.png" alt="prison-satellite-image">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">NZ Prisons Analysis & Directory</span>
-                <span class="seperator"></span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Sep 2021 - Oct 2021</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span><a href="https://share.streamlit.io/alecsharpie/nz-prisons/main/app.py">Web app</a></span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://storage.googleapis.com/dataset-sharing/data/prisons_info.csv">Dataset</a>
-        </span>
-                    </div>
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/nz-prisons">Github</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description"> A data driven, dynamic directory of New Zealand's prisons, and a visualization and analysis of Dept Corrections and Justice data.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                    <span class="tag dataset">Dataset</span>
-                </div>
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">Explore Melbourne's Foot Traffic</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Sept 2020 - Nov 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.shinyapps.io/where_to_walk/">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/where_to_walk">Github</a>
-        </span>
-                    </div>
-                </div>
-                <p class="project-description">An R Shiny Web app built to help people understand how the time of the day, the day of the week, and the Covid-19 Lockdown influence the number of pedestrians throughout the City of Melbourne, Australia.
-                </p>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-
-            <div class="flex-block">
-                <img class="right-img" src="images/where_to_walk.png" alt="where-to-walk-image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-l">
-            <div class="flex-block">
-                <img class="left-img" src="images/black_owned_la_map.png" alt="where-to-walk-image">
-            </div>
-            <div class="flex-block">
-                <span class="project-title">Support Black Owned Restaurants in LA</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>Jun 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://alecsharpie.shinyapps.io/blackownedla/">Web app</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://github.com/alecsharpie/shiny-blm">Github</a>
-        </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description">
-                            An interactive map to help people on instagram find and support black owned restaurants in Los Angeles.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag webapp">Web App</span>
-                </div>
-            </div>
-
-        </div>
-        <hr class="projects-split" />
-        <div class="project-row-r">
-            <div class="flex-block">
-                <span class="project-title">Companion Planting Dataset</span>
-                <div class="flex-item">
-
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>May 2020</span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="info-link">
-                        <span class="iconify" data-icon="bx:bx-data" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-          <a class="project-link" href="https://storage.googleapis.com/dataset-sharing/data/companion_plants.json">Dataset</a>
-        </span>
-                    </div>
-                    <div class="info-link">
-                        <span class="info-link">
-      <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
-                        <span class="seperator"> | </span>
-                        <span>
-        <a class="project-link" href="https://github.com/alecsharpie/companion_planting_dataset">Github</a>
-      </span>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div>
-                        <p class="project-description">
-                            A data set containing info about the relationships between plants to help with companion planting. Scraped from Wikipedia, cleaned to only include relationships with references.
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <span class="tag dataset">Dataset</span>
-                </div>
-            </div>
-            <div class="flex-block">
-                <img class="right-img" src="images/companion_data.png" alt="comapnion-dataset-image">
-            </div>
-        </div>
-        <hr class="projects-split" />
-    </div>
     </div>
     <p class="section-title">Other People's Cool Stuff</p>
     <hr class="section-split" />
     <div class="middle-container">
-        <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bx:bx-video-recording" data-inline="false"></span>
+        <div class="links-cool-stuff ">
+            <span class="iconify" data-icon="bx:bx-video-recording " data-inline="false "></span>
             <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://happenfilms.com/fools-and-dreamers">Man spends 30 years turning degraded land into massive forest in NZ. (Documentary)</a>
+            <a class="about-actual-link" href="https://happenfilms.com/fools-and-dreamers ">Man spends 30 years turning degraded land into massive forest in NZ. (Documentary)</a>
+        </div>
+        <div class="links-cool-stuff ">
+            <span class="iconify" data-icon="bi:globe " data-inline="false "></span>
+            <span class="seperator"> | </span>
+            <a class="about-actual-link " href="https://earth.nullschool.net/ ">A visualization of global weather, ocean, & aurora conditions. Forecast by supercomputers. (Website)</a>
         </div>
         <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
+            <span class="iconify" data-icon="bi:globe " data-inline="false "></span>
             <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://earth.nullschool.net/">A visualization of global weather, ocean, & aurora conditions. Forecast by supercomputers. (Website)</a>
+            <a class="about-actual-link " href="https://www.photopea.com/ ">A free photoshop alternative that runs in your web browser. The creator is super responsive to questions. (Website)</a>
+        </div>
+        <div class="links-cool-stuff ">
+            <span class="iconify" data-icon="bi:people-fill " data-inline="false "></span>
+            <span class="seperator"> | </span>
+            <a class="about-actual-link" href="https://work-with-nature.com/en/b ">Work With Nature: A Dutch foundation that focuses on increasing biodiversity in Costa Rica. (Organisation)</a>
         </div>
         <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bi:globe" data-inline="false"></span>
+            <span class="iconify" data-icon="bi:people-fill " data-inline="false "></span>
             <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://www.photopea.com/">A free photoshop alternative that runs in your web browser. The creator is super responsive to questions. (Website)</a>
+            <a class="about-actual-link " href="https://www.onepercentcollective.org/ ">One Percent Collective: A NZ based "meta " charity making it easy to donate 1% of your income to worthy causes. (Organisation)</a>
         </div>
         <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bi:people-fill" data-inline="false"></span>
-            <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://work-with-nature.com/en/b">Work With Nature: A Dutch foundation that focuses on increasing biodiversity in Costa Rica. (Organisation)</a>
+            <span class="iconify " data-icon="bx:bx-book-content " data-inline="false "></span>
+            <span class="seperator "> | </span>
+            <a class="about-actual-link " href="https://www.security.org/resources/data-tech-companies-have/ ">An overview of the data big tech companies have about you. (Article)</a>
         </div>
         <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bi:people-fill" data-inline="false"></span>
-            <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://www.onepercentcollective.org/">One Percent Collective: A NZ based "meta" charity making it easy to donate 1% of your income to worthy causes. (Organisation)</a>
-        </div>
-        <div class="links-cool-stuff">
-            <span class="iconify" data-icon="bx:bx-book-content" data-inline="false"></span>
-            <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://www.security.org/resources/data-tech-companies-have/">An overview of the data big tech companies have about you. (Article)</a>
-        </div>
-        <div class="links-cool-stuff">
-            <span class="iconify" data-icon="fluent:megaphone-loud-24-regular" data-inline="false"></span>
-            <span class="seperator"> | </span>
-            <a class="about-actual-link" href="https://www.3blue1brown.com/">Math concepts explained beautifully and engagingly using programmatic animation. (Science Communicator)</a>
+            <span class="iconify " data-icon="fluent:megaphone-loud-24-regular " data-inline="false "></span>
+            <span class="seperator "> | </span>
+            <a class="about-actual-link " href="https://www.3blue1brown.com/ ">Math concepts explained beautifully and engagingly using programmatic animation. (Science Communicator)</a>
         </div>
     </div>
     <hr>
     <div class="bottom-container">
         <p>© 2022 Alec Sharp.</p>
-        <!-- <a class="reference-links" href='https://pngtree.com/so/food'>food png from pngtree.com</a> -->
     </div>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1LKLHJKVR6"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1LKLHJKVR6 "></script>
     <script>
         window.dataLayer = window.dataLayer || [];
 
