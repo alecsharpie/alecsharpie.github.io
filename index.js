@@ -89,9 +89,7 @@ fetch('projects.json')
                     link_block.innerHTML = `
                       <span class="iconify" data-icon=${data['icons'][key]} data-inline="false"></span>
                       <span class="seperator"> | </span>
-                      <span>
-                      <a class="project-links" href=${project['links'][key]}>${key}</a>
-                      </span>
+                      <a class="link" href=${project['links'][key]}>${key}</a>
                       `;
 
                     flex_item.append(link_block)

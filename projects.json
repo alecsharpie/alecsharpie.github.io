@@ -92,7 +92,7 @@
                 "Github": "https://github.com/alecsharpie/conv_rgb"
             },
             "image_path": "images/all_rgb_colours.png",
-            "image_alt": "a generation of all rgb colors, computer graphics, image",
+            "image_alt": "an image generated with an AI image gen model, the prompt was 'a generation of all rgb colors, computer graphics, image'",
             "tags": [
                 "Code"
             ]
@@ -120,7 +120,7 @@
                 "Github": "https://github.com/alecsharpie/wakematch"
             },
             "image_path": "images/waketimes_overlap_image.png",
-            "image_alt": "waketimes-graph-image",
+            "image_alt": "a screenshot from the waketimes tool, showing the overlap multiple timezones",
             "tags": [
                 "Web App"
             ]
@@ -135,7 +135,7 @@
                 "Github": "https://github.com/alecsharpie/nz-prisons"
             },
             "image_path": "images/auckland_prison.png",
-            "image_alt": "prison-satellite-image",
+            "image_alt": "a zoomed in satellite image of part of Auckland Prison",
             "tags": [
                 "Web App",
                 "Dataset"
@@ -150,7 +150,7 @@
                 "Github": "https://github.com/alecsharpie/where_to_walk"
             },
             "image_path": "images/where_to_walk.png",
-            "image_alt": "where-to-walk-image",
+            "image_alt": "a screenshot of a map showing the locations of pedestrian traffic in Melbourne",
             "tags": [
                 "Web App"
             ]
@@ -164,7 +164,7 @@
                 "Github": "https://github.com/alecsharpie/shiny-blm"
             },
             "image_path": "images/black_owned_la_map.png",
-            "image_alt": "restaurant map screenshot",
+            "image_alt": "a screenshot of a map showing the locations of restaurants in Los Angeles",
             "tags": [
                 "Web App"
             ]
@@ -178,7 +178,7 @@
                 "Github": "https://github.com/alecsharpie/companion_planting_dataset"
             },
             "image_path": "images/companion_data.png",
-            "image_alt": "comapnion-dataset-image",
+            "image_alt": "an black and white vector illustration of different fruit and vegetables",
             "tags": [
                 "Dataset"
             ]
