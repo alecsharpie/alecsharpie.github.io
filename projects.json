@@ -199,7 +199,7 @@
         {
             "title": "Git Collaborative Workflows Cheatsheet",
             "date": "Sep 2021",
-            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it\n                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate \"full websites\".",
+            "description": "A few key git workflows to help beginner-intermediate coders learn to work as a team.",
             "links": {
                 "Article": "https://www.notion.so/alecsharpie/Git-Cheatcodes-be310d6314234c289449b59dc482ac00"
             },
@@ -225,7 +225,7 @@
         {
             "title": "School School - Educational Website",
             "date": "2019 - 2020",
-            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it\n                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate \"full websites\".",
+            "description": "School School is designed to help R users expand their data visualisation toolbox. Every graph on this site includes the real world data and easy to understand R code you need to create it yourself.",
             "links": {
                 "Down for maintenance": "http://www.alecsharpie.me/educational-resources.html"
             },
