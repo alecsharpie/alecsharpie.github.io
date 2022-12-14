@@ -1,43 +1,151 @@
-var request = new XMLHttpRequest();
+function square(number) {
+    return number * number;
+}
 
-request.open('GET', 'localhost:8000/projects.json', true);
-console.log(request);
-request.onload = function() {
-    if (request.status >= 200 && request.status < 400) {
-        // Success!
-        var data = JSON.parse(request.responseText);
-        console.log(data);
-        for (var key in data) {
-            // if (data.hasOwnProperty(key)) {
-            //     var value = data[key];
-            //     var container = document.getElementById('container');
-            //     container.innerHTML += '<p>' + key + ': ' + value + '</p>';
-            // }
 
-            // Create a new div element
-            var div = document.createElement('div');
+// Retrieve the contents of the JSON file
+fetch('projects.json')
+    .then(response => response.json()) // Parse the JSON data
+    .then(data => {
+            // Use the data in your JavaScript code
+            console.log(data['projects']);
 
-            // Set the inner HTML of the div to some content
-            div.innerHTML = '<p>This is my new div element with content!</p>';
+            // Get an array of the keys in the JSON object
+            // const keys = Object.keys(data);
 
-            // Get a reference to the element with the id "project-container"
-            var container = document.getElementById('project-container');
+            // Loop through the keys in the JSON object
+            data['projects'].forEach((project, index) => {
 
-            // Append the new div to the container element
-            container.appendChild(div);
+                // Create a new div element
+                var row = document.createElement('div');
 
+                if (index % 2 == 0) {
+                    row.className = "project-row-l"
+                } else {
+                    row.className = "project-row-r"
+                }
+
+
+                // IMAGE
+
+                var flexbox_img = document.createElement('div');
+                flexbox_img.className = "flex-block";
+
+                var project_img = document.createElement('img');
+                project_img.className = "project-image";
+                project_img.src = project['image_path'];
+                project_img.alt = project['image_alt'];
+
+                flexbox_img.appendChild(project_img)
+
+                row.appendChild(flexbox_img)
+
+
+                // TEXT
+
+                var flexbox_text = document.createElement('div');
+                flexbox_text.className = "flex-block";
+
+
+                // Title
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                flex_item.innerHTML = `<h2 class="project-title">${project['title']}</h2>`;
+
+                flexbox_text.append(flex_item)
+
+                // Date
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                var date_block = document.createElement('div');
+                date_block.className = "info-link";
+
+                date_block.innerHTML = `
+                  <span class="iconify" data-icon="bi:calendar-week" data-inline="false"></span>
+                  <span class="seperator"> | </span>
+                  <span>${project['date']}</span>
+                  `;
+
+                flex_item.append(date_block)
+
+                flexbox_text.append(flex_item)
+
+
+
+                // Links
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                for (var key of Object.keys(project['links'])) {
+
+                    var link_block = document.createElement('div');
+                    link_block.className = "info-link";
+
+                    link_block.innerHTML = `
+                      <span class="iconify" data-icon=${data['icons'][key]} data-inline="false"></span>
+                      <span class="seperator"> | </span>
+                      <span>
+                      <a class="project-links" href=${project['links'][key]}>${key}</a>
+                      </span>
+                      `;
+
+                    flex_item.append(link_block)
+
+                }
+
+
+                flexbox_text.append(flex_item);
+
+
+                // Description
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                flex_item.innerHTML = `<p class="project-description">${project['description']}`;
+
+                flexbox_text.append(flex_item)
+
+
+                // Tags
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                flex_item.innerHTML = `
+                  <span class = "tag edu">Code</span>
+                  <span class = "tag dataset">Dataset</span>
+                  `;
+
+                flexbox_text.append(flex_item)
+
+
+                row.append(flexbox_text)
+
+
+                // Get a reference to the element with the id "project-container"
+                var container = document.getElementById('project-container');
+
+                // Append the new div to the container element
+                container.appendChild(row);
+
+
+                // Split horizontal line
+
+                var flex_item = document.createElement('div');
+                flex_item.className = "flex-item";
+
+                flex_item.innerHTML = `<hr class="projects-split"/>`;
+
+
+                container.appendChild(flex_item);
+
+            });
         }
 
-    } else {
-        // We reached our target server, but it returned an error
-    }
-
-};
-
-request.onerror = function() {
-    // There was a connection error of some sort
-};
-
-
-
-console.log('hello world');
+    );

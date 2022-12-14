@@ -148,6 +148,27 @@ color scheme 2 - in use!
     width: 300px;
 }
 
+
+/* nav .nav-bar .nav-bar_item a {
+    position: relative;
+    padding-bottom: 5px;
+    text-decoration: none;
+    color: #204051;
+    font-size: 1.2em;
+    text-transform: uppercase;
+}
+
+nav .nav-bar .nav-bar_item a:after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #204051;
+    transition: 0.1s ease-in-out;
+} */
+
 .logo-img {
     width: 100px;
 }
@@ -461,4 +482,9 @@ nav .nav-bar .nav-bar_item a:after {
 
 nav .nav-bar .nav-bar_item a:hover:after {
     width: 100%;
+}
+
+.link {
+    color: #204051;
+    text-decoration: none;
 }
