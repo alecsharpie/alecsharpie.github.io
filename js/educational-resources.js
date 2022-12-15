@@ -2,17 +2,15 @@ import { writeProjectRow } from './project-writer.js';
 
 
 // Retrieve the contents of the JSON file
-fetch('projects.json')
-    .then(response => response.json()) // Parse the JSON data
+fetch('data/projects.json')
+    .then(response => response.json())
     .then(data => {
 
             // Get a reference to the element with the id "project-container"
             var container = document.getElementById('project-container');
 
-
             // Loop through the keys in the JSON object
-            data['projects'].forEach((project, index) => {
-
+            data['educational'].forEach((project, index) => {
 
                 if (index % 2 == 0) {
                     var side = "left"
@@ -29,7 +27,6 @@ fetch('projects.json')
                 flex_item.className = "flex-item";
 
                 flex_item.innerHTML = `<hr class="projects-split"/>`;
-
 
                 container.appendChild(flex_item);
 
