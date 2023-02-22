@@ -2,7 +2,7 @@
     "projects": [{
             "title": "This Website Does Not Exist - AI Web Developer",
             "date": "Dec 2022",
-            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages, so wanted to fine-tune it\n                    to focus on a specific language. Combining fine-tuned HTML and CSS models allows us to generate \"full websites\".",
+            "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages. My idea was combining 2 models, fine-tuned on HTML and CSS respectively, to generate \"full websites\". However, this model is still too small to generate reliable/helpful code.",
             "links": {
                 "Models": "https://huggingface.co/alecsharpie",
                 "Github": "https://github.com/alecsharpie/thiswebsitedoesnotexist"
