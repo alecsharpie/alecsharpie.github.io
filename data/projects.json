@@ -1,5 +1,20 @@
 {
     "projects": [{
+            "title": "Generated Generative Art",
+            "date": "Apr 2023",
+            "description": "New artwork generated daily, inspired by quotes. GPT writes the code to create generative art using Javascript on a canvas. An experiment in reliably generating code.",
+            "links": {
+                "Web app": "https://www.alecsharpie.me/artfx/",
+                "Github": "https://github.com/alecsharpie/artfx"
+            },
+            "image_path": "quote_canvas.png",
+            "image_alt": "some procedurally generated colourful circles",
+            "tags": [
+                "Code",
+                "Web App"
+            ]
+        },
+        {
             "title": "This Website Does Not Exist - AI Web Developer",
             "date": "Dec 2022",
             "description": "CodeGen are pre-trained, open source, code generation models of various sizes (up to 16.1B parameters). I found that the fastest & smallest multi-language model would get confused between programming languages. My idea was combining 2 models, fine-tuned on HTML and CSS respectively, to generate \"full websites\". However, this model is still too small to generate reliable/helpful code.",
