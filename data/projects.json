@@ -5,7 +5,8 @@
             "description": "How much code can you write in one evening, in a framework you don't know super well, with the help of GPT4? This much.",
             "links": {
                 "Web app": "https://www.alecsharpie.me/password-explorer/",
-                "Github": "https://github.com/alecsharpie/password-explorer"
+                "Github": "https://github.com/alecsharpie/password-explorer",
+                "GPT Chat History": "https://chat.openai.com/share/73930224-c433-41ad-838a-f549342cc47d"
             },
             "image_path": "password_explorer_logo.png",
             "image_alt": "5 shields in a circle, blue with an orange tick",
@@ -271,6 +272,7 @@
         "Web app": "bi:globe",
         "Article": "bx:bx-book-content",
         "Playlist": "fluent:megaphone-loud-24-regular",
-        "Tweet": "akar-icons:twitter-fill"
+        "Tweet": "akar-icons:twitter-fill",
+        "GPT Chat History": "tabler:message-chatbot"
     }
 }
