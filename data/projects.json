@@ -1,5 +1,20 @@
 {
     "projects": [{
+            "title": "Pretty Fluid",
+            "date": "Oct 2023",
+            "description": "A fun and simple experiment. Use GLSL to render a simple fluid on a GPU and have these shaders react to mouse input in a browser. Also was a good way to properly explore the Cursor IDE",
+            "links": {
+                "Web app": "https: //www.alecsharpie.me/fluid/",
+                "Github": "https://github.com/alecsharpie/fluid"
+            },
+            "image_path": "fluid_sim_screenshot.png",
+            "image_alt": "a screenshot of a yellow and orange fluid simulation",
+            "tags": [
+                "Web App",
+                "Experiment"
+            ]
+        },
+        {
             "title": "GPT4 and an evening",
             "date": "Oct 2023",
             "description": "How much code can you write in one evening, in a framework you don't know super well, with the help of GPT4? This much.",
