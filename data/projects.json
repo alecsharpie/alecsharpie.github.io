@@ -1,5 +1,19 @@
 {
     "projects": [{
+            "title": "GPT4 and an evening",
+            "date": "Oct 2023",
+            "description": "How much code can you write in one evening, in a framework you don't know super well, with the help of GPT4? This much.",
+            "links": {
+                "Web app": "https://www.alecsharpie.me/password-explorer/",
+                "Github": "https://github.com/alecsharpie/password-explorer"
+            },
+            "image_path": "password_explorer_logo.png",
+            "image_alt": "5 shields in a circle, blue with an orange tick",
+            "tags": [
+                "Web App", "Experiment"
+            ]
+        },
+        {
             "title": "Generated Generative Art",
             "date": "Apr 2023",
             "description": "New artwork generated daily, inspired by quotes. GPT writes the code to create generative art using Javascript on a canvas. An experiment in reliably generating code.",
@@ -259,5 +273,4 @@
         "Playlist": "fluent:megaphone-loud-24-regular",
         "Tweet": "akar-icons:twitter-fill"
     }
-
 }
