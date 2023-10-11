@@ -4,7 +4,7 @@
             "date": "Oct 2023",
             "description": "A fun and simple experiment. Use GLSL to render a simple fluid on a GPU and have these shaders react to mouse input in a browser. Also was a good way to properly explore the Cursor IDE",
             "links": {
-                "Web app": "https: //www.alecsharpie.me/fluid/",
+                "Web app": "https://www.alecsharpie.me/fluid/",
                 "Github": "https://github.com/alecsharpie/fluid"
             },
             "image_path": "fluid_sim_screenshot.png",
