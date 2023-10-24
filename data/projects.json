@@ -2,7 +2,7 @@
     "projects": [{
             "title": "Do Nothing Forest",
             "date": "Oct 2023",
-            "description": "Getting good at React. Generative, interactive, stochastic, canvas based forest. 100% client side web app.",
+            "description": "Getting good at React. Generative, interactive, stochastic, canvas based forest. 100% client side.",
             "links": {
                 "Web app": "https://www.alecsharpie.me/garden/",
                 "Github": "https://github.com/alecsharpie/garden"
