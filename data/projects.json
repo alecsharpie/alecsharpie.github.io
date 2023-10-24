@@ -1,5 +1,20 @@
 {
     "projects": [{
+            "title": "Do Nothing Forest",
+            "date": "Oct 2023",
+            "description": "Getting good at React. Generative, interactive, stochastic, canvas based forest. 100% client side web app.",
+            "links": {
+                "Web app": "https://www.alecsharpie.me/garden/",
+                "Github": "https://github.com/alecsharpie/garden"
+            },
+            "image_path": "do_nothing_forest_screenshot.png",
+            "image_alt": "a circle image, screenshot of a partially grown forest, blue sky above",
+            "tags": [
+                "Web App",
+                "Experiment"
+            ]
+        },
+        {
             "title": "Pretty Fluid",
             "date": "Oct 2023",
             "description": "A fun and simple experiment. Use GLSL to render a simple fluid on a GPU and have these shaders react to mouse input in a browser. Also was a good way to properly explore the Cursor IDE",
@@ -26,7 +41,8 @@
             "image_path": "password_explorer_logo.png",
             "image_alt": "5 shields in a circle, blue with an orange tick",
             "tags": [
-                "Web App", "Experiment"
+                "Web App",
+                "Experiment"
             ]
         },
         {
