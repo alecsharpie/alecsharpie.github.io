@@ -1,5 +1,19 @@
 {
     "projects": [{
+            "title": "Fun",
+            "date": "Jun 2024",
+            "description": "Fun little animation website, 100% client side.",
+            "links": {
+                "Web app": "https://www.alecsharpie.me/fun/",
+                "Github": "https://github.com/alecsharpie/fun"
+            },
+            "image_path": "fun_screenshot.png",
+            "image_alt": "a circle image, screenshot of lots of random shapes: hearts, rectangles, cross, white background",
+            "tags": [
+                "Web App",
+                "Experiment"
+            ]
+        }, {
             "title": "Do Nothing Forest",
             "date": "Oct 2023",
             "description": "Getting good at React. Generative, interactive, stochastic, canvas based forest. 100% client side.",
