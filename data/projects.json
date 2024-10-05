@@ -258,6 +258,18 @@
         }
     ],
     "educational": [{
+            "title": "How to set up a MacBook for Data Science & Engineering",
+            "date": "Oct 2024",
+            "description": "These are all the things I do when I get a new computer. I like to think some of it is generally helpful, but some may be specific to my role as a Data Engineer.",
+            "links": {
+                "Article": "https://alecsharpie.notion.site/How-to-set-up-a-Mac-0a12bcc396d541668146b96983120caa?pvs=4"
+            },
+            "image_path": "mac_emjoi.png",
+            "image_alt": "the open laptop emoji on a blue and black background",
+            "tags": [
+                "Article"
+            ]
+        },{
             "title": "Batch Size & Learning Rate's effect on gradient descent visualised with learning curves",
             "date": "Nov 2021",
             "description": "Expand your understanding of the effect of batch size and learning rate on gradient descent.",
