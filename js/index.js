@@ -1,4 +1,5 @@
 import { writeProjectRow } from './project-writer.js';
+import { loadProjects } from './project-loader.js';
 
 
 // Retrieve the contents of the JSON file
@@ -37,3 +38,8 @@ fetch('data/projects.json')
         }
 
     );
+
+// Load the projects when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    loadProjects('projects');
+});
