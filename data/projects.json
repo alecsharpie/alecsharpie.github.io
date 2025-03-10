@@ -1,5 +1,44 @@
 {
     "projects": [{
+            "title": "Graphing Bike Polo Tournament Results",
+            "date": "Nov 2024",
+            "description": "The Quing of the south is a 24 hour bike polo tournament hosted in Melbourne, I thought it'd be fun and interesting to visualise the timeline and results.",
+            "links": {
+                "Github": "https://github.com/alecsharpie/quing_of_the_south"
+            },
+            "image_path": "quing_of_the_south_2024_results.png",
+            "image_alt": "a circle image, screenshot of a cropped graph showing the timeline and results of the tournament",
+            "tags": [
+                "Code",
+                "Experiment"
+            ]
+        }, {
+            "title": "Personal Finance Tool",
+            "date": "Oct 2024",
+            "description": "Never thought I'd build one of these, must be my granddad's accounting genes haha. I switched banks so wanted to consolidate my data. This tool uses a small local LLM to parse various unstructured financial data, dump it into a SQL database, and visualise it on a FastHTML dashboard. WIP",
+            "links": {
+                "Github": "https://github.com/alecsharpie/finance"
+            },
+            "image_path": "personal_finance_tool.png",
+            "image_alt": "a circle image, screenshot of code editor showing a k-shot data parsing prompt for a local LLM",
+            "tags": [
+                "Code",
+                "Web App"
+            ]
+        }, {
+            "title": "ETF Analysis",
+            "date": "Aug 2024",
+            "description": "I don't know anything about finance. This is a simple ETF analysis tool that assumes the price will revert to the mean, based on linear regression. Good chance to try out the new FastHTML web framework.",
+            "links": {
+                "Github": "https://github.com/alecsharpie/etf"
+            },
+            "image_path": "etf_analysis.png",
+            "image_alt": "a circle image, screenshot of a graph showing 1 year of VAS data trending upwards",
+            "tags": [
+                "Code",
+                "Web App"
+            ]
+        }, {
             "title": "Fun",
             "date": "Jun 2024",
             "description": "Fun little animation website, 100% client side.",
