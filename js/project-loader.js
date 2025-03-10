@@ -33,7 +33,9 @@ export function loadProjects(projectType) {
             
             // Apply blob effects after projects are loaded
             if (typeof window.applyBlobEffects === 'function') {
-                setTimeout(() => window.applyBlobEffects(), 100);
+                // Apply immediately and then again after a short delay to ensure images are loaded
+                window.applyBlobEffects();
+                setTimeout(() => window.applyBlobEffects(), 300);
             }
         })
         .catch(error => {

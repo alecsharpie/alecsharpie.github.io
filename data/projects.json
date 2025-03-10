@@ -4,7 +4,7 @@
             "date": "Jan 2025",
             "description": "Real-time multi-pose detection using ML, rendered to a 2D canvas animation. I was inspired by ACMI's Beings exhibit: 'Move, dance, and play to interact with a vibrant array of larger-than-life digital creatures'. This is a revamp of a project I did a while ago, I wanted to update my personal web dev tech stack (as a Data Engineer I was stuck using create-react-app). I went for React, Vite, Typescript (and Tensorflow.js in this case)",
             "links": {
-                "Web App": "www.alecsharpie.me/dancing-creatures/",
+                "Web app": "www.alecsharpie.me/dancing-creatures/",
                 "Github": "https://github.com/alecsharpie/dancing-creatures"
             },
             "image_path": "dancing_creatures.png",

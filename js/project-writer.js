@@ -9,7 +9,10 @@ export function writeProjectRow(project, side, icon_map) {
         const imageContainer = document.createElement('div');
         imageContainer.className = "project-image-container";
         imageContainer.style.position = "relative";
-        imageContainer.style.overflow = "hidden";
+        imageContainer.style.overflow = "visible";
+        imageContainer.style.width = "150px";
+        imageContainer.style.height = "150px";
+        imageContainer.style.margin = "0 30px";
 
         const projectImg = document.createElement('img');
         projectImg.className = "project-image";
@@ -17,6 +20,9 @@ export function writeProjectRow(project, side, icon_map) {
         projectImg.alt = project.image_alt;
         projectImg.loading = "lazy"; // Add lazy loading for better performance
         projectImg.style.position = "relative";
+        projectImg.style.width = "140px";
+        projectImg.style.height = "140px";
+        projectImg.style.objectFit = "cover";
         projectImg.style.zIndex = "1";
 
         imageContainer.appendChild(projectImg);
