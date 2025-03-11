@@ -110,9 +110,10 @@ function alignContentWithLines(lineHeight) {
                     el.style.transform = '';
                 }
                 
-                // Preserve margins that are intentionally set
+                // Remove the margin setting for project-description
+                // This was adding the unwanted margin
                 if (el.classList.contains('project-description')) {
-                    el.style.marginBottom = 'var(--line-height)';
+                    el.style.marginBottom = '0'; // Set to 0 instead of var(--line-height)
                 }
             });
     });
@@ -214,11 +215,8 @@ function applyPaperEffectToCards() {
 function applySubtleRotation(note) {
     const randomRotation = (Math.random() * 0.4) - 0.2;
     
-    if (note.classList.contains('project-row-left')) {
-        note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
-    } else if (note.classList.contains('project-row-right')) {
-        note.style.transform = `rotate(${0.8 + randomRotation}deg)`;
-    }
+    // Apply the same rotation style regardless of class
+    note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
 }
 
 /**

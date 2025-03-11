@@ -129,7 +129,7 @@ a:hover {
     border: 1px solid #e0e0e0;
     overflow: hidden;
     
-    /* Slight rotation for natural look */
+    /* Consistent rotation for all cards */
     transform: rotate(-0.8deg);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -139,10 +139,11 @@ a:hover {
     justify-content: start;
 }
 
+/* Remove different styling for right-aligned cards */
 .project-row-right {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    transform: rotate(0.8deg); /* Alternate rotation direction */
+    flex-direction: row; /* Change from row-reverse to row */
+    justify-content: start; /* Change from space-between to start */
+    transform: rotate(-0.8deg); /* Use same rotation as left cards */
 }
 
 /* Image styling with blob effect */
@@ -264,7 +265,7 @@ a:hover {
     margin: 0;
     line-height: var(--line-height);
     position: relative;
-    margin-bottom: var(--line-height); /* Add bottom margin of one line height */
+    margin-bottom: 0 !important;
 }
 
 /* Tags - consistent styling */
@@ -770,14 +771,10 @@ hr.section-split, hr.projects-split {
   margin-bottom: calc(var(--line-height) - 1px);
 }
 
-/* Adjust hover effect to be more subtle and paper-like */
+/* Adjust hover effect to be consistent */
 .project-row-left:hover, .project-row-right:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Same as non-hover state */
-    transform: rotate(-0.8deg); /* Same as non-hover state */
-}
-
-.project-row-right:hover {
-    transform: rotate(0.8deg); /* Same as non-hover state */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: rotate(-0.8deg); /* Same for both */
 }
 
 /* Paper lines styling - only for project cards */

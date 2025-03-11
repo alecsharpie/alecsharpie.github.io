@@ -44,7 +44,8 @@ export async function initializeProjects(projectType = 'projects') {
 function createProjectCard(project, side, iconMap) {
     // Create a new div element
     const card = document.createElement('div');
-    card.className = `project-row-${side} paper-note`;
+    // Always use left layout regardless of side parameter
+    card.className = `project-row-left paper-note`;
     
     // Add paper lines container
     const paperLinesContainer = document.createElement('div');
@@ -58,7 +59,7 @@ function createProjectCard(project, side, iconMap) {
     addPaperEffects(card);
     
     // Add paper decorations based on project ID
-    addPaperDecorations(card, project, side);
+    addPaperDecorations(card, project, "left"); // Always use "left" for decorations
     
     // Add image (on desktop only)
     if (window.innerWidth > 800) {
@@ -175,6 +176,7 @@ function createProjectContent(project, iconMap) {
     const descriptionElement = document.createElement('p');
     descriptionElement.className = "project-description line-aligned";
     descriptionElement.textContent = project.description;
+    descriptionElement.style.marginBottom = '0';
     contentContainer.appendChild(descriptionElement);
     
     return contentContainer;
