@@ -1,4 +1,4 @@
-import { DataService } from '../services/DataService.js';
+import { DataService } from '../services/dataService.js';
 
 /**
  * Initializes projects section by loading data and rendering project cards
