@@ -12,6 +12,9 @@
     --button-text: #204051;
     --button-hover-bg: #204051;
     --button-hover-text: #f1f3f4;
+    --line-height: 28px; /* Our base grid unit */
+    --half-line: 14px;
+    --quarter-line: 7px;
 }
 
 /* Base styles and resets */
@@ -20,6 +23,11 @@ body {
     text-align: center;
     background-color: var(--primary-bg);
     color: var(--primary-text);
+    position: relative;
+    /* Add subtle paper texture */
+    background-image: 
+        linear-gradient(rgba(241, 243, 244, 0.9) 0%, rgba(241, 243, 244, 0.95) 100%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
 }
 
 h4 {
@@ -62,9 +70,10 @@ a:hover {
     display: block;
     width: 100%;
     height: 189px;
-    background-color: var(--primary-bg);
+    background-color: transparent; /* Changed from primary-bg to transparent */
     position: relative;
     text-align: center;
+    z-index: 1;
 }
 
 .middle-container {
@@ -103,18 +112,26 @@ a:hover {
     size: 20em;
 }
 
-/* Project display */
+/* Project display - improved alignment */
 .project-row-left, .project-row-right {
     min-height: 200px;
     display: flex;
     text-align: left;
     line-height: 1.8;
-    padding: 15px;
-    margin-bottom: 20px;
+    padding: 20px;  /* Increased padding for better spacing */
+    margin-bottom: 30px;
     border-radius: 8px;
-    /* Remove background and shadow for cleaner look */
-    background-color: transparent;
-    box-shadow: none;
+    position: relative;
+    
+    /* Paper note styling */
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    
+    /* Slight rotation for natural look */
+    transform: rotate(-0.8deg);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .project-row-left {
@@ -125,6 +142,7 @@ a:hover {
 .project-row-right {
     flex-direction: row-reverse;
     justify-content: space-between;
+    transform: rotate(0.8deg); /* Alternate rotation direction */
 }
 
 /* Image styling with blob effect */
@@ -145,6 +163,12 @@ a:hover {
     object-fit: cover;
     position: relative;
     z-index: 1;
+    border-radius: 0; /* Remove rounded corners */
+    transition: none;
+    transform: none !important; /* Remove rotation */
+    box-shadow: none; /* Remove shadow */
+    border: none; /* Remove border */
+    opacity: 0.9; /* Slightly faded to blend with paper */
 }
 
 .image-blob {
@@ -167,71 +191,128 @@ a:hover {
     z-index: 0;
 }
 
+/* Project info container - improved spacing */
 .project-info {
     display: block;
     float: left;
     position: relative;
     text-align: left;
     font-size: 0.9em;
-    padding-bottom: 15px;
-    margin-right: 5px;
-    margin-left: 5px;
+    padding: 0 15px var(--line-height) 15px; /* Bottom padding matches line height */
+    margin-right: 0;
+    margin-left: 0;
     flex: 1;
 }
 
+/* Project title - consistent spacing */
 .project-title {
     font-size: 1.6em;
-    margin: 0px 0px 10px 0px;
+    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
     color: var(--dark-accent);
+    padding-top: 0;
+    position: relative;
+    line-height: var(--line-height); /* Match paper lines */
+    min-height: var(--line-height); /* Ensure it takes up at least one line */
 }
 
-.project-description {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    line-height: 1.6;
+/* Date container - align with paper lines */
+.date-container {
+    display: flex;
+    align-items: center;
+    padding: var(--line-height);
+    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    color: var(--dark-accent);
+    font-size: 0.9em;
+    height: var(--line-height); /* Match line height exactly */
+    position: relative;
+    top: 0; /* Reset any previous positioning */
 }
 
+.date-container .iconify {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    width: 18px;
+}
+
+.date-container .seperator {
+    margin: 0 8px;
+    display: flex;
+    align-items: center;
+    height: 18px;
+}
+
+.date-container .date-text {
+    display: flex;
+    align-items: center;
+    height: 18px;
+}
+
+/* Project links - align with paper lines */
 .project-links {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 15px;
+    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    position: relative;
+    min-height: var(--line-height); /* At least one line height */
+    padding-top: 4px; /* Small offset to position nicely on the line */
 }
 
-.info-link-button {
-    background-color: var(--button-bg);
-    border: 1px solid var(--button-border);
-    border-radius: 8px;
-    box-sizing: border-box;
-    color: var(--button-text);
-    padding: 5px 10px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
+/* Project description - align with paper lines */
+.project-description {
+    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    line-height: var(--line-height); /* Match paper lines exactly */
+    position: relative;
+    padding-top: 4px; /* Small offset to position text nicely on the line */
 }
 
-.info-link-button:hover {
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
-    transform: translateY(-2px);
-}
-
-.date-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    color: var(--dark-accent);
-    font-size: 0.9em;
-}
-
+/* Tags - consistent styling */
 .tag-container {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 10px;
+    margin: 0;
+    min-height: var(--line-height); /* Match paper lines */
+    padding-top: 4px; /* Small offset to position nicely on the line */
+}
+
+.tag {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-bg);
+    font-size: 0.85em;
+    padding: 6px 10px; /* Consistent padding */
+    line-height: 1;
+    border-radius: 4px;
+    height: auto;
+}
+
+/* Ensure content appears above the lines with consistent z-index */
+.project-info, 
+.project-image-container,
+.project-title,
+.date-container,
+.project-links,
+.project-description,
+.tag-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Remove transform adjustments that were causing misalignment */
+.project-title,
+.date-container,
+.project-links,
+.project-description,
+.tag-container,
+.links-about-me,
+.links-cool-stuff,
+.text-about-me {
+    transform: none;
 }
 
 /* Navigation */
@@ -291,6 +372,11 @@ nav .nav-bar .nav-bar_item a:hover:after {
     font-family: "Open Sans", sans-serif;
     text-align: center;
     margin-top: 20px;
+    background-color: rgba(241, 243, 244, 0.7); /* Semi-transparent background */
+    display: inline-block;
+    padding: 0 15px;
+    position: relative;
+    z-index: 2;
 }
 
 .section-split {
@@ -316,16 +402,6 @@ nav .nav-bar .nav-bar_item a:hover:after {
 }
 
 /* Tags and buttons */
-.tag {
-    margin: 0px 8px 0px 0px;
-    display: inline-block;
-    color: var(--primary-bg);
-    font-size: 0.85em;
-    padding: 5px 7px;
-    line-height: 1 !important;
-    border-radius: 4px;
-}
-
 .tag.webapp {
     background-color: var(--dark-accent);
 }
@@ -454,4 +530,594 @@ nav .nav-bar .nav-bar_item a:hover:after {
     .density-plot {
         width: 250px;
     }
+}
+
+/* Paper lines styling */
+.paper-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.paper-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(121, 186, 193, 0.2); /* Lighter lines for more realism */
+    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.5); /* Subtle embossed effect */
+}
+
+/* Adjust text elements to work with paper lines */
+.text-about-me, .project-description, .links-cool-stuff p, 
+.links-about-me, .bottom-container p {
+    margin-bottom: 0; /* Let the line height control spacing */
+    padding-top: 4px; /* Small offset to position text nicely on the line */
+}
+
+/* Project title alignment */
+.project-title {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Date container alignment */
+.date-container {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Tag container alignment */
+.tag-container {
+    margin-top: 0;
+    padding-top: 4px;
+}
+
+/* Links alignment */
+.links-about-me {
+    margin-bottom: 0;
+    padding-top: 4px;
+}
+
+/* Cool stuff section alignment */
+.links-cool-stuff {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Bottom container alignment */
+.bottom-container {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Ensure HR elements don't disrupt line alignment */
+hr.section-split, hr.projects-split {
+    margin-top: calc(var(--line-height) - 1px);
+    margin-bottom: calc(var(--line-height) - 1px);
+}
+
+/* Make sure content appears above the lines */
+main, header, footer, .project-container, .middle-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Paper grid system - fundamental to alignment */
+:root {
+  --line-height: 28px; /* Our base grid unit */
+  --half-line: 14px;
+  --quarter-line: 7px;
+}
+
+/* Base alignment classes - refined for better text positioning */
+.line-aligned {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: var(--line-height);
+  line-height: var(--line-height);
+  position: relative;
+  transform: translateY(-4px); /* Move text slightly above the line */
+}
+
+.line-aligned-2x {
+  margin-top: 0;
+  margin-bottom: 0;
+  min-height: calc(var(--line-height) * 2);
+  line-height: var(--line-height);
+  position: relative;
+}
+
+/* Container spacing */
+.line-container {
+  padding-top: var(--line-height);
+  padding-bottom: var(--line-height);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Section spacing */
+.section-spacing {
+  margin-top: var(--line-height);
+  margin-bottom: var(--line-height);
+}
+
+/* Elements that need specific alignment */
+.project-title {
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: calc(var(--line-height) * 1.5);
+  line-height: calc(var(--line-height) * 1.5);
+  transform: translateY(-6px); /* Slightly above the line */
+}
+
+.date-container {
+  margin: 0;
+  padding: 0;
+  height: var(--line-height);
+  line-height: var(--line-height);
+  display: flex;
+  align-items: flex-end; /* Align items to bottom */
+  transform: translateY(-4px); /* Position above the line */
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: var(--line-height);
+  margin: 0;
+  padding: 0;
+  transform: translateY(-4px);
+}
+
+.project-description {
+  margin: 0;
+  padding: 0;
+  line-height: var(--line-height);
+  transform: translateY(-4px);
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  min-height: var(--line-height);
+  transform: translateY(-4px);
+}
+
+.links-about-me, .links-cool-stuff {
+  transform: translateY(-4px);
+}
+
+.text-about-me {
+  transform: translateY(-4px);
+}
+
+/* Adjust individual lines in multi-line text */
+.project-description:not(:first-child), 
+.text-about-me:not(:first-child) {
+  margin-top: var(--line-height);
+}
+
+/* Ensure project rows have aligned heights */
+.project-row-left, .project-row-right {
+  padding: var(--line-height) 20px; /* Top/bottom padding matches line height */
+  margin-bottom: var(--line-height);
+}
+
+/* Keep separators aligned */
+hr.section-split, hr.projects-split {
+  margin-top: calc(var(--line-height) - 1px);
+  margin-bottom: calc(var(--line-height) - 1px);
+}
+
+/* Adjust hover effect to be more subtle and paper-like */
+.project-row-left:hover, .project-row-right:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Same as non-hover state */
+    transform: rotate(-0.8deg); /* Same as non-hover state */
+}
+
+.project-row-right:hover {
+    transform: rotate(0.8deg); /* Same as non-hover state */
+}
+
+/* Paper lines styling - only for project cards */
+.paper-note .paper-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.paper-note .paper-lines::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent calc(var(--line-height) - 1px),
+        rgba(121, 186, 193, 0.15) calc(var(--line-height) - 1px),
+        rgba(121, 186, 193, 0.15) var(--line-height)
+    );
+    z-index: 0;
+}
+
+/* Remove the global paper lines */
+body > .paper-lines {
+    display: none;
+}
+
+/* Add a subtle tape effect to make it look like notes stuck to the page */
+.paper-note::before, .paper-note::after {
+    content: "";
+    position: absolute;
+    width: 45px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    border-radius: 2px;
+    opacity: 0.8;
+    background-image: 
+        linear-gradient(90deg, 
+            rgba(255,255,255,0.3) 0%, 
+            rgba(255,255,255,0.6) 50%, 
+            rgba(255,255,255,0.3) 100%);
+}
+
+.paper-note::before {
+    top: -5px;
+    left: 20px;
+    transform: rotate(-45deg);
+}
+
+.paper-note::after {
+    top: -5px;
+    right: 20px;
+    transform: rotate(45deg);
+}
+
+/* Ensure content appears above the lines */
+.project-info, .project-image-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Fix for info-link-button styling that was accidentally removed */
+.info-link-button {
+    background-color: var(--button-bg);
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: var(--button-text);
+    padding: 5px 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+}
+
+.info-link-button:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    transform: translateY(-2px);
+}
+
+/* Enhanced paper note styling for more realism */
+.paper-note {
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    position: relative;
+    overflow: hidden;
+    
+    /* Enhanced paper texture with subtle grain */
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.7) 50%, rgba(245, 245, 245, 0.7) 50%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+    
+    /* Torn paper edge effect */
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Remove image hover effects that don't look paper-like */
+.project-image:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Create torn paper edge effect at the top */
+.paper-note::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 L10,2 L20,0 L30,3 L40,1 L50,2 L60,0 L70,3 L80,1 L90,2 L100,0 L110,3 L120,1 L130,2 L140,0 L150,3 L160,1 L170,2 L180,0 L190,3 L200,1 L210,2 L220,0 L230,3 L240,1 L250,2 L260,0 L270,3 L280,1 L290,2 L300,0' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='white' transform='scale(1, 0.5)'/%3E%3C/svg%3E");
+    z-index: 3;
+}
+
+/* Add a red vertical line on the left (like a notebook margin) */
+.paper-note::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 28px;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 0, 0, 0.15);
+    z-index: 1;
+}
+
+/* Add notebook holes on the left side */
+.paper-note .notebook-holes {
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.paper-note .hole {
+    width: 6px;
+    height: 12px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced paper lines for more realism */
+.paper-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(121, 186, 193, 0.15); /* Even lighter lines for more realism */
+    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.7); /* Enhanced embossed effect */
+}
+
+/* Remove the tape effect since we're going for a notepad look */
+.paper-note::before, .paper-note::after {
+    content: none;
+}
+
+/* Add subtle shadow at the bottom of the paper */
+.paper-note {
+    position: relative;
+}
+
+.paper-note .bottom-shadow {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 8px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.03) 100%);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index: 1;
+}
+
+/* Remove the page curl effect styles */
+.paper-note .page-curl {
+    display: none; /* Hide the page curl instead of removing the rule completely */
+}
+
+/* Add subtle coffee stain to some cards for extra realism */
+.project-row-left:nth-child(3n) .coffee-stain,
+.project-row-right:nth-child(5n) .coffee-stain {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(139, 69, 19, 0.05) 0%,
+        rgba(139, 69, 19, 0.03) 60%,
+        rgba(139, 69, 19, 0) 100%
+    );
+    bottom: 20px;
+    right: 40px;
+    z-index: 0;
+    opacity: 0.7;
+    transform: rotate(-5deg) scale(1.2, 0.8);
+}
+
+/* Add subtle pencil marks to some cards */
+.project-row-left:nth-child(2n) .pencil-mark,
+.project-row-right:nth-child(4n) .pencil-mark {
+    position: absolute;
+    font-family: 'Caveat', cursive;
+    color: rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    transform: rotate(-5deg);
+    bottom: 10px;
+    left: 40px;
+    z-index: 2;
+}
+
+/* Additional paper effect enhancements */
+
+/* Fold mark styling */
+.fold-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(0,0,0,0.03);
+    z-index: 1;
+}
+
+.project-row-left .fold-mark {
+    left: 30%;
+}
+
+.project-row-right .fold-mark {
+    left: 70%;
+}
+
+/* Enhanced paper texture */
+.paper-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+}
+
+/* Add a subtle red vertical line on the left (like a notebook margin) */
+.paper-note::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 28px;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 0, 0, 0.1);
+    z-index: 1;
+}
+
+/* Enhanced notebook holes styling for realistic ringbinder effect */
+.paper-note .notebook-holes {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px; /* Wider to accommodate torn paper effect */
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    overflow: visible; /* Allow torn bits to overflow */
+}
+
+/* Torn paper effect along the left edge */
+.paper-note .torn-paper-effect {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 1;
+    
+    /* Create jagged edge effect */
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%),
+        url("data:image/svg+xml,%3Csvg width='15' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15,0 L12,20 L14,40 L11,60 L13,80 L10,100 L14,120 L12,140 L15,160 L11,180 L13,200 L10,220 L15,240 L12,260 L14,280 L11,300 L13,320 L10,340 L14,360 L12,380 L15,400 L11,420 L13,440 L10,460 L14,480 L12,500 L15,520 L11,540 L13,560 L10,580 L15,600' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='white'/%3E%3C/svg%3E");
+}
+
+/* Enhanced hole styling */
+.paper-note .hole {
+    width: 8px;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    margin-left: 15px; /* Position holes after torn edge */
+    position: relative;
+    box-shadow: 
+        inset 0 0 3px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(255, 255, 255, 0.7);
+}
+
+/* Hole inner shadow for 3D effect */
+.paper-note .hole-inner-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+}
+
+/* Hole variations for realism */
+.paper-note .hole-torn {
+    border-radius: 40% 50% 50% 40%;
+    transform: rotate(10deg);
+}
+
+.paper-note .hole-stretched {
+    width: 7px;
+    height: 9px;
+    border-radius: 45%;
+    transform: rotate(-15deg);
+}
+
+/* Torn paper bits around holes */
+.paper-note .torn-paper-bit {
+    position: absolute;
+    width: 4px;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 1px;
+    z-index: 0;
+}
+
+/* Red margin line */
+.paper-note .margin-line {
+    position: absolute;
+    top: 0;
+    left: 28px;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 0, 0, 0.15);
+    z-index: 1;
+}
+
+/* Adjust content padding to accommodate the ringbinder holes */
+.paper-note .project-info {
+    padding-left: 35px; /* Increase left padding for the ringbinder holes */
+}
+
+/* Adjust the fold mark position */
+.paper-note .fold-mark {
+    left: 40px; /* Move fold mark past holes */
+}
+
+/* Remove existing red line that might conflict with our new margin line */
+.paper-note::before {
+    content: none;
+}
+
+/* Adjust project image container position */
+.paper-note .project-image-container {
+    margin-left: 40px; /* Move image away from holes */
 }
