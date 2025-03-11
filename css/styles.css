@@ -1030,13 +1030,14 @@ body > .paper-lines {
     top: 0;
     bottom: 0;
     width: 15px;
-    background-color: rgba(255, 255, 255, 0.9);
+    /* Remove the white background */
+    background-color: transparent;
     z-index: 1;
     
-    /* Create jagged edge effect */
+    /* Update the gradient to be more subtle */
     background-image: 
-        linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%),
-        url("data:image/svg+xml,%3Csvg width='15' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15,0 L12,20 L14,40 L11,60 L13,80 L10,100 L14,120 L12,140 L15,160 L11,180 L13,200 L10,220 L15,240 L12,260 L14,280 L11,300 L13,320 L10,340 L14,360 L12,380 L15,400 L11,420 L13,440 L10,460 L14,480 L12,500 L15,520 L11,540 L13,560 L10,580 L15,600' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='white'/%3E%3C/svg%3E");
+        linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%),
+        url("data:image/svg+xml,%3Csvg width='15' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15,0 L12,20 L14,40 L11,60 L13,80 L10,100 L14,120 L12,140 L15,160 L11,180 L13,200 L10,220 L15,240 L12,260 L14,280 L11,300 L13,320 L10,340 L14,360 L12,380 L15,400 L11,420 L13,440 L10,460 L14,480 L12,500 L15,520 L11,540 L13,560 L10,580 L15,600' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='transparent'/%3E%3C/svg%3E");
 }
 
 /* Enhanced hole styling */
@@ -1045,7 +1046,7 @@ body > .paper-lines {
     height: 8px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
-    margin-left: 15px; /* Position holes after torn edge */
+    margin-left: 12px; /* Adjust margin to position holes correctly */
     position: relative;
     box-shadow: 
         inset 0 0 3px rgba(0, 0, 0, 0.4),

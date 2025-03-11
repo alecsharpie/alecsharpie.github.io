@@ -84,6 +84,9 @@ function createProjectCard(project, side, iconMap) {
  * @param {HTMLElement} card - The card element
  */
 function addNotebookHoles(card) {
+    // Check if notebook holes already exist
+    if (card.querySelector('.notebook-holes')) return;
+    
     const notebookHoles = document.createElement('div');
     notebookHoles.className = "notebook-holes";
     

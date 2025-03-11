@@ -204,8 +204,10 @@ function applyPaperEffectToCards() {
         // Add paper texture if needed
         addPaperTexture(linesContainer);
         
-        // Position notebook holes proportionally
-        positionNotebookHoles(note);
+        // Only create notebook holes if they don't already exist
+        if (!note.querySelector('.notebook-holes')) {
+            positionNotebookHoles(note);
+        }
         
         // Ensure images look like part of the paper
         styleProjectImages(note);

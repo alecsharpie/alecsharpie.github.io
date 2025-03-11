@@ -4,12 +4,10 @@ import { initializePaperEffects } from './components/Paper.js';
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Load projects and display them
-    initializeProjects();
-    
-    // Apply paper effects after a short delay to ensure content is rendered
-    setTimeout(() => {
+    initializeProjects().then(() => {
+        // Apply paper effects after projects are loaded
         initializePaperEffects();
-    }, 300);
+    });
 });
 
 // Handle window resize events
