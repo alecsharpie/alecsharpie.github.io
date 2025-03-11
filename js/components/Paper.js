@@ -98,21 +98,23 @@ function createPaperLines(container, count, lineHeight) {
 function alignContentWithLines(lineHeight) {
     // Apply line-aligned class to elements within paper notes
     document.querySelectorAll('.paper-note').forEach(note => {
-        const textElements = [
-            '.project-description',
-            '.project-title',
-            '.date-container',
-            '.project-links',
-            '.tag-container'
-        ];
-        
-        textElements.forEach(selector => {
-            note.querySelectorAll(selector).forEach(el => {
+        // Ensure all content elements are properly aligned
+        note.querySelectorAll('.project-title, .date-container, .project-links, .project-description, .tag-container')
+            .forEach(el => {
                 if (!el.classList.contains('line-aligned')) {
                     el.classList.add('line-aligned');
                 }
+                
+                // Remove any transform that might be causing misalignment
+                if (el.style.transform) {
+                    el.style.transform = '';
+                }
+                
+                // Preserve margins that are intentionally set
+                if (el.classList.contains('project-description')) {
+                    el.style.marginBottom = 'var(--line-height)';
+                }
             });
-        });
     });
     
     // Set up observer to handle dynamically added content
@@ -128,27 +130,18 @@ function setupAlignmentObserver(lineHeight) {
     if (!projectContainer) return;
     
     const observer = new MutationObserver(() => {
-        // Adjust titles
-        document.querySelectorAll('.paper-note .project-title').forEach(el => {
-            adjustElementToLineHeight(el, lineHeight * 1.5);
-        });
-        
-        // Adjust descriptions
-        document.querySelectorAll('.paper-note .project-description').forEach(el => {
-            const lineCount = Math.max(1, Math.floor(el.scrollHeight / lineHeight));
-            el.style.minHeight = `${lineCount * lineHeight}px`;
-        });
-        
-        // Position elements just above lines
-        document.querySelectorAll(
-            '.paper-note .line-aligned, ' + 
-            '.paper-note .project-title, ' + 
-            '.paper-note .date-container, ' + 
-            '.paper-note .project-links, ' + 
-            '.paper-note .tag-container'
-        ).forEach(el => {
-            if (!el.style.transform || el.style.transform !== 'translateY(-4px)') {
-                el.style.transform = 'translateY(-4px)';
+        // Apply consistent spacing to all project content elements
+        document.querySelectorAll('.paper-note .line-aligned').forEach(el => {
+            // Ensure each element takes up at least one line height
+            const currentHeight = el.offsetHeight;
+            const lines = Math.max(1, Math.ceil(currentHeight / lineHeight));
+            
+            // Set minimum height to ensure proper spacing
+            el.style.minHeight = `${lines * lineHeight}px`;
+            
+            // Remove any transform that might be causing misalignment
+            if (el.style.transform) {
+                el.style.transform = '';
             }
         });
     });
@@ -250,7 +243,7 @@ function createCardPaperLines(container, count, lineHeight) {
         line.style.left = `${(100 - width) / 2}%`;
         
         // Add slight waviness to some lines
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.5) {
             line.style.transform = `scaleY(1) translateY(${(Math.random() * 0.6) - 0.3}px)`;
         }
         
@@ -285,16 +278,172 @@ function addPaperTexture(container) {
  * @param {HTMLElement} note - The card element
  */
 function positionNotebookHoles(note) {
-    const notebookHoles = note.querySelector('.notebook-holes');
-    if (!notebookHoles) return;
+    // First, let's make sure we have a clean slate
+    // Remove any existing notebook-holes container
+    const existingHoles = note.querySelector('.notebook-holes');
+    if (existingHoles) {
+        existingHoles.remove();
+    }
     
-    const holes = notebookHoles.querySelectorAll('.hole');
-    const spacing = note.offsetHeight / (holes.length + 1);
+    // Create a fresh notebook-holes container
+    const notebookHoles = document.createElement('div');
+    notebookHoles.className = "notebook-holes";
+    note.appendChild(notebookHoles);
     
-    holes.forEach((hole, index) => {
-        hole.style.marginTop = index === 0 ? `${spacing}px` : '0';
-        hole.style.marginBottom = index === holes.length - 1 ? `${spacing}px` : `${spacing}px`;
-    });
+    // Create torn paper effect with unique SVG path for each card
+    const tornPaperEffect = document.createElement('div');
+    tornPaperEffect.className = "torn-paper-effect";
+    
+    // Generate a unique torn edge SVG path for each card
+    const uniqueTornEdgePath = generateUniqueTornEdgePath();
+    tornPaperEffect.style.backgroundImage = `
+        linear-gradient(90deg, rgba(255,255,255,0.4) 0%, transparent 100%),
+        url("data:image/svg+xml,${encodeURIComponent(uniqueTornEdgePath)}")
+    `;
+    
+    notebookHoles.appendChild(tornPaperEffect);
+    
+    // Add vertical fold mark
+    const foldMarkVertical = document.createElement('div');
+    foldMarkVertical.className = "fold-mark-vertical";
+    notebookHoles.appendChild(foldMarkVertical);
+    
+    // Get the note height
+    const noteHeight = note.offsetHeight;
+    
+    // Fixed number of holes for reliability
+    const holeCount = 10; // Slightly fewer holes for subtlety
+    
+    // Calculate spacing between holes
+    const spacing = Math.floor(noteHeight / (holeCount + 1));
+    
+    // Hole variations for realism
+    const holeVariations = [
+        'hole-standard', 'hole-torn', 'hole-stretched', 'hole-ripped', 
+        'hole-damaged', 'hole-severely-torn', 'hole-extremely-damaged'
+    ];
+    
+    // Create each hole with explicit positioning
+    for (let i = 0; i < holeCount; i++) {
+        // Calculate position
+        const topPosition = (i + 1) * spacing;
+        
+        // Create hole element
+        const hole = document.createElement('div');
+        
+        // Set position explicitly
+        hole.style.top = `${topPosition - 5}px`; // Center the hole vertically
+        
+        // Set class and variation
+        const variationType = holeVariations[Math.floor(Math.random() * holeVariations.length)];
+        hole.className = `hole ${variationType}`;
+        
+        // Add subtle torn paper bits
+        const tornBitsCount = Math.floor(Math.random() * 2) + 1; // 1-2 bits per hole for subtlety
+        for (let j = 0; j < tornBitsCount; j++) {
+            const tornBit = document.createElement('div');
+            tornBit.className = "torn-paper-bit";
+            const angle = Math.random() * 360;
+            const distance = 3 + Math.random() * 4;
+            tornBit.style.transform = `rotate(${angle}deg) translateX(${distance}px)`;
+            tornBit.style.width = `${1 + Math.random() * 3}px`;
+            tornBit.style.height = `${1 + Math.random() * 2}px`;
+            tornBit.style.opacity = 0.7 + (Math.random() * 0.3); // More subtle opacity
+            hole.appendChild(tornBit);
+        }
+        
+        // Add to container
+        notebookHoles.appendChild(hole);
+    }
+    
+    // Add paper fragments - fewer and more subtle
+    const fragmentCount = Math.floor(Math.random() * 4) + 3; // 3-6 fragments
+    for (let i = 0; i < fragmentCount; i++) {
+        const fragment = document.createElement('div');
+        fragment.className = "paper-fragment";
+        
+        // Random size and position
+        const width = 2 + Math.random() * 4;
+        const height = 1 + Math.random() * 3;
+        const top = Math.random() * noteHeight;
+        const left = Math.random() * 20;
+        
+        fragment.style.width = `${width}px`;
+        fragment.style.height = `${height}px`;
+        fragment.style.top = `${top}px`;
+        fragment.style.left = `${left}px`;
+        fragment.style.transform = `rotate(${Math.random() * 360}deg)`;
+        fragment.style.opacity = 0.6 + (Math.random() * 0.4); // More subtle opacity
+        
+        notebookHoles.appendChild(fragment);
+    }
+    
+    // Add stress lines - fewer and more subtle
+    const stressLineCount = Math.floor(Math.random() * 3) + 2; // 2-4 stress lines
+    for (let i = 0; i < stressLineCount; i++) {
+        const stressLine = document.createElement('div');
+        stressLine.className = "stress-line";
+        stressLine.style.top = `${Math.random() * noteHeight}px`;
+        stressLine.style.opacity = 0.2 + (Math.random() * 0.3); // More subtle opacity
+        notebookHoles.appendChild(stressLine);
+    }
+}
+
+/**
+ * Generates a unique SVG path for the torn paper edge
+ * @returns {string} SVG markup for the torn edge
+ */
+function generateUniqueTornEdgePath() {
+    const width = 25; // Narrower width
+    const height = 600;
+    
+    // Generate a unique jagged path for the torn edge
+    let path = `M${width},0 `;
+    
+    // Number of control points - fewer for subtlety
+    const controlPoints = 30 + Math.floor(Math.random() * 15); // 30-44 points
+    
+    // Height per segment
+    const segmentHeight = height / controlPoints;
+    
+    // Generate random control points
+    for (let i = 0; i < controlPoints; i++) {
+        // Create more subtle variation in the torn edge
+        const xVariation = Math.random() * 15; // Less variation for subtlety
+        const x = width - xVariation;
+        
+        // Add some randomness to the curve shape
+        const curveType = Math.random();
+        
+        if (curveType < 0.4) {
+            // Subtle point
+            const y1 = i * segmentHeight;
+            const x1 = x - (Math.random() * 3); // Less pronounced
+            path += `L${x1},${y1} `;
+        } else if (curveType < 0.8) {
+            // Gentle curved segment
+            const y1 = i * segmentHeight;
+            const x1 = x - (Math.random() * 5); // Less pronounced
+            const y2 = (i + 0.5) * segmentHeight;
+            const x2 = x - (Math.random() * 7); // Less pronounced
+            path += `C${x1},${y1} ${x2},${y2} ${x},${(i+1) * segmentHeight} `;
+        } else {
+            // Subtle jagged tear
+            const y1 = i * segmentHeight;
+            const x1 = x - (Math.random() * 8); // Less pronounced
+            const y2 = (i + 0.3) * segmentHeight;
+            const x2 = x - (Math.random() * 3); // Less pronounced
+            const y3 = (i + 0.7) * segmentHeight;
+            const x3 = x - (Math.random() * 6); // Less pronounced
+            path += `L${x1},${y1} L${x2},${y2} L${x3},${y3} `;
+        }
+    }
+    
+    // Close the path
+    path += `L${width},${height}`;
+    
+    // Create the SVG with more subtle stroke
+    return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg"><path d="${path}" stroke="rgba(0,0,0,0.03)" stroke-width="0.5" fill="white"/></svg>`;
 }
 
 /**

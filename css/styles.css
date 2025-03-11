@@ -193,39 +193,37 @@ a:hover {
 
 /* Project info container - improved spacing */
 .project-info {
-    display: block;
-    float: left;
+    display: flex;
+    flex-direction: column;
     position: relative;
     text-align: left;
     font-size: 0.9em;
-    padding: 0 15px var(--line-height) 15px; /* Bottom padding matches line height */
-    margin-right: 0;
-    margin-left: 0;
+    /* padding: var(--line-height) 15px; */
+    margin: 0;
     flex: 1;
+    /* gap: var(--line-height); Use consistent gap between elements */
 }
 
 /* Project title - consistent spacing */
 .project-title {
     font-size: 1.6em;
-    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    margin: 0;
     color: var(--dark-accent);
-    padding-top: 0;
+    padding: 0;
     position: relative;
-    line-height: var(--line-height); /* Match paper lines */
-    min-height: var(--line-height); /* Ensure it takes up at least one line */
+    line-height: var(--line-height);
+    min-height: var(--line-height);
 }
 
 /* Date container - align with paper lines */
 .date-container {
     display: flex;
     align-items: center;
-    padding: var(--line-height);
-    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    margin: 0;
     color: var(--dark-accent);
     font-size: 0.9em;
-    height: var(--line-height); /* Match line height exactly */
+    height: var(--line-height);
     position: relative;
-    top: 0; /* Reset any previous positioning */
 }
 
 .date-container .iconify {
@@ -249,46 +247,106 @@ a:hover {
     height: 18px;
 }
 
-/* Project links - align with paper lines */
+/* Project links - align with paper lines and center items vertically */
 .project-links {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
+    margin: 0;
     position: relative;
-    min-height: var(--line-height); /* At least one line height */
-    padding-top: 4px; /* Small offset to position nicely on the line */
+    min-height: var(--line-height);
+    margin-top: 10px;
+    align-items: center;
 }
 
 /* Project description - align with paper lines */
 .project-description {
-    margin: 0 0 var(--line-height) 0; /* Use line height for spacing */
-    line-height: var(--line-height); /* Match paper lines exactly */
+    margin: 0;
+    line-height: var(--line-height);
     position: relative;
-    padding-top: 4px; /* Small offset to position text nicely on the line */
+    margin-bottom: var(--line-height); /* Add bottom margin of one line height */
 }
 
 /* Tags - consistent styling */
 .tag-container {
+    position: absolute;
+    top: 10px;
+    right: -40px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
     margin: 0;
-    min-height: var(--line-height); /* Match paper lines */
-    padding-top: 4px; /* Small offset to position nicely on the line */
+    min-height: auto;
+    padding: 0;
+    z-index: 10; /* Increased z-index to ensure it's above all other elements */
 }
 
 .tag {
     margin: 0;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     color: var(--primary-bg);
     font-size: 0.85em;
-    padding: 6px 10px; /* Consistent padding */
+    padding: 6px 10px;
     line-height: 1;
-    border-radius: 4px;
+    border-radius: 2px;
     height: auto;
+    position: relative;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    min-width: 70px;
+    transform: rotate(2deg); /* Slight rotation for natural look */
+}
+
+/* Add tape effect to the left side of each tag */
+.tag::before {
+    content: "";
+    position: absolute;
+    left: -30px; /* Moved much further left */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px; /* Significantly increased width */
+    height: 18px; /* Significantly increased height */
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    opacity: 0.8;
+    background-image: 
+        linear-gradient(90deg, 
+            rgba(255,255,255,0.3) 0%, 
+            rgba(255,255,255,0.6) 50%, 
+            rgba(255,255,255,0.3) 100%);
+    z-index: -1;
+}
+
+/* Add subtle shadow to the bottom of each tag for depth */
+.tag::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+/* Add slight variations to each tag's rotation for realism */
+.tag:nth-child(odd) {
+    transform: rotate(3deg);
+}
+
+.tag:nth-child(even) {
+    transform: rotate(1deg);
+}
+
+.tag:nth-child(3n) {
+    transform: rotate(-1deg);
+}
+
+.tag:nth-child(3n+1) {
+    transform: rotate(2deg);
 }
 
 /* Ensure content appears above the lines with consistent z-index */
@@ -617,14 +675,11 @@ main, header, footer, .project-container, .middle-container {
 
 /* Base alignment classes - refined for better text positioning */
 .line-aligned {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+  position: relative;
+  margin: 0;
+  padding: 0;
   min-height: var(--line-height);
   line-height: var(--line-height);
-  position: relative;
-  transform: translateY(-4px); /* Move text slightly above the line */
 }
 
 .line-aligned-2x {
@@ -701,12 +756,6 @@ main, header, footer, .project-container, .middle-container {
 
 .text-about-me {
   transform: translateY(-4px);
-}
-
-/* Adjust individual lines in multi-line text */
-.project-description:not(:first-child), 
-.text-about-me:not(:first-child) {
-  margin-top: var(--line-height);
 }
 
 /* Ensure project rows have aligned heights */
@@ -815,6 +864,8 @@ body > .paper-lines {
     white-space: nowrap;
     transition: all 0.2s ease;
     margin-bottom: 4px;
+    /* Add height to match line height */
+    height: 28px;
 }
 
 .info-link-button:hover {
@@ -829,7 +880,7 @@ body > .paper-lines {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #e0e0e0;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible to allow tags to extend beyond */
     
     /* Enhanced paper texture with subtle grain */
     background-image: 
@@ -872,253 +923,254 @@ body > .paper-lines {
     z-index: 1;
 }
 
-/* Add notebook holes on the left side */
-.paper-note .notebook-holes {
-    position: absolute;
-    left: 12px;
-    top: 0;
-    bottom: 0;
-    width: 6px;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-.paper-note .hole {
-    width: 6px;
-    height: 12px;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 3px;
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Enhanced paper lines for more realism */
-.paper-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: rgba(121, 186, 193, 0.15); /* Even lighter lines for more realism */
-    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.7); /* Enhanced embossed effect */
-}
-
-/* Remove the tape effect since we're going for a notepad look */
-.paper-note::before, .paper-note::after {
-    content: none;
-}
-
-/* Add subtle shadow at the bottom of the paper */
-.paper-note {
-    position: relative;
-}
-
-.paper-note .bottom-shadow {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    height: 8px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.03) 100%);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    z-index: 1;
-}
-
-/* Remove the page curl effect styles */
-.paper-note .page-curl {
-    display: none; /* Hide the page curl instead of removing the rule completely */
-}
-
-/* Add subtle coffee stain to some cards for extra realism */
-.project-row-left:nth-child(3n) .coffee-stain,
-.project-row-right:nth-child(5n) .coffee-stain {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle,
-        rgba(139, 69, 19, 0.05) 0%,
-        rgba(139, 69, 19, 0.03) 60%,
-        rgba(139, 69, 19, 0) 100%
-    );
-    bottom: 20px;
-    right: 40px;
-    z-index: 0;
-    opacity: 0.7;
-    transform: rotate(-5deg) scale(1.2, 0.8);
-}
-
-/* Add subtle pencil marks to some cards */
-.project-row-left:nth-child(2n) .pencil-mark,
-.project-row-right:nth-child(4n) .pencil-mark {
-    position: absolute;
-    font-family: 'Caveat', cursive;
-    color: rgba(0, 0, 0, 0.2);
-    font-size: 14px;
-    transform: rotate(-5deg);
-    bottom: 10px;
-    left: 40px;
-    z-index: 2;
-}
-
-/* Additional paper effect enhancements */
-
-/* Fold mark styling */
-.fold-mark {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: rgba(0,0,0,0.03);
-    z-index: 1;
-}
-
-.project-row-left .fold-mark {
-    left: 30%;
-}
-
-.project-row-right .fold-mark {
-    left: 70%;
-}
-
-/* Enhanced paper texture */
-.paper-texture {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.05;
-    mix-blend-mode: multiply;
-}
-
-/* Add a subtle red vertical line on the left (like a notebook margin) */
-.paper-note::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 28px;
-    bottom: 0;
-    width: 1px;
-    background-color: rgba(255, 0, 0, 0.1);
-    z-index: 1;
-}
-
 /* Enhanced notebook holes styling for realistic ringbinder effect */
 .paper-note .notebook-holes {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 30px; /* Wider to accommodate torn paper effect */
+    width: 60px;
+    height: 100%;
     z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    overflow: visible; /* Allow torn bits to overflow */
-}
-
-/* Torn paper effect along the left edge */
-.paper-note .torn-paper-effect {
+    overflow: visible;
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 15px;
-    /* Remove the white background */
-    background-color: transparent;
-    z-index: 1;
-    
-    /* Update the gradient to be more subtle */
-    background-image: 
-        linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%),
-        url("data:image/svg+xml,%3Csvg width='15' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15,0 L12,20 L14,40 L11,60 L13,80 L10,100 L14,120 L12,140 L15,160 L11,180 L13,200 L10,220 L15,240 L12,260 L14,280 L11,300 L13,320 L10,340 L14,360 L12,380 L15,400 L11,420 L13,440 L10,460 L14,480 L12,500 L15,520 L11,540 L13,560 L10,580 L15,600' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='transparent'/%3E%3C/svg%3E");
 }
 
-/* Enhanced hole styling */
+/* Keyhole-shaped holes that extend to the left edge */
 .paper-note .hole {
-    width: 8px;
-    height: 8px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    margin-left: 12px; /* Adjust margin to position holes correctly */
-    position: relative;
+    position: absolute !important;
+    z-index: 10;
+    height: 10px;
+    width: 18px;
+    background-color: transparent;
+    left: 0;
+    
+    /* Create the keyhole shape with a clip-path */
+    clip-path: polygon(
+        0 0,                  /* Top-left corner */
+        0 100%,               /* Bottom-left corner */
+        40% 100%,             /* Bottom edge start of circle */
+        50% 85%,              /* Bottom curve of circle */
+        65% 75%,              /* Right curve of circle */
+        75% 50%,              /* Right edge of circle */
+        65% 25%,              /* Top curve of circle */
+        50% 15%,              /* Top edge of circle */
+        40% 0                 /* Top edge end of circle */
+    );
+    
+    /* Add subtle shadow for depth */
     box-shadow: 
-        inset 0 0 3px rgba(0, 0, 0, 0.4),
-        0 1px 2px rgba(255, 255, 255, 0.7);
+        inset 1px 0 3px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Hole inner shadow for 3D effect */
-.paper-note .hole-inner-shadow {
+/* Hole variations for realism */
+.paper-note .hole-torn {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        35% 100%, 
+        45% 90%, 
+        70% 80%, 
+        80% 50%, 
+        70% 20%, 
+        45% 10%, 
+        35% 0
+    );
+    height: 12px;
+}
+
+.paper-note .hole-stretched {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        30% 100%, 
+        40% 95%, 
+        60% 90%, 
+        75% 50%, 
+        60% 10%, 
+        40% 5%, 
+        30% 0
+    );
+    height: 14px;
+}
+
+.paper-note .hole-ripped {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        25% 100%, 
+        35% 90%, 
+        55% 85%, 
+        70% 50%, 
+        55% 15%, 
+        35% 10%, 
+        25% 0
+    );
+    height: 11px;
+}
+
+.paper-note .hole-damaged {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        20% 100%, 
+        30% 95%, 
+        45% 90%, 
+        65% 85%, 
+        75% 50%, 
+        65% 15%, 
+        45% 10%, 
+        30% 5%, 
+        20% 0
+    );
+    height: 13px;
+}
+
+.paper-note .hole-severely-torn {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        15% 100%, 
+        25% 95%, 
+        40% 90%, 
+        60% 85%, 
+        80% 50%, 
+        60% 15%, 
+        40% 10%, 
+        25% 5%, 
+        15% 0
+    );
+    height: 12px;
+}
+
+.paper-note .hole-extremely-damaged {
+    clip-path: polygon(
+        0 0, 
+        0 100%, 
+        10% 100%, 
+        20% 95%, 
+        35% 90%, 
+        55% 85%, 
+        75% 50%, 
+        55% 15%, 
+        35% 10%, 
+        20% 5%, 
+        10% 0
+    );
+    height: 10px;
+}
+
+/* Create the actual hole effect by showing the background */
+.paper-note .hole::before {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle at 30% 30%,
-        rgba(0, 0, 0, 0.1) 0%,
-        rgba(0, 0, 0, 0.4) 100%
-    );
+    background-color: transparent; /* This will show the background */
+    z-index: -1;
 }
 
-/* Hole variations for realism */
-.paper-note .hole-torn {
-    border-radius: 40% 50% 50% 40%;
-    transform: rotate(10deg);
-}
-
-.paper-note .hole-stretched {
-    width: 7px;
-    height: 9px;
-    border-radius: 45%;
-    transform: rotate(-15deg);
-}
-
-/* Torn paper bits around holes */
+/* Add subtle torn paper bits around holes */
 .paper-note .torn-paper-bit {
     position: absolute;
     width: 4px;
     height: 3px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.03);
     border-radius: 1px;
-    z-index: 0;
+    z-index: 2;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.03);
 }
 
-/* Red margin line */
-.paper-note .margin-line {
-    position: absolute;
-    top: 0;
-    left: 28px;
-    bottom: 0;
-    width: 1px;
-    background-color: rgba(255, 0, 0, 0.15);
-    z-index: 1;
-}
-
-/* Adjust content padding to accommodate the ringbinder holes */
+/* Adjust content padding to accommodate the holes */
 .paper-note .project-info {
-    padding-left: 35px; /* Increase left padding for the ringbinder holes */
-}
-
-/* Adjust the fold mark position */
-.paper-note .fold-mark {
-    left: 40px; /* Move fold mark past holes */
-}
-
-/* Remove existing red line that might conflict with our new margin line */
-.paper-note::before {
-    content: none;
+    padding-left: 55px; /* Slightly reduced padding */
 }
 
 /* Adjust project image container position */
 .paper-note .project-image-container {
-    margin-left: 40px; /* Move image away from holes */
+    margin-left: 55px; /* Slightly reduced margin */
+}
+
+/* Paper texture enhancement */
+.paper-note {
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.8) 50%, rgba(250, 250, 250, 0.8) 50%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2'/%3E%3C/svg%3E");
+}
+
+/* Add subtle fold marks near the holes */
+.paper-note .fold-mark-vertical {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(0,0,0,0.04);
+    z-index: 1;
+    left: 52px;
+}
+
+/* Add horizontal stress lines near holes */
+.paper-note .stress-line {
+    position: absolute;
+    height: 1px;
+    left: 0;
+    width: 50px;
+    background-color: rgba(0,0,0,0.03);
+    z-index: 1;
+}
+
+/* Add paper fiber strands that connect torn areas */
+.paper-note .paper-fiber {
+    position: absolute;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 2;
+    transform-origin: left center;
+}
+
+/* Torn paper effect along the left edge - more subtle and closer to edge */
+.paper-note .torn-paper-effect {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 25px; /* Narrower width to be closer to edge */
+    background-color: transparent;
+    z-index: 1;
+    /* The background image will be set dynamically in JavaScript */
+}
+
+/* Add paper fragment styling */
+.paper-note .paper-fragment {
+    position: absolute;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: 2px;
+    z-index: 2;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
+    transform-origin: center;
+}
+
+/* Remove the red margin line */
+.paper-note .margin-line {
+    display: none; /* Hide the red margin line */
+}
+
+/* Adjust content padding to accommodate the narrower torn edge */
+.paper-note .project-info {
+    padding-left: 45px; /* Reduced padding */
+}
+
+/* Adjust project image container position */
+.paper-note .project-image-container {
+    margin-left: 45px; /* Reduced margin */
+}
+
+/* Adjust fold mark position */
+.paper-note .fold-mark-vertical {
+    left: 42px; /* Move closer to edge */
 }

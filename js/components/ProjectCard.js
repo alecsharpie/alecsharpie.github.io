@@ -22,14 +22,6 @@ export async function initializeProjects(projectType = 'projects') {
             // Create the project card
             const card = createProjectCard(project, side, icons);
             container.appendChild(card);
-            
-            // Add divider except after the last project
-            if (index < projects.length - 1) {
-                const divider = document.createElement('div');
-                divider.className = "flex-item";
-                divider.innerHTML = `<hr class="projects-split"/>`;
-                container.appendChild(divider);
-            }
         });
         
         return true;
@@ -76,6 +68,9 @@ function createProjectCard(project, side, iconMap) {
     // Add content
     card.appendChild(createProjectContent(project, iconMap));
     
+    // Add tags directly to the card (not inside project content)
+    card.appendChild(createTagsElement(project.tags));
+    
     return card;
 }
 
@@ -84,52 +79,10 @@ function createProjectCard(project, side, iconMap) {
  * @param {HTMLElement} card - The card element
  */
 function addNotebookHoles(card) {
-    // Check if notebook holes already exist
-    if (card.querySelector('.notebook-holes')) return;
-    
-    const notebookHoles = document.createElement('div');
-    notebookHoles.className = "notebook-holes";
-    
-    // Create a container for the torn paper effect
-    const tornPaperEffect = document.createElement('div');
-    tornPaperEffect.className = "torn-paper-effect";
-    notebookHoles.appendChild(tornPaperEffect);
-    
-    // Add 4-6 holes with variable spacing for realism
-    const holeCount = Math.floor(Math.random() * 3) + 4;
-    const holeVariations = ['hole-standard', 'hole-torn', 'hole-stretched'];
-    
-    for (let i = 0; i < holeCount; i++) {
-        const hole = document.createElement('div');
-        // Randomly assign different hole styles for more realism
-        const variationType = holeVariations[Math.floor(Math.random() * holeVariations.length)];
-        hole.className = `hole ${variationType}`;
-        
-        // Add inner shadow element for 3D effect
-        const innerShadow = document.createElement('div');
-        innerShadow.className = "hole-inner-shadow";
-        hole.appendChild(innerShadow);
-        
-        // Add torn paper bits around some holes
-        if (Math.random() > 0.5) {
-            const tornBit = document.createElement('div');
-            tornBit.className = "torn-paper-bit";
-            // Randomly position the torn bit
-            const angle = Math.random() * 360;
-            const distance = 1 + Math.random() * 2;
-            tornBit.style.transform = `rotate(${angle}deg) translateX(${distance}px)`;
-            hole.appendChild(tornBit);
-        }
-        
-        notebookHoles.appendChild(hole);
-    }
-    
-    // Add red vertical line for the margin
-    const marginLine = document.createElement('div');
-    marginLine.className = "margin-line";
-    notebookHoles.appendChild(marginLine);
-    
-    card.appendChild(notebookHoles);
+    // We'll let positionNotebookHoles handle this completely
+    // This function will just be a stub that does nothing
+    // The positioning function will create everything from scratch
+    return;
 }
 
 /**
@@ -204,24 +157,25 @@ function createProjectContent(project, iconMap) {
     
     // Title
     const titleElement = document.createElement('h2');
-    titleElement.className = "project-title";
+    titleElement.className = "project-title line-aligned";
     titleElement.textContent = project.title;
     contentContainer.appendChild(titleElement);
     
     // Date
-    contentContainer.appendChild(createDateElement(project.date));
+    const dateContainer = createDateElement(project.date);
+    dateContainer.classList.add('line-aligned');
+    contentContainer.appendChild(dateContainer);
     
     // Links
-    contentContainer.appendChild(createLinksElement(project.links, iconMap));
+    const linksElement = createLinksElement(project.links, iconMap);
+    linksElement.classList.add('line-aligned');
+    contentContainer.appendChild(linksElement);
     
     // Description
     const descriptionElement = document.createElement('p');
     descriptionElement.className = "project-description line-aligned";
     descriptionElement.textContent = project.description;
     contentContainer.appendChild(descriptionElement);
-    
-    // Tags
-    contentContainer.appendChild(createTagsElement(project.tags));
     
     return contentContainer;
 }
@@ -236,7 +190,7 @@ function createDateElement(date) {
     dateContainer.className = "date-container";
     dateContainer.innerHTML = `
         <span class="iconify" data-icon="bi:calendar-week" data-width="18" data-height="18"></span>
-        <span class="seperator">|</span>
+        <span class="seperator inline">|</span>
         <span class="date-text">${date}</span>
     `;
     return dateContainer;
@@ -285,6 +239,11 @@ function createTagsElement(tags) {
         const tagElement = document.createElement('span');
         tagElement.className = `tag ${tag.toLowerCase().replace(/\s+/g, '')}`;
         tagElement.textContent = tag;
+        
+        // Add slight random offset for more natural look
+        const randomOffset = Math.random() * 3;
+        tagElement.style.right = `-${randomOffset}px`;
+        
         tagContainer.appendChild(tagElement);
     }
     

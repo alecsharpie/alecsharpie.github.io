@@ -7,6 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeProjects().then(() => {
         // Apply paper effects after projects are loaded
         initializePaperEffects();
+        
+        // Add a delay to ensure all DOM elements are fully rendered
+        setTimeout(() => {
+            // Re-apply paper effects to ensure torn edges are properly positioned
+            initializePaperEffects();
+            
+            // Add another delay for a final check
+            setTimeout(() => {
+                // Force one more refresh of the paper effects
+                initializePaperEffects();
+                
+                // Log for debugging
+                console.log("Final paper effects applied");
+            }, 500);
+        }, 200);
     });
 });
 
