@@ -16,11 +16,8 @@ export async function initializeProjects(projectType = 'projects') {
         
         // Render each project
         projects.forEach((project, index) => {
-            // Alternate between left and right layouts
-            const side = index % 2 === 0 ? "left" : "right";
-            
-            // Create the project card
-            const card = createProjectCard(project, side, icons);
+            // Create the project card (always using left layout)
+            const card = createProjectCard(project, icons);
             container.appendChild(card);
         });
         
@@ -37,14 +34,12 @@ export async function initializeProjects(projectType = 'projects') {
 /**
  * Creates a project card element
  * @param {Object} project - Project data
- * @param {string} side - Layout side ("left" or "right")
  * @param {Object} iconMap - Mapping of link types to icon identifiers
  * @returns {HTMLElement} The project card element
  */
-function createProjectCard(project, side, iconMap) {
+function createProjectCard(project, iconMap) {
     // Create a new div element
     const card = document.createElement('div');
-    // Always use left layout regardless of side parameter
     card.className = `project-row-left paper-note`;
     
     // Add paper lines container
@@ -52,14 +47,8 @@ function createProjectCard(project, side, iconMap) {
     paperLinesContainer.className = "paper-lines";
     card.appendChild(paperLinesContainer);
     
-    // Add notebook holes
-    addNotebookHoles(card);
-    
     // Add paper effects
-    addPaperEffects(card);
-    
-    // Add paper decorations based on project ID
-    addPaperDecorations(card, project, "left"); // Always use "left" for decorations
+    addPaperEffects(card, project);
     
     // Add image (on desktop only)
     if (window.innerWidth > 800) {
@@ -69,28 +58,18 @@ function createProjectCard(project, side, iconMap) {
     // Add content
     card.appendChild(createProjectContent(project, iconMap));
     
-    // Add tags directly to the card (not inside project content)
+    // Add tags directly to the card
     card.appendChild(createTagsElement(project.tags));
     
     return card;
 }
 
 /**
- * Adds notebook holes to a project card
- * @param {HTMLElement} card - The card element
- */
-function addNotebookHoles(card) {
-    // We'll let positionNotebookHoles handle this completely
-    // This function will just be a stub that does nothing
-    // The positioning function will create everything from scratch
-    return;
-}
-
-/**
  * Adds paper effects to a card
  * @param {HTMLElement} card - The card element
+ * @param {Object} project - Project data
  */
-function addPaperEffects(card) {
+function addPaperEffects(card, project) {
     // Add a subtle fold mark
     const foldMark = document.createElement('div');
     foldMark.className = "fold-mark";
@@ -100,26 +79,16 @@ function addPaperEffects(card) {
     const bottomShadow = document.createElement('div');
     bottomShadow.className = "bottom-shadow";
     card.appendChild(bottomShadow);
-}
-
-/**
- * Adds decorative elements to card based on project ID
- * @param {HTMLElement} card - The card element
- * @param {Object} project - Project data
- * @param {string} side - Layout side
- */
-function addPaperDecorations(card, project, side) {
+    
     // Add coffee stain to some cards
-    if ((side === 'left' && project.id % 3 === 0) || 
-        (side === 'right' && project.id % 5 === 0)) {
+    if (project.id % 3 === 0) {
         const coffeeStain = document.createElement('div');
         coffeeStain.className = "coffee-stain";
         card.appendChild(coffeeStain);
     }
     
     // Add pencil mark to some cards
-    if ((side === 'left' && project.id % 2 === 0) || 
-        (side === 'right' && project.id % 4 === 0)) {
+    if (project.id % 2 === 0) {
         const pencilMark = document.createElement('div');
         pencilMark.className = "pencil-mark";
         pencilMark.textContent = "Check this out!";

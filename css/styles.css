@@ -371,7 +371,7 @@ a:hover {
 .links-about-me,
 .links-cool-stuff,
 .text-about-me {
-    transform: none;
+    transform: none !important; /* Force no transform to prevent misalignment */
 }
 
 /* Navigation */
@@ -681,6 +681,7 @@ main, header, footer, .project-container, .middle-container {
   padding: 0;
   min-height: var(--line-height);
   line-height: var(--line-height);
+  transform: none !important; /* Force no transform */
 }
 
 .line-aligned-2x {
@@ -807,7 +808,7 @@ hr.section-split, hr.projects-split {
 
 /* Remove the global paper lines */
 body > .paper-lines {
-    display: none;
+    display: none; /* Hide global paper lines, use only card-specific ones */
 }
 
 /* Add a subtle tape effect to make it look like notes stuck to the page */

@@ -67,9 +67,6 @@ function getPaperLineHeight() {
 
 /**
  * Creates paper lines with realistic variations
- * @param {HTMLElement} container - Container for the lines
- * @param {number} count - Number of lines to create
- * @param {number} lineHeight - Height between lines
  */
 function createPaperLines(container, count, lineHeight) {
     for (let i = 0; i < count; i++) {
@@ -93,7 +90,6 @@ function createPaperLines(container, count, lineHeight) {
 
 /**
  * Ensures page content aligns with paper lines
- * @param {number} lineHeight - Height between lines
  */
 function alignContentWithLines(lineHeight) {
     // Apply line-aligned class to elements within paper notes
@@ -110,10 +106,9 @@ function alignContentWithLines(lineHeight) {
                     el.style.transform = '';
                 }
                 
-                // Remove the margin setting for project-description
-                // This was adding the unwanted margin
+                // Set margin to 0 for project-description
                 if (el.classList.contains('project-description')) {
-                    el.style.marginBottom = '0'; // Set to 0 instead of var(--line-height)
+                    el.style.marginBottom = '0';
                 }
             });
     });
@@ -124,7 +119,6 @@ function alignContentWithLines(lineHeight) {
 
 /**
  * Sets up mutation observer to handle dynamically added content
- * @param {number} lineHeight - Height between lines
  */
 function setupAlignmentObserver(lineHeight) {
     const projectContainer = document.getElementById('project-container');
@@ -151,22 +145,6 @@ function setupAlignmentObserver(lineHeight) {
 }
 
 /**
- * Adjusts an element's height to align with the line grid
- * @param {HTMLElement} element - Element to adjust
- * @param {number} targetHeight - Target height (usually line height)
- */
-function adjustElementToLineHeight(element, targetHeight) {
-    if (!element) return;
-    
-    const currentHeight = element.offsetHeight;
-    const remainder = currentHeight % targetHeight;
-    
-    if (remainder !== 0) {
-        element.style.minHeight = `${Math.ceil(currentHeight / targetHeight) * targetHeight}px`;
-    }
-}
-
-/**
  * Applies paper effect to project cards
  */
 function applyPaperEffectToCards() {
@@ -189,14 +167,17 @@ function applyPaperEffectToCards() {
         const noteHeight = note.offsetHeight;
         
         // Apply subtle random rotation
-        applySubtleRotation(note);
+        const randomRotation = (Math.random() * 0.4) - 0.2;
+        note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
         
         // Create paper lines
         const numberOfLines = Math.floor(noteHeight / lineHeight);
         createCardPaperLines(linesContainer, numberOfLines, lineHeight);
         
-        // Add paper texture if needed
-        addPaperTexture(linesContainer);
+        // Add paper texture
+        if (!linesContainer.querySelector('.paper-texture')) {
+            addPaperTexture(linesContainer);
+        }
         
         // Only create notebook holes if they don't already exist
         if (!note.querySelector('.notebook-holes')) {
@@ -209,21 +190,7 @@ function applyPaperEffectToCards() {
 }
 
 /**
- * Applies subtle rotation to cards for natural look
- * @param {HTMLElement} note - The card element
- */
-function applySubtleRotation(note) {
-    const randomRotation = (Math.random() * 0.4) - 0.2;
-    
-    // Apply the same rotation style regardless of class
-    note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
-}
-
-/**
  * Creates paper lines for cards with realistic variations
- * @param {HTMLElement} container - Container for the lines
- * @param {number} count - Number of lines to create
- * @param {number} lineHeight - Height between lines
  */
 function createCardPaperLines(container, count, lineHeight) {
     for (let i = 1; i <= count; i++) {
@@ -251,11 +218,8 @@ function createCardPaperLines(container, count, lineHeight) {
 
 /**
  * Adds paper texture overlay to cards
- * @param {HTMLElement} container - The lines container
  */
 function addPaperTexture(container) {
-    if (container.querySelector('.paper-texture')) return;
-    
     const textureOverlay = document.createElement('div');
     textureOverlay.className = 'paper-texture';
     textureOverlay.style.position = 'absolute';
@@ -272,27 +236,19 @@ function addPaperTexture(container) {
 }
 
 /**
- * Positions notebook holes proportionally along the side of the card
- * @param {HTMLElement} note - The card element
+ * Positions notebook holes along the side of the card
  */
 function positionNotebookHoles(note) {
-    // First, let's make sure we have a clean slate
-    // Remove any existing notebook-holes container
-    const existingHoles = note.querySelector('.notebook-holes');
-    if (existingHoles) {
-        existingHoles.remove();
-    }
-    
-    // Create a fresh notebook-holes container
+    // Create notebook-holes container
     const notebookHoles = document.createElement('div');
     notebookHoles.className = "notebook-holes";
     note.appendChild(notebookHoles);
     
-    // Create torn paper effect with unique SVG path for each card
+    // Create torn paper effect with unique SVG path
     const tornPaperEffect = document.createElement('div');
     tornPaperEffect.className = "torn-paper-effect";
     
-    // Generate a unique torn edge SVG path for each card
+    // Generate a unique torn edge SVG path
     const uniqueTornEdgePath = generateUniqueTornEdgePath();
     tornPaperEffect.style.backgroundImage = `
         linear-gradient(90deg, rgba(255,255,255,0.4) 0%, transparent 100%),
@@ -309,8 +265,8 @@ function positionNotebookHoles(note) {
     // Get the note height
     const noteHeight = note.offsetHeight;
     
-    // Fixed number of holes for reliability
-    const holeCount = 10; // Slightly fewer holes for subtlety
+    // Fixed number of holes
+    const holeCount = 10;
     
     // Calculate spacing between holes
     const spacing = Math.floor(noteHeight / (holeCount + 1));
@@ -337,7 +293,7 @@ function positionNotebookHoles(note) {
         hole.className = `hole ${variationType}`;
         
         // Add subtle torn paper bits
-        const tornBitsCount = Math.floor(Math.random() * 2) + 1; // 1-2 bits per hole for subtlety
+        const tornBitsCount = Math.floor(Math.random() * 2) + 1; // 1-2 bits per hole
         for (let j = 0; j < tornBitsCount; j++) {
             const tornBit = document.createElement('div');
             tornBit.className = "torn-paper-bit";
@@ -346,7 +302,7 @@ function positionNotebookHoles(note) {
             tornBit.style.transform = `rotate(${angle}deg) translateX(${distance}px)`;
             tornBit.style.width = `${1 + Math.random() * 3}px`;
             tornBit.style.height = `${1 + Math.random() * 2}px`;
-            tornBit.style.opacity = 0.7 + (Math.random() * 0.3); // More subtle opacity
+            tornBit.style.opacity = 0.7 + (Math.random() * 0.3);
             hole.appendChild(tornBit);
         }
         
@@ -354,7 +310,7 @@ function positionNotebookHoles(note) {
         notebookHoles.appendChild(hole);
     }
     
-    // Add paper fragments - fewer and more subtle
+    // Add paper fragments
     const fragmentCount = Math.floor(Math.random() * 4) + 3; // 3-6 fragments
     for (let i = 0; i < fragmentCount; i++) {
         const fragment = document.createElement('div');
@@ -371,34 +327,33 @@ function positionNotebookHoles(note) {
         fragment.style.top = `${top}px`;
         fragment.style.left = `${left}px`;
         fragment.style.transform = `rotate(${Math.random() * 360}deg)`;
-        fragment.style.opacity = 0.6 + (Math.random() * 0.4); // More subtle opacity
+        fragment.style.opacity = 0.6 + (Math.random() * 0.4);
         
         notebookHoles.appendChild(fragment);
     }
     
-    // Add stress lines - fewer and more subtle
+    // Add stress lines
     const stressLineCount = Math.floor(Math.random() * 3) + 2; // 2-4 stress lines
     for (let i = 0; i < stressLineCount; i++) {
         const stressLine = document.createElement('div');
         stressLine.className = "stress-line";
         stressLine.style.top = `${Math.random() * noteHeight}px`;
-        stressLine.style.opacity = 0.2 + (Math.random() * 0.3); // More subtle opacity
+        stressLine.style.opacity = 0.2 + (Math.random() * 0.3);
         notebookHoles.appendChild(stressLine);
     }
 }
 
 /**
  * Generates a unique SVG path for the torn paper edge
- * @returns {string} SVG markup for the torn edge
  */
 function generateUniqueTornEdgePath() {
-    const width = 25; // Narrower width
+    const width = 25;
     const height = 600;
     
     // Generate a unique jagged path for the torn edge
     let path = `M${width},0 `;
     
-    // Number of control points - fewer for subtlety
+    // Number of control points
     const controlPoints = 30 + Math.floor(Math.random() * 15); // 30-44 points
     
     // Height per segment
@@ -407,7 +362,7 @@ function generateUniqueTornEdgePath() {
     // Generate random control points
     for (let i = 0; i < controlPoints; i++) {
         // Create more subtle variation in the torn edge
-        const xVariation = Math.random() * 15; // Less variation for subtlety
+        const xVariation = Math.random() * 15;
         const x = width - xVariation;
         
         // Add some randomness to the curve shape
@@ -416,23 +371,23 @@ function generateUniqueTornEdgePath() {
         if (curveType < 0.4) {
             // Subtle point
             const y1 = i * segmentHeight;
-            const x1 = x - (Math.random() * 3); // Less pronounced
+            const x1 = x - (Math.random() * 3);
             path += `L${x1},${y1} `;
         } else if (curveType < 0.8) {
             // Gentle curved segment
             const y1 = i * segmentHeight;
-            const x1 = x - (Math.random() * 5); // Less pronounced
+            const x1 = x - (Math.random() * 5);
             const y2 = (i + 0.5) * segmentHeight;
-            const x2 = x - (Math.random() * 7); // Less pronounced
+            const x2 = x - (Math.random() * 7);
             path += `C${x1},${y1} ${x2},${y2} ${x},${(i+1) * segmentHeight} `;
         } else {
             // Subtle jagged tear
             const y1 = i * segmentHeight;
-            const x1 = x - (Math.random() * 8); // Less pronounced
+            const x1 = x - (Math.random() * 8);
             const y2 = (i + 0.3) * segmentHeight;
-            const x2 = x - (Math.random() * 3); // Less pronounced
+            const x2 = x - (Math.random() * 3);
             const y3 = (i + 0.7) * segmentHeight;
-            const x3 = x - (Math.random() * 6); // Less pronounced
+            const x3 = x - (Math.random() * 6);
             path += `L${x1},${y1} L${x2},${y2} L${x3},${y3} `;
         }
     }
@@ -446,7 +401,6 @@ function generateUniqueTornEdgePath() {
 
 /**
  * Styles images to blend with the paper effect
- * @param {HTMLElement} note - The card element
  */
 function styleProjectImages(note) {
     const projectImages = note.querySelectorAll('.project-image');
