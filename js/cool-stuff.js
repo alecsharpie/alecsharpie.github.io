@@ -1,12 +1,14 @@
-import { initializeProjects } from './components/ProjectCard.js';
 import { initializePaperEffects } from './components/Paper.js';
+import { initializeCoolStuff } from './components/CoolStuff.js';
 
-// Initialize the educational resources page
+/**
+ * Initialize the Cool Stuff page
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    // Load educational projects
-    initializeProjects('educational');
+    // Initialize cool stuff items
+    initializeCoolStuff();
     
-    // Apply paper effects after a short delay to ensure content is rendered
+    // Apply paper effects
     setTimeout(() => {
         initializePaperEffects();
     }, 300);
@@ -22,4 +24,4 @@ window.addEventListener('resize', () => {
     window.resizeTimeout = setTimeout(() => {
         initializePaperEffects();
     }, 250);
-});
+}); 
