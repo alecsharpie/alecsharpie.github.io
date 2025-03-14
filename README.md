@@ -1,5 +1,3 @@
-# My Portfolio
+# Alec Sharp's place on the internet.
 
- A place to communicate my projects & experience.
-
- [www.alecsharpie.me](https://www.alecsharpie.me/)
+[www.alecsharpie.me](https://www.alecsharpie.me/)
