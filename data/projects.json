@@ -1,5 +1,6 @@
 {
-    "projects": [{
+    "projects": [
+        {
             "title": "Dancing Creatures",
             "date": "2025-03-01",
             "description": "Real-time multi-pose detection using ML, rendered to a 2D canvas animation. I was inspired by ACMI's Beings exhibit: 'Move, dance, and play to interact with a vibrant array of larger-than-life digital creatures'. This is a revamp of a project I did a while ago, I wanted to update my personal web dev tech stack (as a Data Engineer I was stuck using create-react-app). I went for React, Vite, Typescript (and Tensorflow.js in this case)",
@@ -13,7 +14,8 @@
                 "Code",
                 "Web App"
             ]
-        }, {
+        },
+        {
             "title": "Badbits: AI-powered Posture/Nailbiting Coach",
             "date": "2025-01-01",
             "description": "BadBits is a CLI tool that uses your webcam and AI to help you maintain good posture and break the nail-biting habit. It provides real-time monitoring with a clean interface and various alert levels (notification or screenblock).",
@@ -25,7 +27,8 @@
             "tags": [
                 "Code"
             ]
-        }, {
+        },
+        {
             "title": "Graphing Bike Polo Tournament Results",
             "date": "2024-11-01",
             "description": "The Quing of the south is a 24 hour bike polo tournament hosted in Melbourne, I thought it'd be fun and interesting to visualise the timeline and results.",
@@ -38,7 +41,8 @@
                 "Code",
                 "Experiment"
             ]
-        }, {
+        },
+        {
             "title": "Personal Finance Tool",
             "date": "2024-10-01",
             "description": "Never thought I'd build one of these, must be my granddad's accounting genes haha. I switched banks so wanted to consolidate my data. This tool uses a small local LLM to parse various unstructured financial data, dump it into a SQL database, and visualise it on a FastHTML dashboard. (Work In Progress)",
@@ -51,7 +55,8 @@
                 "Code",
                 "Web App"
             ]
-        }, {
+        },
+        {
             "title": "ETF Analysis",
             "date": "2024-08-01",
             "description": "I don't know anything about finance. This is a simple ETF analysis tool that assumes the price will revert to the mean, based on linear regression. Good chance to try out the new FastHTML web framework.",
@@ -64,7 +69,8 @@
                 "Code",
                 "Web App"
             ]
-        }, {
+        },
+        {
             "title": "Fun",
             "date": "2024-06-01",
             "description": "Fun little animation website, 100% client side.",
@@ -78,7 +84,8 @@
                 "Web App",
                 "Experiment"
             ]
-        }, {
+        },
+        {
             "title": "Do Nothing Forest",
             "date": "2023-10-01",
             "description": "Getting good at React. Generative, interactive, stochastic, canvas based forest. 100% client side.",

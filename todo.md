@@ -6,3 +6,4 @@ comments
 card spacing - date
 proof read titles & descriptions
 mobile friendly
+random rotation of cards

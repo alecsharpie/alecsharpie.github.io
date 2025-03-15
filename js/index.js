@@ -7,14 +7,14 @@ import { initializeCoolStuff } from './components/CoolStuff.js';
 document.addEventListener('DOMContentLoaded', () => {
     // Set current year in footer
     setCurrentYearInFooter();
-    
+
     // First apply paper effects to header elements
     try {
         initializePaperEffects();
     } catch (error) {
         console.error("Error initializing paper effects:", error);
     }
-    
+
     // Then load all projects and display them
     initializeProjects().then(() => {
         // Apply paper effects again after projects are loaded
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error initializing paper effects after projects:", error);
         }
-        
+
         // Add a delay to ensure all DOM elements are fully rendered
         setTimeout(() => {
             // Force one more refresh of the paper effects
@@ -47,7 +47,7 @@ window.addEventListener('resize', () => {
     if (window.resizeTimeout) {
         clearTimeout(window.resizeTimeout);
     }
-    
+
     window.resizeTimeout = setTimeout(() => {
         try {
             initializePaperEffects();

@@ -18,17 +18,17 @@ export function formatDate(dateString) {
     if (/^[A-Za-z]{3,} \d{4}$/.test(dateString)) {
         return dateString;
     }
-    
+
     try {
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
             return dateString; // Return original if not a valid date
         }
-        
+
         // Format date to "Month Year"
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            year: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            year: 'numeric'
         });
     } catch (error) {
         console.error('Error formatting date:', error);

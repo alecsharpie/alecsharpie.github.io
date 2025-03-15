@@ -11,7 +11,7 @@ export function initializeCoolStuff() {
             }
         });
     });
-    
+
     // Add paper lines to cool stuff container if needed
     const coolStuffContainer = document.querySelector('.cool-stuff-container');
     if (coolStuffContainer) {
