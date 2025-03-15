@@ -91,7 +91,7 @@ a:hover {
 
 .project-container {
     display: inline-block;
-    max-width: 80%;
+    max-width: 90%;
     padding: 20px;
 }
 
@@ -132,6 +132,7 @@ a:hover {
     /* Consistent rotation for all cards */
     transform: rotate(-0.8deg);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-left: 10px; /* Add a small left margin */
 }
 
 .project-row-left {
@@ -256,7 +257,7 @@ a:hover {
     margin: 0;
     position: relative;
     min-height: var(--line-height);
-    margin-top: 10px;
+    margin-top: 8px;
     align-items: center;
 }
 
@@ -271,7 +272,7 @@ a:hover {
 /* Tags - consistent styling */
 .tag-container {
     position: absolute;
-    top: 10px;
+    top: 25px;
     right: -40px;
     display: flex;
     flex-direction: column;
@@ -303,11 +304,11 @@ a:hover {
 .tag::before {
     content: "";
     position: absolute;
-    left: -30px; /* Moved much further left */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 35px; /* Significantly increased width */
-    height: 18px; /* Significantly increased height */
+    left: -30px;
+    top: 0;
+    transform: none;
+    width: 35px;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.7);
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -556,11 +557,29 @@ nav .nav-bar .nav-bar_item a:hover:after {
     .section-title {
         font-size: 1.8em;
     }
+    
+    /* Adjust project layout for tablets */
+    .project-row-left, .project-row-right {
+        padding: 15px; /* Reduce padding on smaller screens */
+    }
+    
+    /* Improve project links wrapping */
+    .project-links {
+        flex-wrap: wrap;
+        gap: 6px; /* Smaller gap between links */
+    }
+    
+    /* Make link buttons more compact */
+    .info-link-button {
+        padding: 3px 8px;
+        font-size: 0.85em;
+    }
 }
 
 @media screen and (max-width: 480px) {
     .project-row-left, .project-row-right {
         flex-direction: column;
+        margin-left: 5px; /* Even smaller margin on mobile */
     }
     
     .project-row-right {
@@ -578,7 +597,10 @@ nav .nav-bar .nav-bar_item a:hover:after {
     }
     
     .project-links {
-        justify-content: center;
+        flex-direction: column; /* Stack links vertically on mobile */
+        align-items: flex-start; /* Align to the left */
+        gap: 4px; /* Tighter spacing */
+        margin-top: 10px; /* Even more space on mobile */
     }
     
     .my_name {
@@ -588,6 +610,57 @@ nav .nav-bar .nav-bar_item a:hover:after {
     
     .density-plot {
         width: 250px;
+    }
+    
+    /* Adjust project layout for mobile */
+    .project-row-left, .project-row-right {
+        padding: 12px 10px; /* Further reduce padding */
+        margin-bottom: 20px; /* Less space between cards */
+    }
+    
+    /* Adjust content padding */
+    .paper-note .project-info {
+        padding-left: 25px; /* Reduce from 35px to 25px on mobile */
+    }
+    
+    /* Adjust link buttons for mobile */
+    .info-link-button {
+        padding: 2px 6px;
+        font-size: 0.8em;
+        height: 24px; /* Smaller height */
+    }
+    
+    /* Adjust project title size */
+    .project-title {
+        font-size: 1.3em;
+    }
+    
+    /* Adjust tag container position */
+    .tag-container {
+        right: -30px; /* Move tags closer to the card */
+    }
+    
+    /* Make tags narrower on mobile */
+    .tag {
+        font-size: 0.7em;
+        padding: 3px 6px;
+        min-width: 50px; /* Reduce minimum width */
+    }
+    
+    /* Adjust image positioning */
+    .project-image-container {
+        margin-left: 25px; /* Reduce from 35px to 25px on mobile */
+    }
+    
+    /* Keep tags on the right side but closer to the note */
+    .tag-container {
+        right: -25px; /* Move closer to the edge of the note */
+    }
+    
+    /* Make the tape narrower */
+    .tag::before {
+        width: 25px; /* Narrower tape */
+        left: -25px; /* Position closer to tag */
     }
 }
 
@@ -925,17 +998,45 @@ body > .paper-lines {
     z-index: 3;
 }
 
-/* Add a red vertical line on the left (like a notebook margin) */
+/* Remove the red vertical line (notebook margin) */
 .paper-note::after {
+    display: none; /* Hide the red vertical line completely */
+}
+
+/* Move the blue vertical fold mark further left */
+.paper-note .fold-mark-vertical {
+    left: 30px; /* Move from 52px to 30px - closer to the left edge */
+}
+
+/* Lower the tag container position */
+.tag-container {
+    top: 25px; /* Change from 10px to 25px to lower the position */
+}
+
+/* Decrease margin between paper notes and screen edge */
+.project-container {
+    max-width: 90%; /* Increase from 80% to 90% to reduce margins */
+}
+
+/* Make tape height match the tag height */
+.tag::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 28px;
-    bottom: 0;
-    width: 1px;
-    background-color: rgba(255, 0, 0, 0.15);
-    z-index: 1;
-    display: block; /* Ensure it's visible */
+    left: -30px;
+    top: 0; /* Position at the top of the tag */
+    transform: none; /* Remove the vertical centering transform */
+    width: 35px;
+    height: 100%; /* Match the full height of the tag */
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    opacity: 0.8;
+    background-image: 
+        linear-gradient(90deg, 
+            rgba(255,255,255,0.3) 0%, 
+            rgba(255,255,255,0.6) 50%, 
+            rgba(255,255,255,0.3) 100%);
+    z-index: -1;
 }
 
 /* Enhanced notebook holes styling for realistic ringbinder effect */
@@ -1103,12 +1204,12 @@ body > .paper-lines {
 
 /* Adjust content padding to accommodate the holes */
 .paper-note .project-info {
-    padding-left: 55px; /* Slightly reduced padding */
+    padding-left: 40px; /* Reduce from 55px to 40px */
 }
 
 /* Adjust project image container position */
 .paper-note .project-image-container {
-    margin-left: 55px; /* Slightly reduced margin */
+    margin-left: 40px; /* Reduce from 55px to 40px */
 }
 
 /* Paper texture enhancement */
@@ -1126,7 +1227,7 @@ body > .paper-lines {
     width: 1px;
     background-color: rgba(0,0,0,0.04);
     z-index: 1;
-    left: 52px;
+    left: 30px;
     display: block; /* Ensure it's visible */
 }
 
@@ -1199,4 +1300,16 @@ body > .paper-lines {
     background-color: var(--button-hover-bg);
     color: var(--button-hover-text);
     transform: translateY(-2px);
+}
+
+/* Add more space between date-container and project-links */
+.date-container + .project-links {
+    margin-top: 15px !important; /* Force more space with !important */
+}
+
+/* Additional spacing for mobile */
+@media screen and (max-width: 480px) {
+    .date-container + .project-links {
+        margin-top: 20px !important; /* Even more space on mobile */
+    }
 }

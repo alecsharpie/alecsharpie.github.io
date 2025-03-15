@@ -265,11 +265,29 @@ function positionNotebookHoles(note) {
     // Get the note height
     const noteHeight = note.offsetHeight;
     
-    // Fixed number of holes
-    const holeCount = 10;
+    // Reduced spacing between holes
+    const holeSpacing = 30; // Reduced from 40px to 30px
     
-    // Calculate spacing between holes
-    const spacing = Math.floor(noteHeight / (holeCount + 1));
+    // Smaller margin from top and bottom
+    const margin = 15; // Reduced from 20px to 15px
+    
+    // Place holes at fixed positions from top to bottom
+    const positions = [];
+    
+    // Add first hole at the top margin
+    positions.push(margin);
+    
+    // Add holes at regular intervals
+    let currentPos = margin;
+    while (currentPos + holeSpacing < noteHeight - margin) {
+        currentPos += holeSpacing;
+        positions.push(currentPos);
+    }
+    
+    // Ensure we have a hole near the bottom
+    if (noteHeight - currentPos > margin * 1.5) {
+        positions.push(noteHeight - margin);
+    }
     
     // Hole variations for realism
     const holeVariations = [
@@ -277,11 +295,8 @@ function positionNotebookHoles(note) {
         'hole-damaged', 'hole-severely-torn', 'hole-extremely-damaged'
     ];
     
-    // Create each hole with explicit positioning
-    for (let i = 0; i < holeCount; i++) {
-        // Calculate position
-        const topPosition = (i + 1) * spacing;
-        
+    // Create each hole at the calculated positions
+    positions.forEach(topPosition => {
         // Create hole element
         const hole = document.createElement('div');
         
@@ -308,7 +323,7 @@ function positionNotebookHoles(note) {
         
         // Add to container
         notebookHoles.appendChild(hole);
-    }
+    });
     
     // Add paper fragments
     const fragmentCount = Math.floor(Math.random() * 4) + 3; // 3-6 fragments

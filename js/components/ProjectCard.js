@@ -202,6 +202,13 @@ function createProjectContent(project, iconMap) {
     dateContainer.classList.add('line-aligned');
     contentContainer.appendChild(dateContainer);
     
+    // Add a spacer div that takes up one line height
+    const spacerDiv = document.createElement('div');
+    spacerDiv.className = "line-spacer line-aligned";
+    spacerDiv.style.minHeight = 'var(--line-height)';
+    spacerDiv.style.height = 'var(--line-height)';
+    contentContainer.appendChild(spacerDiv);
+    
     // Links
     const linksElement = createLinksElement(project.links, iconMap);
     linksElement.classList.add('line-aligned');
