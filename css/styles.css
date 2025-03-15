@@ -1313,3 +1313,65 @@ body > .paper-lines {
         margin-top: 20px !important; /* Even more space on mobile */
     }
 }
+
+/* Add proper padding and spacing for paper-note about-me sections */
+.paper-note.about-me {
+    padding: var(--line-height) 40px 20px 40px; /* Increased from 35px to 40px */
+    margin-bottom: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.paper-note.about-me .text-about-me,
+.paper-note.about-me .links-about-me {
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Style for the density plot container - adjusted dimensions */
+.paper-note.density-plot-container {
+    padding: 15px 10px 0px 35px; /* Increased from 25px to 30px */
+    margin-bottom: 30px;
+    text-align: center;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 180px;
+}
+
+/* Ensure the density plot image fits properly and is positioned correctly */
+.paper-note.density-plot-container img {
+    max-width: 100%;
+    height: auto;
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0 auto;
+    z-index: 3; /* Higher than paper-lines and other effects */
+    mix-blend-mode: normal; /* Override any blend mode that might be applied */
+}
+
+/* Style for the section title container */
+.paper-note.section-title-container {
+    padding: var(--line-height) 40px 10px; /* Increased from 35px to 40px */
+    margin: 20px auto;
+    text-align: center;
+    max-width: 300px;
+    display: inline-block;
+}
+
+/* Adjust the section title within the paper note */
+.paper-note.section-title-container .section-title {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+/* Style for the footer paper note */
+.paper-note.bottom-container {
+    padding: var(--line-height) 40px 10px; /* Increased from 35px to 40px */
+    margin: 20px auto;
+    text-align: center;
+    max-width: 300px;
+}

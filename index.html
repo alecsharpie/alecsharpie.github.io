@@ -26,38 +26,40 @@
             </ul>
         </nav>
         <div class="top-container">
-            <img class="density-plot" src="images/density_plot_w_name.png" alt="density plot with Alec Sharp's name">
+            <div class="paper-note density-plot-container">
+                <img class="density-plot" src="images/density_plot_w_name.png" alt="density plot with Alec Sharp's name">
+            </div>
         </div>
     </header>
 
     <main>
         <section class="about-section">
             <div class="about-container">
-                <div class="about-me">
-                    <div class="text-about-me">
+                <div class="paper-note about-me">
+                    <div class="text-about-me line-aligned">
                         Hello! I like bridging the gap between people and data.
                     </div>
-                    <div class="text-about-me">
+                    <div class="text-about-me line-aligned">
                         From New Zealand, living in Melbourne.
                     </div>
                 </div>
-                <div class="about-me">
+                <div class="paper-note about-me">
                     <a class="link" href="mailto:alecsharpie@gmail.com">
-                        <div class="links-about-me">
+                        <div class="links-about-me line-aligned">
                             <span class="iconify" data-icon="ic:outline-email" data-width="18" data-height="18"></span>
                             <span class="seperator inline"> | </span>
                             <p class="inline">alecsharpie@gmail.com</p>
                         </div>
                     </a>
                     <a class="link" href="https://github.com/alecsharpie">
-                        <div class="links-about-me">
+                        <div class="links-about-me line-aligned">
                             <span class="iconify" data-icon="octicon:mark-github-16" data-inline="false"></span>
                             <span class="seperator inline"> | </span>
                             <p class="inline">Github</p>
                         </div>
                     </a>
                     <a class="link" href="https://www.linkedin.com/in/alecsharpie/">
-                        <div class="links-about-me">
+                        <div class="links-about-me line-aligned">
                             <span class="iconify" data-icon="brandico:linkedin-rect" data-inline="false"></span>
                             <span class="seperator inline"> | </span>
                             <p class="inline">LinkedIn</p>
@@ -68,18 +70,17 @@
         </section>
 
         <section class="projects-section">
-            <h1 class="section-title">My Projects</h1>
-            <hr class="section-split" />
-            <div class="project-container" id="project-container">
-                <!-- Projects will be loaded here by JavaScript -->
+            <div class="paper-note section-title-container">
+                <h1 class="section-title line-aligned">My Projects</h1>
+            </div>
+                <div class="project-container" id="project-container">
             </div>
         </section>
     </main>
 
     <footer>
-        <hr>
-        <div class="bottom-container">
-            <p class="line-aligned">© 2024 Alec Sharp.</p>
+        <div class="paper-note bottom-container">
+            <p class="line-aligned">© <span id="current-year"></span> Alec Sharp.</p>
         </div>
     </footer>
 
