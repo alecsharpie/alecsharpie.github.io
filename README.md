@@ -1,3 +1,3 @@
-# Alec Sharp's place on the internet.
+# Alec Sharp's Projects.
 
 [www.alecsharpie.me](https://www.alecsharpie.me/)
