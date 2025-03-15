@@ -12,3 +12,4 @@ shadows
 rounded bottom corners of paper
 3D paper effect
 slight hard corner sticking out bottom left
+educational tag colour
