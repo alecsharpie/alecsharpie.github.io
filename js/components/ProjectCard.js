@@ -1,9 +1,10 @@
 import { DataService } from '../services/DataService.js';
+import { formatDate } from '../utils/DateUtils.js';
 
 /**
  * Initializes projects section by loading data and rendering project cards
  */
-export async function initializeProjects(projectType = 'projects') {
+export async function initializeProjects() {
     try {
         const container = document.getElementById('project-container');
         if (!container) return;
@@ -12,10 +13,13 @@ export async function initializeProjects(projectType = 'projects') {
         container.innerHTML = '';
         
         // Load project data
-        const { projects, icons } = await DataService.fetchProjects(projectType);
+        const { projects, icons } = await DataService.fetchProjects();
+        
+        // Sort projects by date (descending order)
+        const sortedProjects = sortProjectsByDate(projects);
         
         // Render each project
-        projects.forEach((project, index) => {
+        sortedProjects.forEach((project, index) => {
             // Create the project card (always using left layout)
             const card = createProjectCard(project, icons);
             container.appendChild(card);
@@ -32,6 +36,19 @@ export async function initializeProjects(projectType = 'projects') {
         }
         return false;
     }
+}
+
+/**
+ * Sort projects by date in descending order (newest first)
+ * @param {Array} projects - Array of project objects
+ * @returns {Array} Sorted projects array
+ */
+function sortProjectsByDate(projects) {
+    return [...projects].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA; // Descending order
+    });
 }
 
 /**
@@ -232,10 +249,14 @@ function createProjectContent(project, iconMap) {
 function createDateElement(date) {
     const dateContainer = document.createElement('div');
     dateContainer.className = "date-container";
+    
+    // Format the date using our utility function
+    const formattedDate = formatDate(date);
+    
     dateContainer.innerHTML = `
         <span class="iconify" data-icon="bi:calendar-week" data-width="18" data-height="18"></span>
         <span class="seperator inline">|</span>
-        <span class="date-text">${date}</span>
+        <span class="date-text">${formattedDate}</span>
     `;
     return dateContainer;
 }

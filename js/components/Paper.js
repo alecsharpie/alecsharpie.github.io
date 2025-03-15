@@ -514,12 +514,13 @@ function addDrawingPins(note) {
     const existingPins = note.querySelectorAll('.drawing-pin');
     existingPins.forEach(pin => pin.remove());
     
-    // Check if this is a project card
+    // Check if this is a project card or cool stuff container
     const isProjectCard = note.classList.contains('project-row-left') || 
-                          note.classList.contains('project-row-right');
+                         note.classList.contains('project-row-right');
+    const isCoolStuffContainer = note.classList.contains('cool-stuff-container');
     
-    if (isProjectCard) {
-        // Add two pins for project cards
+    if (isProjectCard || isCoolStuffContainer) {
+        // Add two pins for project cards and cool stuff container
         const leftPin = createPin();
         const rightPin = createPin();
         

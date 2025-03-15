@@ -1,6 +1,7 @@
 import { initializeProjects } from './components/ProjectCard.js';
 import { initializePaperEffects } from './components/Paper.js';
 import { setCurrentYearInFooter } from './utils/DateUtils.js';
+import { initializeCoolStuff } from './components/CoolStuff.js';
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Error initializing paper effects:", error);
     }
     
-    // Then load projects and display them
+    // Then load all projects and display them
     initializeProjects().then(() => {
         // Apply paper effects again after projects are loaded
         try {
@@ -35,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(error => {
         console.error("Error initializing projects:", error);
     });
+
+    // Initialize cool stuff
+    initializeCoolStuff();
 });
 
 // Handle window resize events
