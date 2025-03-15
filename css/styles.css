@@ -811,68 +811,84 @@ body > .paper-lines {
     display: none; /* Hide global paper lines, use only card-specific ones */
 }
 
-/* Add a subtle tape effect to make it look like notes stuck to the page */
+/* Remove the tape effect that was previously used */
 .paper-note::before, .paper-note::after {
+    display: none; /* Hide the tape effect */
+}
+
+/* Drawing pin styling */
+.drawing-pin {
+    position: absolute;
+    z-index: 10;
+    width: 16px;
+    height: 16px;
+    transform: translateZ(0); /* Force hardware acceleration for better rendering */
+}
+
+.pin-head {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c0c0c0 0%, #f5f5f5 50%, #a0a0a0 100%);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
+.pin-highlight {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    top: 3px;
+    right: 3px;
+    transform: translateZ(0);
+}
+
+/* Remove the pin center point as requested */
+.pin-center {
+    display: none;
+}
+
+/* Add a subtle shadow beneath the pin */
+.pin-head::after {
     content: "";
     position: absolute;
-    width: 45px;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-    border-radius: 2px;
-    opacity: 0.8;
-    background-image: 
-        linear-gradient(90deg, 
-            rgba(255,255,255,0.3) 0%, 
-            rgba(255,255,255,0.6) 50%, 
-            rgba(255,255,255,0.3) 100%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+    top: 0;
+    left: 0;
 }
 
-.paper-note::before {
-    top: -5px;
-    left: 20px;
-    transform: rotate(-45deg);
+/* Add a subtle indentation in the paper around the pin */
+.drawing-pin::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.02) 40%,
+        transparent 70%
+    );
+    top: -2px;
+    left: -2px;
+    z-index: -1;
 }
 
-.paper-note::after {
-    top: -5px;
-    right: 20px;
-    transform: rotate(45deg);
-}
-
-/* Ensure content appears above the lines */
-.project-info, .project-image-container {
+/* Ensure paper notes have proper positioning for pins */
+.paper-note {
     position: relative;
-    z-index: 1;
+    overflow: visible;
 }
 
-/* Fix for info-link-button styling that was accidentally removed */
-.info-link-button {
-    background-color: var(--button-bg);
-    border: 1px solid var(--button-border);
-    border-radius: 8px;
-    box-sizing: border-box;
-    color: var(--button-text);
-    padding: 5px 10px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    margin-bottom: 4px;
-    /* Add height to match line height */
-    height: 28px;
-}
-
-.info-link-button:hover {
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
-    transform: translateY(-2px);
-}
-
-/* Enhanced paper note styling for more realism */
+/* Restore the paper note styling for more realism */
 .paper-note {
     background-color: #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -919,6 +935,7 @@ body > .paper-lines {
     width: 1px;
     background-color: rgba(255, 0, 0, 0.15);
     z-index: 1;
+    display: block; /* Ensure it's visible */
 }
 
 /* Enhanced notebook holes styling for realistic ringbinder effect */
@@ -931,7 +948,7 @@ body > .paper-lines {
     height: 100%;
     z-index: 2;
     overflow: visible;
-    position: absolute;
+    display: block; /* Ensure it's visible */
 }
 
 /* Keyhole-shaped holes that extend to the left edge */
@@ -942,6 +959,7 @@ body > .paper-lines {
     width: 18px;
     background-color: transparent;
     left: 0;
+    display: block; /* Ensure it's visible */
     
     /* Create the keyhole shape with a clip-path */
     clip-path: polygon(
@@ -1109,6 +1127,7 @@ body > .paper-lines {
     background-color: rgba(0,0,0,0.04);
     z-index: 1;
     left: 52px;
+    display: block; /* Ensure it's visible */
 }
 
 /* Add horizontal stress lines near holes */
@@ -1119,6 +1138,7 @@ body > .paper-lines {
     width: 50px;
     background-color: rgba(0,0,0,0.03);
     z-index: 1;
+    display: block; /* Ensure it's visible */
 }
 
 /* Add paper fiber strands that connect torn areas */
@@ -1128,6 +1148,7 @@ body > .paper-lines {
     background-color: rgba(255, 255, 255, 0.9);
     z-index: 2;
     transform-origin: left center;
+    display: block; /* Ensure it's visible */
 }
 
 /* Torn paper effect along the left edge - more subtle and closer to edge */
@@ -1139,6 +1160,7 @@ body > .paper-lines {
     width: 25px; /* Narrower width to be closer to edge */
     background-color: transparent;
     z-index: 1;
+    display: block; /* Ensure it's visible */
     /* The background image will be set dynamically in JavaScript */
 }
 
@@ -1151,24 +1173,30 @@ body > .paper-lines {
     z-index: 2;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
     transform-origin: center;
+    display: block; /* Ensure it's visible */
 }
 
-/* Remove the red margin line */
-.paper-note .margin-line {
-    display: none; /* Hide the red margin line */
+/* Fix for info-link-button styling that was accidentally removed */
+.info-link-button {
+    background-color: var(--button-bg);
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: var(--button-text);
+    padding: 5px 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    /* Add height to match line height */
+    height: 28px;
 }
 
-/* Adjust content padding to accommodate the narrower torn edge */
-.paper-note .project-info {
-    padding-left: 45px; /* Reduced padding */
-}
-
-/* Adjust project image container position */
-.paper-note .project-image-container {
-    margin-left: 45px; /* Reduced margin */
-}
-
-/* Adjust fold mark position */
-.paper-note .fold-mark-vertical {
-    left: 42px; /* Move closer to edge */
+.info-link-button:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    transform: translateY(-2px);
 }
