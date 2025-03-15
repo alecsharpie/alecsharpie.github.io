@@ -167,8 +167,11 @@ function applyPaperEffectToCards() {
         const noteHeight = note.offsetHeight;
         
         // Apply subtle random rotation
-        const randomRotation = (Math.random() * 0.4) - 0.2;
-        note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
+        // Don't rotate the density plot container
+        if (!note.classList.contains('density-plot-container')) {
+            const randomRotation = (Math.random() * 0.4) - 0.2;
+            note.style.transform = `rotate(${-0.8 + randomRotation}deg)`;
+        }
         
         // Create paper lines
         const numberOfLines = Math.floor(noteHeight / lineHeight);
@@ -186,6 +189,19 @@ function applyPaperEffectToCards() {
         
         // Ensure images look like part of the paper
         styleProjectImages(note);
+        
+        // Add drawing pins based on note type
+        addDrawingPins(note);
+        
+        // Special handling for density plot
+        if (note.classList.contains('density-plot-container')) {
+            styleDensityPlot(note);
+        }
+        
+        // Add paper effects to about-me sections
+        if (note.classList.contains('about-me')) {
+            styleAboutMe(note);
+        }
     });
 }
 
@@ -265,11 +281,29 @@ function positionNotebookHoles(note) {
     // Get the note height
     const noteHeight = note.offsetHeight;
     
-    // Fixed number of holes
-    const holeCount = 10;
+    // Reduced spacing between holes
+    const holeSpacing = 30; // Reduced from 40px to 30px
     
-    // Calculate spacing between holes
-    const spacing = Math.floor(noteHeight / (holeCount + 1));
+    // Smaller margin from top and bottom
+    const margin = 15; // Reduced from 20px to 15px
+    
+    // Place holes at fixed positions from top to bottom
+    const positions = [];
+    
+    // Add first hole at the top margin
+    positions.push(margin);
+    
+    // Add holes at regular intervals
+    let currentPos = margin;
+    while (currentPos + holeSpacing < noteHeight - margin) {
+        currentPos += holeSpacing;
+        positions.push(currentPos);
+    }
+    
+    // Ensure we have a hole near the bottom
+    if (noteHeight - currentPos > margin * 1.5) {
+        positions.push(noteHeight - margin);
+    }
     
     // Hole variations for realism
     const holeVariations = [
@@ -277,11 +311,8 @@ function positionNotebookHoles(note) {
         'hole-damaged', 'hole-severely-torn', 'hole-extremely-damaged'
     ];
     
-    // Create each hole with explicit positioning
-    for (let i = 0; i < holeCount; i++) {
-        // Calculate position
-        const topPosition = (i + 1) * spacing;
-        
+    // Create each hole at the calculated positions
+    positions.forEach(topPosition => {
         // Create hole element
         const hole = document.createElement('div');
         
@@ -308,7 +339,7 @@ function positionNotebookHoles(note) {
         
         // Add to container
         notebookHoles.appendChild(hole);
-    }
+    });
     
     // Add paper fragments
     const fragmentCount = Math.floor(Math.random() * 4) + 3; // 3-6 fragments
@@ -412,4 +443,135 @@ function styleProjectImages(note) {
         img.style.opacity = '0.9';
         img.style.mixBlendMode = 'multiply';
     });
+}
+
+/**
+ * Styles the density plot to blend with paper effect
+ */
+function styleDensityPlot(container) {
+    const densityPlot = container.querySelector('.density-plot');
+    if (densityPlot) {
+        // Apply paper-like styling to the density plot
+        densityPlot.style.mixBlendMode = 'normal';
+        densityPlot.style.opacity = '1';
+        
+        // Add a fold mark to the density plot container
+        if (!container.querySelector('.fold-mark')) {
+            const foldMark = document.createElement('div');
+            foldMark.className = "fold-mark";
+            container.appendChild(foldMark);
+        }
+        
+        // Add bottom shadow
+        if (!container.querySelector('.bottom-shadow')) {
+            const bottomShadow = document.createElement('div');
+            bottomShadow.className = "bottom-shadow";
+            container.appendChild(bottomShadow);
+        }
+    }
+}
+
+/**
+ * Styles the about-me sections to look like paper notes
+ */
+function styleAboutMe(container) {
+    // Add a fold mark
+    if (!container.querySelector('.fold-mark')) {
+        const foldMark = document.createElement('div');
+        foldMark.className = "fold-mark";
+        container.appendChild(foldMark);
+    }
+    
+    // Add bottom shadow
+    if (!container.querySelector('.bottom-shadow')) {
+        const bottomShadow = document.createElement('div');
+        bottomShadow.className = "bottom-shadow";
+        container.appendChild(bottomShadow);
+    }
+    
+    // Add a coffee stain to one of the about-me sections
+    if (Math.random() > 0.5 && !container.querySelector('.coffee-stain')) {
+        const coffeeStain = document.createElement('div');
+        coffeeStain.className = "coffee-stain";
+        coffeeStain.style.opacity = '0.15'; // More subtle stain
+        container.appendChild(coffeeStain);
+    }
+    
+    // Make sure text is properly aligned with paper lines
+    container.querySelectorAll('.text-about-me, .links-about-me').forEach(el => {
+        if (!el.classList.contains('line-aligned')) {
+            el.classList.add('line-aligned');
+        }
+    });
+}
+
+/**
+ * Adds drawing pins to a note based on its type
+ * @param {HTMLElement} note - The note element
+ */
+function addDrawingPins(note) {
+    // Remove any existing pins
+    const existingPins = note.querySelectorAll('.drawing-pin');
+    existingPins.forEach(pin => pin.remove());
+    
+    // Check if this is a project card or cool stuff container
+    const isProjectCard = note.classList.contains('project-row-left') || 
+                         note.classList.contains('project-row-right');
+    const isCoolStuffContainer = note.classList.contains('cool-stuff-container');
+    
+    if (isProjectCard || isCoolStuffContainer) {
+        // Add two pins for project cards and cool stuff container
+        const leftPin = createPin();
+        const rightPin = createPin();
+        
+        // Position with slight randomness
+        const topOffset = 10 + (Math.random() * 5);
+        
+        leftPin.style.top = `${topOffset}px`;
+        leftPin.style.left = `${15 + (Math.random() * 10)}px`;
+        
+        rightPin.style.top = `${topOffset + (Math.random() * 5 - 2.5)}px`;
+        rightPin.style.right = `${15 + (Math.random() * 10)}px`;
+        
+        note.appendChild(leftPin);
+        note.appendChild(rightPin);
+    } else {
+        // Add one pin for all other paper notes - centered horizontally
+        const pin = createPin();
+        
+        // Position with slight randomness for vertical position
+        // But center horizontally with slight random offset
+        pin.style.top = `${10 + (Math.random() * 5)}px`;
+        pin.style.left = `calc(50% - ${8 + (Math.random() * 4)}px)`; // Center with slight random offset
+        
+        note.appendChild(pin);
+    }
+}
+
+/**
+ * Creates a drawing pin element
+ * @returns {HTMLElement} The drawing pin element
+ */
+function createPin() {
+    const pin = document.createElement('div');
+    pin.className = 'drawing-pin';
+    
+    // Create pin head
+    const pinHead = document.createElement('div');
+    pinHead.className = 'pin-head';
+    
+    // Create highlight on the pin
+    const pinHighlight = document.createElement('div');
+    pinHighlight.className = 'pin-highlight';
+    
+    // Create pin center
+    const pinCenter = document.createElement('div');
+    pinCenter.className = 'pin-center';
+    
+    // Assemble the pin
+    pinHead.appendChild(pinHighlight);
+    pinHead.appendChild(pinCenter);
+    pin.appendChild(pinHead);
+    
+    return pin;
 } 

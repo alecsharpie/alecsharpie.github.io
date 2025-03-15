@@ -1,9 +1,10 @@
 import { DataService } from '../services/DataService.js';
+import { formatDate } from '../utils/DateUtils.js';
 
 /**
  * Initializes projects section by loading data and rendering project cards
  */
-export async function initializeProjects(projectType = 'projects') {
+export async function initializeProjects() {
     try {
         const container = document.getElementById('project-container');
         if (!container) return;
@@ -12,14 +13,20 @@ export async function initializeProjects(projectType = 'projects') {
         container.innerHTML = '';
         
         // Load project data
-        const { projects, icons } = await DataService.fetchProjects(projectType);
+        const { projects, icons } = await DataService.fetchProjects();
+        
+        // Sort projects by date (descending order)
+        const sortedProjects = sortProjectsByDate(projects);
         
         // Render each project
-        projects.forEach((project, index) => {
+        sortedProjects.forEach((project, index) => {
             // Create the project card (always using left layout)
             const card = createProjectCard(project, icons);
             container.appendChild(card);
         });
+        
+        // Calculate median description length and position pins
+        positionDrawingPins();
         
         return true;
     } catch (error) {
@@ -29,6 +36,79 @@ export async function initializeProjects(projectType = 'projects') {
         }
         return false;
     }
+}
+
+/**
+ * Sort projects by date in descending order (newest first)
+ * @param {Array} projects - Array of project objects
+ * @returns {Array} Sorted projects array
+ */
+function sortProjectsByDate(projects) {
+    return [...projects].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA; // Descending order
+    });
+}
+
+/**
+ * Calculates median description length and positions pins accordingly
+ */
+function positionDrawingPins() {
+    // Get all cards
+    const cards = document.querySelectorAll('.paper-note');
+    if (cards.length === 0) return;
+    
+    // Extract description lengths
+    const descriptionLengths = Array.from(cards).map(card => 
+        parseInt(card.dataset.descriptionLength || '0', 10)
+    );
+    
+    // Calculate median
+    const sortedLengths = [...descriptionLengths].sort((a, b) => a - b);
+    const medianLength = sortedLengths[Math.floor(sortedLengths.length / 2)];
+    
+    // Position pins on each card
+    cards.forEach(card => {
+        // Remove placeholder pin
+        const placeholder = card.querySelector('.drawing-pin-placeholder');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        const descLength = parseInt(card.dataset.descriptionLength || '0', 10);
+        const useDoublePins = descLength >= medianLength;
+        
+        if (useDoublePins) {
+            // Add two pins for longer descriptions
+            const leftPin = createDrawingPin();
+            const rightPin = createDrawingPin();
+            
+            // Position with slight randomness
+            const topOffset = 10 + (Math.random() * 5);
+            
+            leftPin.style.top = `${topOffset}px`;
+            leftPin.style.left = `${15 + (Math.random() * 10)}px`;
+            
+            rightPin.style.top = `${topOffset + (Math.random() * 5 - 2.5)}px`;
+            rightPin.style.right = `${15 + (Math.random() * 10)}px`;
+            
+            card.appendChild(leftPin);
+            card.appendChild(rightPin);
+        } else {
+            // Add one pin for shorter descriptions
+            const pin = createDrawingPin();
+            
+            // Position with slight randomness
+            const topOffset = 10 + (Math.random() * 5);
+            const leftOffset = 50 + (Math.random() * 10 - 5); // Roughly centered
+            
+            pin.style.top = `${topOffset}px`;
+            pin.style.left = `${leftOffset}%`;
+            
+            card.appendChild(pin);
+        }
+    });
 }
 
 /**
@@ -49,6 +129,9 @@ function createProjectCard(project, iconMap) {
     
     // Add paper effects
     addPaperEffects(card, project);
+    
+    // Add drawing pins based on description length
+    addDrawingPins(card, project.description);
     
     // Add image (on desktop only)
     if (window.innerWidth > 800) {
@@ -136,6 +219,13 @@ function createProjectContent(project, iconMap) {
     dateContainer.classList.add('line-aligned');
     contentContainer.appendChild(dateContainer);
     
+    // Add a spacer div that takes up one line height
+    const spacerDiv = document.createElement('div');
+    spacerDiv.className = "line-spacer line-aligned";
+    spacerDiv.style.minHeight = 'var(--line-height)';
+    spacerDiv.style.height = 'var(--line-height)';
+    contentContainer.appendChild(spacerDiv);
+    
     // Links
     const linksElement = createLinksElement(project.links, iconMap);
     linksElement.classList.add('line-aligned');
@@ -159,10 +249,14 @@ function createProjectContent(project, iconMap) {
 function createDateElement(date) {
     const dateContainer = document.createElement('div');
     dateContainer.className = "date-container";
+    
+    // Format the date using our utility function
+    const formattedDate = formatDate(date);
+    
     dateContainer.innerHTML = `
         <span class="iconify" data-icon="bi:calendar-week" data-width="18" data-height="18"></span>
         <span class="seperator inline">|</span>
-        <span class="date-text">${date}</span>
+        <span class="date-text">${formattedDate}</span>
     `;
     return dateContainer;
 }
@@ -219,4 +313,48 @@ function createTagsElement(tags) {
     }
     
     return tagContainer;
+}
+
+/**
+ * Adds drawing pins to a card based on description length
+ * @param {HTMLElement} card - The card element
+ * @param {string} description - Project description
+ */
+function addDrawingPins(card, description) {
+    // Store description length for later comparison
+    card.dataset.descriptionLength = description.length;
+    
+    // We'll determine the actual number of pins after all cards are created
+    // This is just a placeholder that will be updated in initializeProjects
+    const pin = createDrawingPin();
+    pin.classList.add('drawing-pin-placeholder');
+    card.appendChild(pin);
+}
+
+/**
+ * Creates a drawing pin element
+ * @returns {HTMLElement} The drawing pin element
+ */
+function createDrawingPin() {
+    const pin = document.createElement('div');
+    pin.className = 'drawing-pin';
+    
+    // Create pin head
+    const pinHead = document.createElement('div');
+    pinHead.className = 'pin-head';
+    
+    // Create highlight on the pin
+    const pinHighlight = document.createElement('div');
+    pinHighlight.className = 'pin-highlight';
+    
+    // Create pin center
+    const pinCenter = document.createElement('div');
+    pinCenter.className = 'pin-center';
+    
+    // Assemble the pin
+    pinHead.appendChild(pinHighlight);
+    pinHead.appendChild(pinCenter);
+    pin.appendChild(pinHead);
+    
+    return pin;
 } 
