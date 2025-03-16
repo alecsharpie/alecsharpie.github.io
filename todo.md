@@ -9,4 +9,3 @@ mobile friendly
 random rotation of cards
 shadows
 3D paper effect
-educational tag colour
