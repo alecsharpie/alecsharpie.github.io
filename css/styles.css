@@ -6,6 +6,7 @@
     --secondary-accent: #2a7886;
     --dark-accent: #204051;
     --highlight: #512b58;
+    --secondary-highlight: #7a4284;
     --light-grey-accent: #bcc1c4;
     --button-bg: #f1f3f4;
     --button-border: #204051;
@@ -494,7 +495,7 @@ a:hover {
 }
 
 .tag.educational {
-    background-color: var(--highlight);
+    background-color: var(--secondary-highlight);
 }
 
 .tag.experiment {
