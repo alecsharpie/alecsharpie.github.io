@@ -70,6 +70,16 @@ function positionDrawingPins() {
 
     // Position pins on each card
     cards.forEach(card => {
+        // Skip if pins already exist (to prevent repositioning on scroll)
+        if (card.querySelectorAll('.drawing-pin:not(.drawing-pin-placeholder)').length > 0) {
+            // Remove placeholder pin if it exists
+            const placeholder = card.querySelector('.drawing-pin-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            return;
+        }
+
         // Remove placeholder pin
         const placeholder = card.querySelector('.drawing-pin-placeholder');
         if (placeholder) {

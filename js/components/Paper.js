@@ -510,9 +510,10 @@ function styleAboutMe(container) {
  * @param {HTMLElement} note - The note element
  */
 function addDrawingPins(note) {
-    // Remove any existing pins
-    const existingPins = note.querySelectorAll('.drawing-pin');
-    existingPins.forEach(pin => pin.remove());
+    // Skip if pins already exist (to prevent repositioning on scroll)
+    if (note.querySelector('.drawing-pin')) {
+        return;
+    }
 
     // Check if this is a project card or cool stuff container
     const isProjectCard = note.classList.contains('project-row-left') ||

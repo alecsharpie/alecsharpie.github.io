@@ -24,7 +24,7 @@ body {
     color: var(--primary-text);
     position: relative;
 
-    /* Cork board background */
+    /* Cork board background - make it scroll with content */
     background-color: #BB8141;
     /* Base cork color */
     background-image:
@@ -73,7 +73,8 @@ body {
         30px 30px, 70px 80px, 120px 40px, 180px 60px, 90px 130px, 210px 100px, 250px 30px, 300px 85px,
         0 0;
 
-    background-attachment: fixed;
+    /* Remove fixed background attachment to allow scrolling with content */
+    background-attachment: scroll;
 }
 
 h4 {
@@ -938,6 +939,10 @@ body>.paper-lines {
     height: 16px;
     transform: translateZ(0);
     /* Force hardware acceleration for better rendering */
+    will-change: transform;
+    /* Hint to browser that this element's transform will change */
+    transition: none !important;
+    /* Disable any transitions that might cause movement */
 }
 
 .pin-head {
@@ -999,12 +1004,14 @@ body>.paper-lines {
 .paper-note {
     position: relative;
     overflow: visible;
+    will-change: transform;
+    /* Hint to browser that this element's transform will change */
 }
 
 /* Restore the paper note styling for more realism */
 .paper-note {
     background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(210, 210, 210, 0.8);
     position: relative;
     overflow: visible;
@@ -1015,10 +1022,12 @@ body>.paper-lines {
         linear-gradient(rgba(255, 255, 255, 0.7) 50%, rgba(245, 245, 245, 0.7) 50%),
         url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
 
-    /* Torn paper edge effect */
-    border-top: none;
+    /* Remove all border radius */
+    border-radius: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 /* Remove image hover effects that don't look paper-like */
@@ -1549,4 +1558,15 @@ body>.paper-lines {
         line-height: 1.4;
         /* Increased line height for better readability */
     }
+}
+
+/* Ensure the paper lines don't scroll with the page */
+.paper-lines:not(.in-card) {
+    position: absolute; /* Change from fixed to absolute */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
 }

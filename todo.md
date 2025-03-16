@@ -7,9 +7,6 @@ card spacing - date
 proof read titles & descriptions
 mobile friendly
 random rotation of cards
-drawing pin movement on scroll
 shadows
-rounded bottom corners of paper
 3D paper effect
-slight hard corner sticking out bottom left
 educational tag colour
