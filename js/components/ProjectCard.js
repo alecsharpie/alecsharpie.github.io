@@ -26,7 +26,7 @@ export async function initializeProjects() {
         });
 
         // Calculate median description length and position pins
-        positionDrawingPins();
+        // positionDrawingPins(); // Removed as per subtask
 
         return true;
     } catch (error) {
@@ -51,75 +51,7 @@ function sortProjectsByDate(projects) {
     });
 }
 
-/**
- * Calculates median description length and positions pins accordingly
- */
-function positionDrawingPins() {
-    // Get all cards
-    const cards = document.querySelectorAll('.paper-note');
-    if (cards.length === 0) return;
-
-    // Extract description lengths
-    const descriptionLengths = Array.from(cards).map(card =>
-        parseInt(card.dataset.descriptionLength || '0', 10)
-    );
-
-    // Calculate median
-    const sortedLengths = [...descriptionLengths].sort((a, b) => a - b);
-    const medianLength = sortedLengths[Math.floor(sortedLengths.length / 2)];
-
-    // Position pins on each card
-    cards.forEach(card => {
-        // Skip if pins already exist (to prevent repositioning on scroll)
-        if (card.querySelectorAll('.drawing-pin:not(.drawing-pin-placeholder)').length > 0) {
-            // Remove placeholder pin if it exists
-            const placeholder = card.querySelector('.drawing-pin-placeholder');
-            if (placeholder) {
-                placeholder.remove();
-            }
-            return;
-        }
-
-        // Remove placeholder pin
-        const placeholder = card.querySelector('.drawing-pin-placeholder');
-        if (placeholder) {
-            placeholder.remove();
-        }
-
-        const descLength = parseInt(card.dataset.descriptionLength || '0', 10);
-        const useDoublePins = descLength >= medianLength;
-
-        if (useDoublePins) {
-            // Add two pins for longer descriptions
-            const leftPin = createDrawingPin();
-            const rightPin = createDrawingPin();
-
-            // Position with slight randomness
-            const topOffset = 10 + (Math.random() * 5);
-
-            leftPin.style.top = `${topOffset}px`;
-            leftPin.style.left = `${15 + (Math.random() * 10)}px`;
-
-            rightPin.style.top = `${topOffset + (Math.random() * 5 - 2.5)}px`;
-            rightPin.style.right = `${15 + (Math.random() * 10)}px`;
-
-            card.appendChild(leftPin);
-            card.appendChild(rightPin);
-        } else {
-            // Add one pin for shorter descriptions
-            const pin = createDrawingPin();
-
-            // Position with slight randomness
-            const topOffset = 10 + (Math.random() * 5);
-            const leftOffset = 50 + (Math.random() * 10 - 5); // Roughly centered
-
-            pin.style.top = `${topOffset}px`;
-            pin.style.left = `${leftOffset}%`;
-
-            card.appendChild(pin);
-        }
-    });
-}
+// function positionDrawingPins() removed as per subtask
 
 /**
  * Creates a project card element
@@ -132,16 +64,16 @@ function createProjectCard(project, iconMap) {
     const card = document.createElement('div');
     card.className = `project-row-left paper-note`;
 
-    // Add paper lines container
-    const paperLinesContainer = document.createElement('div');
-    paperLinesContainer.className = "paper-lines";
-    card.appendChild(paperLinesContainer);
+    // Add paper lines container - Removed as per subtask
+    // const paperLinesContainer = document.createElement('div');
+    // paperLinesContainer.className = "paper-lines";
+    // card.appendChild(paperLinesContainer);
 
     // Add paper effects
-    addPaperEffects(card, project);
+    // addPaperEffects(card, project); // Removed as per subtask
 
     // Add drawing pins based on description length
-    addDrawingPins(card, project.description);
+    // addDrawingPins(card, project.description); // Removed as per subtask
 
     // Add image (on desktop only)
     if (window.innerWidth > 800) {
@@ -157,37 +89,7 @@ function createProjectCard(project, iconMap) {
     return card;
 }
 
-/**
- * Adds paper effects to a card
- * @param {HTMLElement} card - The card element
- * @param {Object} project - Project data
- */
-function addPaperEffects(card, project) {
-    // Add a subtle fold mark
-    const foldMark = document.createElement('div');
-    foldMark.className = "fold-mark";
-    card.appendChild(foldMark);
-
-    // Add bottom shadow
-    const bottomShadow = document.createElement('div');
-    bottomShadow.className = "bottom-shadow";
-    card.appendChild(bottomShadow);
-
-    // Add coffee stain to some cards
-    if (project.id % 3 === 0) {
-        const coffeeStain = document.createElement('div');
-        coffeeStain.className = "coffee-stain";
-        card.appendChild(coffeeStain);
-    }
-
-    // Add pencil mark to some cards
-    if (project.id % 2 === 0) {
-        const pencilMark = document.createElement('div');
-        pencilMark.className = "pencil-mark";
-        pencilMark.textContent = "Check this out!";
-        card.appendChild(pencilMark);
-    }
-}
+// function addPaperEffects(card, project) removed as per subtask
 
 /**
  * Adds project image to a card
@@ -325,46 +227,6 @@ function createTagsElement(tags) {
     return tagContainer;
 }
 
-/**
- * Adds drawing pins to a card based on description length
- * @param {HTMLElement} card - The card element
- * @param {string} description - Project description
- */
-function addDrawingPins(card, description) {
-    // Store description length for later comparison
-    card.dataset.descriptionLength = description.length;
+// function addDrawingPins(card, description) removed as per subtask
 
-    // We'll determine the actual number of pins after all cards are created
-    // This is just a placeholder that will be updated in initializeProjects
-    const pin = createDrawingPin();
-    pin.classList.add('drawing-pin-placeholder');
-    card.appendChild(pin);
-}
-
-/**
- * Creates a drawing pin element
- * @returns {HTMLElement} The drawing pin element
- */
-function createDrawingPin() {
-    const pin = document.createElement('div');
-    pin.className = 'drawing-pin';
-
-    // Create pin head
-    const pinHead = document.createElement('div');
-    pinHead.className = 'pin-head';
-
-    // Create highlight on the pin
-    const pinHighlight = document.createElement('div');
-    pinHighlight.className = 'pin-highlight';
-
-    // Create pin center
-    const pinCenter = document.createElement('div');
-    pinCenter.className = 'pin-center';
-
-    // Assemble the pin
-    pinHead.appendChild(pinHighlight);
-    pinHead.appendChild(pinCenter);
-    pin.appendChild(pinHead);
-
-    return pin;
-} 
+// function createDrawingPin() removed as per subtask

@@ -14,7 +14,6 @@
     --button-hover-bg: #204051;
     --button-hover-text: #f1f3f4;
     --line-height: 28px;
-    /* base grid unit for ruled line look */
     --half-line: 14px;
     --quarter-line: 7px;
 }
@@ -73,8 +72,6 @@ body {
         /* Random positions for dark speckles */
         30px 30px, 70px 80px, 120px 40px, 180px 60px, 90px 130px, 210px 100px, 250px 30px, 300px 85px,
         0 0;
-
-    /* Remove fixed background attachment to allow scrolling with content */
     background-attachment: scroll;
 }
 
@@ -101,12 +98,17 @@ h5 {
 }
 
 hr {
-    padding-bottom: 10px;
+    padding-bottom: 0; /* Removed unusual padding */
     border-color: var(--light-grey-accent);
+    border-style: solid;
+    border-width: 1px 0 0 0; /* Only top border */
+    margin: var(--line-height) auto; /* Consistent spacing */
 }
 
 ul {
-    float: left;
+    float: left; /* Consider removing if not necessary for layout */
+    list-style-position: inside; /* Or outside, depending on desired alignment */
+    padding-left: 20px; /* Indent list */
 }
 
 a:hover {
@@ -116,29 +118,30 @@ a:hover {
 /* Layout containers */
 .top-container {
     height: auto;
-    /* Allow height to be determined by content */
     background-color: transparent;
     position: relative;
     text-align: center;
-    z-index: 1;
+    z-index: 1; /* Ensure content is above body background */
     flex: 1;
     min-width: 250px;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 20px 0; /* Add some vertical padding */
 }
 
 .middle-container {
-    display: inline-block;
+    display: block; /* Changed from inline-block for better centering */
     max-width: 80%;
     padding: 20px;
+    margin: 0 auto; /* Center if it's a main content block */
 }
 
 .about-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: stretch;
+    align-items: stretch; /* Makes children of same height */
     gap: 20px;
     padding: 20px;
     max-width: 1200px;
@@ -146,50 +149,59 @@ a:hover {
 }
 
 .project-container {
-    display: inline-block;
+    display: block; /* Changed from inline-block for better centering */
     max-width: 90%;
-    padding: 20px;
+    padding: 20px 0; /* Vertical padding */
+    margin: 0 auto; /* Center project container */
 }
 
-/* About section */
-.about-me {
+/* Simplified .paper-note styling with CSS-only lines */
+.paper-note {
+    position: relative;
+    background-color: #fdfdfd; /* Light off-white for paper */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    border: 1px solid #e0e0e0; /* Light border for definition */
+    overflow: hidden; /* Contains any pseudo-elements or complex children */
+    border-radius: 0; /* Sharp corners for paper */
+    padding: var(--line-height) 20px 20px 20px; /* Top padding for first line, others for content */
+    margin-bottom: 30px; /* Space between notes */
+    background-image: repeating-linear-gradient(
+        transparent,
+        transparent calc(var(--line-height) - 1px),
+        rgba(0,0,0,0.07) calc(var(--line-height) - 1px),
+        rgba(0,0,0,0.07) var(--line-height)
+    );
+    line-height: var(--line-height); /* Default line height for content within */
+}
+
+/* About section (as a .paper-note variant) */
+.about-me.paper-note {
     min-width: 210px;
-    margin: 20px;
-    display: inline-block;
+    margin: 0; /* If used within .about-container, gap handles spacing */
     text-align: left;
+    flex: 1; /* Allow it to grow if in flex container */
+    max-width: 400px;
 }
 
 .text-about-me {
     font-size: 1.1em;
-    margin-bottom: 10px;
+    margin: 0 0 var(--line-height) 0; /* Spacing based on line height */
 }
 
 .links-about-me {
-    size: 20em;
+    margin: 0;
 }
 
-/* Project display - improved alignment */
+
+/* Project display */
 .project-row-left,
 .project-row-right {
-    min-height: 200px;
+    /* These are .paper-note variants, so they inherit base .paper-note styles */
     display: flex;
     text-align: left;
-    line-height: 1.8;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    position: relative;
-
-    /* Paper note styling */
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-    overflow: hidden;
-
-    /* Consistent rotation for all cards */
-    transform: rotate(-0.8deg);
+    transform: rotate(-0.8deg); /* Subtle rotation effect, can be optional */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-left: 10px;
+    margin-left: 10px; /* Specific margin for project rows */
 }
 
 .project-row-left {
@@ -197,252 +209,136 @@ a:hover {
     justify-content: start;
 }
 
-/* Remove different styling for right-aligned cards */
 .project-row-right {
     flex-direction: row;
-    /* Change from row-reverse to row */
     justify-content: start;
-    /* Change from space-between to start */
-    transform: rotate(-0.8deg);
-    /* Use same rotation as left cards */
 }
 
-/* Image styling with blob effect */
+.project-row-left:hover,
+.project-row-right:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Slightly more pronounced shadow */
+}
+
+
+/* Image styling */
 .project-image-container {
     position: relative;
     width: 150px;
     height: 150px;
-    margin: 0 30px;
+    margin: 0 30px; /* Spacing around image */
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: visible;
 }
 
 .project-image {
     width: 140px;
     height: 140px;
     object-fit: cover;
-    position: relative;
-    z-index: 1;
-    border-radius: 0;
-    /* Remove rounded corners */
-    transition: none;
-    transform: none !important;
-    /* Remove rotation */
-    box-shadow: none;
-    /* Remove shadow */
-    border: none;
-    /* Remove border */
-    opacity: 0.9;
-    /* Slightly faded to blend with paper */
+    border-radius: 0; /* Sharp corners */
 }
 
-.image-blob {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-.image-border {
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    width: calc(100% + 10px);
-    height: calc(100% + 10px);
-    border: 2px solid var(--primary-accent);
-    border-radius: 50%;
-    /* Default circle before JS applies the blob */
-    z-index: 0;
-}
-
-/* Project info container - improved spacing */
+/* Project info container */
 .project-info {
     display: flex;
     flex-direction: column;
-    position: relative;
     text-align: left;
     font-size: 0.9em;
-    /* padding: var(--line-height) 15px; */
     margin: 0;
-    flex: 1;
-    /* gap: var(--line-height); Use consistent gap between elements */
+    flex: 1; /* Takes available space */
 }
 
-/* Project title - consistent spacing */
+/* Project content elements */
 .project-title {
     font-size: 1.6em;
-    margin: 0;
+    margin: 0 0 var(--half-line) 0; /* Bottom margin for spacing */
     color: var(--dark-accent);
-    padding: 0;
-    position: relative;
-    line-height: var(--line-height);
-    min-height: var(--line-height);
+    padding: 0; /* Remove padding if relying on margin */
+    line-height: 1.2; /* Adjusted for larger font, may not perfectly align with CSS lines */
 }
 
-/* Date container - align with paper lines */
 .date-container {
     display: flex;
     align-items: center;
-    margin: 0;
+    margin: 0 0 var(--half-line) 0; /* Bottom margin */
     color: var(--dark-accent);
     font-size: 0.9em;
-    height: var(--line-height);
-    position: relative;
 }
 
 .date-container .iconify {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 18px;
-    width: 18px;
+    margin-right: var(--quarter-line);
 }
+.date-container .seperator { margin: 0 var(--quarter-line); }
 
-.date-container .seperator {
-    margin: 0 8px;
-    display: flex;
-    align-items: center;
-    height: 18px;
-}
 
-.date-container .date-text {
-    display: flex;
-    align-items: center;
-    height: 18px;
-}
-
-/* Project links - align with paper lines and center items vertically */
 .project-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 0;
-    position: relative;
-    min-height: var(--line-height);
-    margin-top: 8px;
-    align-items: center;
+    gap: 10px; /* Space between link buttons */
+    margin: 0 0 var(--line-height) 0; /* Bottom margin */
+    align-items: center; /* Vertically align items if they wrap */
 }
 
-/* Project description - align with paper lines */
 .project-description {
-    margin: 0;
-    line-height: var(--line-height);
-    position: relative;
-    margin-bottom: 0 !important;
+    margin: 0; /* Let line-height from .paper-note handle spacing within */
 }
 
-/* Tags - consistent styling */
+/* Tags */
 .tag-container {
     position: absolute;
-    top: 25px;
-    right: -40px;
+    top: 20px;
+    right: -35px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin: 0;
-    min-height: auto;
-    padding: 0;
-    z-index: 10;
-    /* Increased z-index to ensure it's above all other elements */
+    z-index: 2; /* Above paper lines */
 }
 
 .tag {
-    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--primary-bg);
     font-size: 0.85em;
     padding: 6px 10px;
-    line-height: 1;
+    line-height: 1; /* Tags have their own line height */
     border-radius: 2px;
-    height: auto;
     position: relative;
-    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.2);
     min-width: 70px;
-    transform: rotate(2deg);
-    /* Slight rotation for natural look */
+    transform: rotate(2deg); /* Subtle rotation for tags */
 }
 
-/* Add tape effect to the left side of each tag */
-.tag::before {
+.tag::before { /* Tape effect */
     content: "";
     position: absolute;
     left: -30px;
     top: 0;
-    transform: none;
     width: 35px;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255,255,255,0.7);
     border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     opacity: 0.8;
-    background-image:
-        linear-gradient(90deg,
-            rgba(255, 255, 255, 0.3) 0%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.3) 100%);
-    z-index: -1;
+    background-image: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.3) 100%);
+    z-index: -1; /* Behind the tag */
 }
 
-/* Add subtle shadow to the bottom of each tag for depth */
-.tag::after {
+.tag::after { /* Bottom shadow for depth - subtle */
     content: "";
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.05)); /* Softer shadow */
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
 }
 
-/* Add slight variations to each tag's rotation for realism */
-.tag:nth-child(odd) {
-    transform: rotate(3deg);
-}
+.tag:nth-child(odd) { transform: rotate(3deg); }
+.tag:nth-child(even) { transform: rotate(1deg); }
+.tag:nth-child(3n) { transform: rotate(-1deg); }
+.tag:nth-child(3n+1) { transform: rotate(2deg); }
 
-.tag:nth-child(even) {
-    transform: rotate(1deg);
-}
-
-.tag:nth-child(3n) {
-    transform: rotate(-1deg);
-}
-
-.tag:nth-child(3n+1) {
-    transform: rotate(2deg);
-}
-
-/* Ensure content appears above the lines with consistent z-index */
-.project-info,
-.project-image-container,
-.project-title,
-.date-container,
-.project-links,
-.project-description,
-.tag-container {
-    position: relative;
-    z-index: 1;
-}
-
-/* Remove transform adjustments that were causing misalignment */
-.project-title,
-.date-container,
-.project-links,
-.project-description,
-.tag-container,
-.links-about-me,
-.links-cool-stuff,
-.text-about-me {
-    transform: none !important;
-    /* Force no transform to prevent misalignment */
-}
 
 /* Section titles and dividers */
 .section-title {
@@ -450,109 +346,122 @@ a:hover {
     font-size: 2.2em;
     font-family: "Open Sans", sans-serif;
     text-align: center;
-    margin-top: 20px;
-    background-color: rgba(241, 243, 244, 0.7);
-    /* Semi-transparent background */
-    display: inline-block;
+    margin-top: 20px; /* Spacing above title */
+    margin-bottom: var(--line-height); /* Spacing below title, aligned with lines */
+    background-color: rgba(241,243,244,0.7); /* Semi-transparent background */
+    display: inline-block; /* So background fits content */
     padding: 0 15px;
-    position: relative;
-    z-index: 2;
+    position: relative; /* For z-index if needed */
+    z-index: 1; /* Above paper lines if it's on a paper-note */
 }
 
-.section-split {
+.section-split, .projects-split, .experience-split {
     width: 90%;
-    margin-bottom: 30px;
-    margin-top: 30px;
-    border-color: var(--primary-accent);
-    height: 20px;
-}
-
-.projects-split {
-    width: 33%;
-    margin-bottom: 30px;
-    margin-top: 30px;
+    margin: var(--line-height) auto; /* Consistent spacing */
     border-color: var(--primary-accent);
 }
+.projects-split, .experience-split { width: 33%; }
 
-.experience-split {
-    width: 33%;
-    margin-bottom: 30px;
-    margin-top: 30px;
-    border-color: var(--primary-accent);
-}
 
-/* Tags and buttons */
-.tag.webapp {
-    background-color: var(--dark-accent);
-}
-
-.tag.dataset {
-    background-color: var(--secondary-accent);
-}
-
-.tag.code {
-    background-color: var(--highlight);
-}
-
-.tag.educational {
-    background-color: var(--secondary-highlight);
-}
-
-.tag.experiment {
-    background-color: var(--primary-accent);
-}
+/* Tag colors */
+.tag.webapp { background-color: var(--dark-accent); }
+.tag.dataset { background-color: var(--secondary-accent); }
+.tag.code { background-color: var(--highlight); }
+.tag.educational { background-color: var(--secondary-highlight); }
+.tag.experiment { background-color: var(--primary-accent); }
 
 /* Utility classes */
-.center {
+.center { text-align: center; }
+.seperator { margin: 0 var(--quarter-line); }
+.link { color: var(--dark-accent); text-decoration: none; }
+.inline { display: inline-block; margin: 0px; }
+
+/* Density plot styling */
+.paper-note.density-plot-container {
+    margin: 20px auto; /* Center */
     text-align: center;
-}
-
-.seperator {
-    margin-left: 2px;
-    margin-right: 2px;
-}
-
-.date {
-    text-align: left;
-    margin-right: 20px;
-    margin-bottom: 3px;
-}
-
-.flex-item {
+    width: 320px;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    margin-bottom: 3px;
-    margin-top: 3px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-
-.link {
-    color: var(--dark-accent);
-    text-decoration: none;
-}
-
-.inline {
-    display: inline-block;
-    margin: 0px;
-}
-
-.density-plot {
-    position: relative;
-    /* Change from absolute to relative */
-    top: auto;
-    left: auto;
+.density-plot { /* The image itself */
     max-width: 100%;
-    width: 280px;
-    /* Slightly smaller than container */
+    width: 280px; /* Slightly smaller than container */
     height: auto;
-    margin: 0 auto;
+    margin: 0 auto; /* Center */
 }
 
-.links-cool-stuff {
-    text-align: left;
-    font-size: 0.9em;
-    margin-bottom: 10px;
+/* Cool Stuff Section */
+.cool-stuff-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+.cool-stuff-container.paper-note {
+    max-width: 1000px;
+    margin: 0 auto; /* Center */
+}
+
+.cool-stuff-links { /* Container for links inside cool-stuff-container */
+    position: relative; /* For z-index if needed */
+    z-index: 1; /* Above paper lines */
+}
+
+.cool-stuff-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--half-line); /* Spacing between items */
+    transition: transform 0.2s ease;
+    padding-left: 10px; /* Indent items slightly */
+}
+
+.cool-stuff-item:hover {
+    transform: translateX(5px);
+    color: var(--dark-accent);
+}
+
+.cool-stuff-item .iconify {
+    min-width: 20px; /* Ensure icon has space */
+    margin-right: var(--quarter-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cool-stuff-item p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Section title container as paper note */
+.paper-note.section-title-container {
+    margin: 20px auto;
+    text-align: center;
+    max-width: 450px;
+    display: inline-block; /* To size to content */
+}
+.paper-note.section-title-container .section-title {
+    margin: 0;
+    padding: 0;
+    background-color: transparent; /* No extra background for title itself */
+    line-height: 1.3; /* For wrapped text */
+}
+
+/* Footer paper note */
+.paper-note.bottom-container {
+    margin: 20px auto;
+    text-align: center;
+    max-width: 300px;
+}
+.bottom-container p {
+    margin: 0; /* Remove default p margin */
+}
+
 
 .my_name {
     position: absolute;
@@ -568,1006 +477,134 @@ a:hover {
 @media screen and (max-width: 900px) {
     .about-container {
         flex-direction: column;
-        /* Stack vertically on smaller screens */
         align-items: center;
-        /* Center items */
     }
 
     .paper-note.density-plot-container,
     .paper-note.about-me,
     .top-container {
         width: 90%;
-        /* Take up most of the container width */
         max-width: 400px;
-        /* Cap the maximum width */
-        margin-bottom: 20px;
-        /* Add space between stacked items */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 20px; /* Spacing when stacked */
     }
+    .top-container { margin-bottom: 20px; }
 
-    .density-plot {
-        width: 250px;
-        /* Slightly smaller on mobile */
-    }
+
+    .density-plot { width: 250px; }
 }
 
 @media screen and (max-width: 480px) {
-
     .project-row-left,
     .project-row-right {
-        flex-direction: column;
-        margin-left: 5px;
-    }
-
-    .project-row-right {
-        flex-direction: column;
+        flex-direction: column; /* Stack image and info */
+        margin-left: 5px; /* Closer to edge */
+        transform: none; /* No rotation on small screens */
     }
 
     .project-image-container {
         width: 100px;
         height: 100px;
+        margin: var(--half-line) auto; /* Center image */
     }
-
-    .project-image {
-        width: 90px;
-        height: 90px;
-    }
+    .project-image { width: 90px; height: 90px; }
 
     .project-links {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-        margin-top: 10px;
+        align-items: flex-start; /* Align links to left */
+        gap: var(--quarter-line);
+        margin-top: var(--half-line);
     }
 
-    .my_name {
-        font-size: 2.5rem;
-        left: 20%;
-    }
+    .my_name { font-size: 2.5rem; left: 15%; } /* Adjust as needed */
 
-    .density-plot {
-        width: 250px;
+    .paper-note, .project-row-left, .project-row-right {
+        padding: var(--half-line) 15px; /* Smaller padding */
     }
-
-    .project-row-left,
-    .project-row-right {
-        padding: 12px 10px;
-        /* Further reduce padding */
-        margin-bottom: 20px;
-        /* Less space between cards */
-    }
-
-    .paper-note .project-info {
-        padding-left: 25px;
-        /* Reduce from 35px to 25px on mobile */
+    
+    .project-row-left .project-info, .project-row-right .project-info {
+        padding-left: 0; /* No extra padding when stacked */
     }
 
     .info-link-button {
         padding: 2px 6px;
         font-size: 0.8em;
-        height: 24px;
-        /* Smaller height */
+        height: auto; /* Let content define height */
+        min-height: var(--line-height); /* Minimum touch target */
     }
 
-    .project-title {
-        font-size: 1.3em;
-    }
+    .project-title { font-size: 1.3em; }
 
-    .tag-container {
-        right: -30px;
-    }
-
-    .tag {
-        font-size: 0.7em;
-        padding: 3px 6px;
-        min-width: 50px;
-    }
-
-    /* Adjust image positioning */
-    .project-image-container {
-        margin-left: 25px;
-        /* Reduce from 35px to 25px on mobile */
-    }
-
-    /* Keep tags on the right side but closer to the note */
-    .tag-container {
-        right: -25px;
-        /* Move closer to the edge of the note */
-    }
-
-    /* Make the tape narrower */
-    .tag::before {
-        width: 25px;
-        /* Narrower tape */
-        left: -25px;
-        /* Position closer to tag */
-    }
+    .tag-container { right: -15px; top: 15px; gap: 5px;}
+    .tag { font-size: 0.7em; padding: 3px 6px; min-width: 50px; }
+    .tag::before { width: 20px; left: -20px; } /* Narrower tape for smaller tags */
 }
 
-/* Paper lines styling */
-.paper-lines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
-
-.paper-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: rgba(121, 186, 193, 0.2);
-    /* Lighter lines for more realism */
-    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.5);
-    /* Subtle embossed effect */
-}
-
-/* Adjust text elements to work with paper lines */
-.text-about-me,
-.project-description,
-.links-cool-stuff p,
-.links-about-me,
-.bottom-container p {
-    margin-bottom: 0;
-    /* Let the line height control spacing */
-    padding-top: 4px;
-    /* Small offset to position text nicely on the line */
-}
-
-/* Project title alignment */
-.project-title {
-    margin-top: 0;
-    padding-top: 0;
-}
-
-/* Date container alignment */
-.date-container {
-    margin-top: 0;
-    padding-top: 0;
-}
-
-/* Tag container alignment */
-.tag-container {
-    margin-top: 0;
-    padding-top: 4px;
-}
-
-/* Links alignment */
-.links-about-me {
-    margin-bottom: 0;
-    padding-top: 4px;
-}
-
-/* Cool stuff section alignment */
-.links-cool-stuff {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-/* Bottom container alignment */
-.bottom-container {
-    padding-top: 0;
-    margin-top: 0;
-}
-
-/* Ensure HR elements don't disrupt line alignment */
-hr.section-split,
-hr.projects-split {
-    margin-top: calc(var(--line-height) - 1px);
-    margin-bottom: calc(var(--line-height) - 1px);
-}
-
-/* Make sure content appears above the lines */
-main,
-header,
-footer,
-.project-container,
-.middle-container {
-    position: relative;
-    z-index: 1;
-}
-
-/* Paper grid system - fundamental to alignment */
-:root {
-    --line-height: 28px;
-    /* Our base grid unit */
-    --half-line: 14px;
-    --quarter-line: 7px;
-}
-
-/* Base alignment classes - refined for better text positioning */
+/* Simplified .line-aligned class - apply to text elements needing line alignment */
 .line-aligned {
-    position: relative;
-    margin: 0;
-    padding: 0;
-    min-height: var(--line-height);
     line-height: var(--line-height);
-    transform: none !important;
-    /* Force no transform */
-}
-
-.line-aligned-2x {
     margin-top: 0;
-    margin-bottom: 0;
-    min-height: calc(var(--line-height) * 2);
-    line-height: var(--line-height);
-    position: relative;
+    margin-bottom: 0; 
+    padding-top: var(--quarter-line); /* Adjust for better visual alignment on the line */
+    padding-bottom: var(--quarter-line);
 }
 
-/* Container spacing */
-.line-container {
-    padding-top: var(--line-height);
-    padding-bottom: var(--line-height);
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-/* Section spacing */
-.section-spacing {
-    margin-top: var(--line-height);
-    margin-bottom: var(--line-height);
-}
-
-/* Elements that need specific alignment */
-.project-title {
-    margin: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    min-height: calc(var(--line-height) * 1.5);
-    line-height: calc(var(--line-height) * 1.5);
-    transform: translateY(-6px);
-    /* Slightly above the line */
-}
-
-.date-container {
-    margin: 0;
-    padding: 0;
-    height: var(--line-height);
-    line-height: var(--line-height);
-    display: flex;
-    align-items: flex-end;
-    /* Align items to bottom */
-    transform: translateY(-4px);
-    /* Position above the line */
-}
-
-.project-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: var(--line-height);
-    margin: 0;
-    padding: 0;
-    transform: translateY(-4px);
-}
-
-.project-description {
-    margin: 0;
-    padding: 0;
-    line-height: var(--line-height);
-    transform: translateY(-4px);
-}
-
-.tag-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 0;
-    min-height: var(--line-height);
-    transform: translateY(-4px);
-}
-
-.links-about-me,
-.links-cool-stuff {
-    transform: translateY(-4px);
-}
-
-.text-about-me {
-    transform: translateY(-4px);
-}
-
-/* Ensure project rows have aligned heights */
-.project-row-left,
-.project-row-right {
-    padding: var(--line-height) 20px;
-    /* Top/bottom padding matches line height */
-    margin-bottom: var(--line-height);
-}
-
-/* Keep separators aligned */
-hr.section-split,
-hr.projects-split {
-    margin-top: calc(var(--line-height) - 1px);
-    margin-bottom: calc(var(--line-height) - 1px);
-}
-
-/* Adjust hover effect to be consistent */
-.project-row-left:hover,
-.project-row-right:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transform: rotate(-0.8deg);
-    /* Same for both */
-}
-
-/* Paper lines styling - only for project cards */
-.paper-note .paper-lines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
-
-.paper-note .paper-lines::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(transparent,
-            transparent calc(var(--line-height) - 1px),
-            rgba(121, 186, 193, 0.15) calc(var(--line-height) - 1px),
-            rgba(121, 186, 193, 0.15) var(--line-height));
-    z-index: 0;
-}
-
-/* Remove the global paper lines */
-body>.paper-lines {
-    display: none;
-    /* Hide global paper lines, use only card-specific ones */
-}
-
-/* Remove the tape effect that was previously used */
-.paper-note::before,
-.paper-note::after {
-    display: none;
-    /* Hide the tape effect */
-}
-
-/* Drawing pin styling */
-.drawing-pin {
-    position: absolute;
-    z-index: 10;
-    width: 16px;
-    height: 16px;
-    transform: translateZ(0);
-    /* Force hardware acceleration for better rendering */
-    will-change: transform;
-    /* Hint to browser that this element's transform will change */
-    transition: none !important;
-    /* Disable any transitions that might cause movement */
-}
-
-.pin-head {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #c0c0c0 0%, #f5f5f5 50%, #a0a0a0 100%);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    transform: translateZ(0);
-}
-
-.pin-highlight {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.8);
-    top: 3px;
-    right: 3px;
-    transform: translateZ(0);
-}
-
-/* Remove the pin center point as requested */
-.pin-center {
-    display: none;
-}
-
-/* Add a subtle shadow beneath the pin */
-.pin-head::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
-    top: 0;
-    left: 0;
-}
-
-/* Add a subtle indentation in the paper around the pin */
-.drawing-pin::before {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: radial-gradient(circle at center,
-            rgba(0, 0, 0, 0.05) 0%,
-            rgba(0, 0, 0, 0.02) 40%,
-            transparent 70%);
-    top: -2px;
-    left: -2px;
-    z-index: -1;
-}
-
-/* Ensure paper notes have proper positioning for pins */
-.paper-note {
-    position: relative;
-    overflow: visible;
-    will-change: transform;
-    /* Hint to browser that this element's transform will change */
-}
-
-/* Restore the paper note styling for more realism */
-.paper-note {
-    background-color: #fff;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(210, 210, 210, 0.8);
-    position: relative;
-    overflow: visible;
-    /* Changed from hidden to visible to allow tags to extend beyond */
-
-    /* Enhanced paper texture with subtle grain */
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.7) 50%, rgba(245, 245, 245, 0.7) 50%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
-
-    /* Remove all border radius */
-    border-radius: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-/* Remove image hover effects that don't look paper-like */
-.project-image:hover {
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* Create torn paper edge effect at the top */
-.paper-note::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 5px;
-    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 L10,2 L20,0 L30,3 L40,1 L50,2 L60,0 L70,3 L80,1 L90,2 L100,0 L110,3 L120,1 L130,2 L140,0 L150,3 L160,1 L170,2 L180,0 L190,3 L200,1 L210,2 L220,0 L230,3 L240,1 L250,2 L260,0 L270,3 L280,1 L290,2 L300,0' stroke='rgba(0,0,0,0.05)' stroke-width='1' fill='white' transform='scale(1, 0.5)'/%3E%3C/svg%3E");
-    z-index: 3;
-}
-
-/* Remove the red vertical line (notebook margin) */
-.paper-note::after {
-    display: none;
-    /* Hide the red vertical line completely */
-}
-
-/* Move the blue vertical fold mark further left */
-.paper-note .fold-mark-vertical {
-    left: 30px;
-    /* Move from 52px to 30px - closer to the left edge */
-}
-
-/* Lower the tag container position */
-.tag-container {
-    top: 25px;
-    /* Change from 10px to 25px to lower the position */
-}
-
-/* Decrease margin between paper notes and screen edge */
-.project-container {
-    max-width: 90%;
-    /* Increase from 80% to 90% to reduce margins */
-}
-
-/* Make tape height match the tag height */
-.tag::before {
-    content: "";
-    position: absolute;
-    left: -30px;
-    top: 0;
-    /* Position at the top of the tag */
-    transform: none;
-    /* Remove the vertical centering transform */
-    width: 35px;
-    height: 100%;
-    /* Match the full height of the tag */
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    opacity: 0.8;
-    background-image:
-        linear-gradient(90deg,
-            rgba(255, 255, 255, 0.3) 0%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.3) 100%);
-    z-index: -1;
-}
-
-/* Enhanced notebook holes styling for realistic ringbinder effect */
-.paper-note .notebook-holes {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 60px;
-    height: 100%;
-    z-index: 2;
-    overflow: visible;
-    display: block;
-    /* Ensure it's visible */
-}
-
-/* Keyhole-shaped holes that extend to the left edge */
-.paper-note .hole {
-    position: absolute !important;
-    z-index: 10;
-    height: 10px;
-    width: 18px;
-    background-color: transparent;
-    left: 0;
-    display: block;
-    /* Ensure it's visible */
-
-    /* Create the keyhole shape with a clip-path */
-    clip-path: polygon(0 0,
-            /* Top-left corner */
-            0 100%,
-            /* Bottom-left corner */
-            40% 100%,
-            /* Bottom edge start of circle */
-            50% 85%,
-            /* Bottom curve of circle */
-            65% 75%,
-            /* Right curve of circle */
-            75% 50%,
-            /* Right edge of circle */
-            65% 25%,
-            /* Top curve of circle */
-            50% 15%,
-            /* Top edge of circle */
-            40% 0
-            /* Top edge end of circle */
-        );
-
-    /* Add subtle shadow for depth */
-    box-shadow:
-        inset 1px 0 3px rgba(0, 0, 0, 0.2),
-        inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Hole variations for realism */
-.paper-note .hole-torn {
-    clip-path: polygon(0 0,
-            0 100%,
-            35% 100%,
-            45% 90%,
-            70% 80%,
-            80% 50%,
-            70% 20%,
-            45% 10%,
-            35% 0);
-    height: 12px;
-}
-
-.paper-note .hole-stretched {
-    clip-path: polygon(0 0,
-            0 100%,
-            30% 100%,
-            40% 95%,
-            60% 90%,
-            75% 50%,
-            60% 10%,
-            40% 5%,
-            30% 0);
-    height: 14px;
-}
-
-.paper-note .hole-ripped {
-    clip-path: polygon(0 0,
-            0 100%,
-            25% 100%,
-            35% 90%,
-            55% 85%,
-            70% 50%,
-            55% 15%,
-            35% 10%,
-            25% 0);
-    height: 11px;
-}
-
-.paper-note .hole-damaged {
-    clip-path: polygon(0 0,
-            0 100%,
-            20% 100%,
-            30% 95%,
-            45% 90%,
-            65% 85%,
-            75% 50%,
-            65% 15%,
-            45% 10%,
-            30% 5%,
-            20% 0);
-    height: 13px;
-}
-
-.paper-note .hole-severely-torn {
-    clip-path: polygon(0 0,
-            0 100%,
-            15% 100%,
-            25% 95%,
-            40% 90%,
-            60% 85%,
-            80% 50%,
-            60% 15%,
-            40% 10%,
-            25% 5%,
-            15% 0);
-    height: 12px;
-}
-
-.paper-note .hole-extremely-damaged {
-    clip-path: polygon(0 0,
-            0 100%,
-            10% 100%,
-            20% 95%,
-            35% 90%,
-            55% 85%,
-            75% 50%,
-            55% 15%,
-            35% 10%,
-            20% 5%,
-            10% 0);
-    height: 10px;
-}
-
-/* Create the actual hole effect by showing the background */
-.paper-note .hole::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: transparent;
-    /* This will show the background */
-    z-index: -1;
-}
-
-/* Add subtle torn paper bits around holes */
-.paper-note .torn-paper-bit {
-    position: absolute;
-    width: 4px;
-    height: 3px;
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    border-radius: 1px;
-    z-index: 2;
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.03);
-}
-
-/* Adjust content padding to accommodate the holes */
-.paper-note .project-info {
-    padding-left: 40px;
-    /* Reduce from 55px to 40px */
-}
-
-/* Adjust project image container position */
-.paper-note .project-image-container {
-    margin-left: 40px;
-    /* Reduce from 55px to 40px */
-}
-
-/* Paper texture enhancement */
-.paper-note {
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.8) 50%, rgba(250, 250, 250, 0.8) 50%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2'/%3E%3C/svg%3E");
-}
-
-/* Add subtle fold marks near the holes */
-.paper-note .fold-mark-vertical {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: rgba(0, 0, 0, 0.04);
-    z-index: 1;
-    left: 30px;
-    display: block;
-    /* Ensure it's visible */
-}
-
-/* Add horizontal stress lines near holes */
-.paper-note .stress-line {
-    position: absolute;
-    height: 1px;
-    left: 0;
-    width: 50px;
-    background-color: rgba(0, 0, 0, 0.03);
-    z-index: 1;
-    display: block;
-    /* Ensure it's visible */
-}
-
-/* Add paper fiber strands that connect torn areas */
-.paper-note .paper-fiber {
-    position: absolute;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.9);
-    z-index: 2;
-    transform-origin: left center;
-    display: block;
-    /* Ensure it's visible */
-}
-
-/* Torn paper effect along the left edge - more subtle and closer to edge */
-.paper-note .torn-paper-effect {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 25px;
-    /* Narrower width to be closer to edge */
-    background-color: transparent;
-    z-index: 1;
-    display: block;
-    /* Ensure it's visible */
-    /* The background image will be set dynamically in JavaScript */
-}
-
-/* Add paper fragment styling */
-.paper-note .paper-fragment {
-    position: absolute;
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    border-radius: 2px;
-    z-index: 2;
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
-    transform-origin: center;
-    display: block;
-    /* Ensure it's visible */
-}
-
-/* Fix for info-link-button styling that was accidentally removed */
+/* Ensure info-link-button aligns nicely */
 .info-link-button {
-    background-color: var(--button-bg);
-    border: 1px solid var(--button-border);
-    border-radius: 8px;
-    box-sizing: border-box;
-    color: var(--button-text);
-    padding: 5px 10px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    margin-bottom: 4px;
-    /* Add height to match line height */
-    height: 28px;
-}
-
-.info-link-button:hover {
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
-    transform: translateY(-2px);
-}
-
-/* Add more space between date-container and project-links */
-.date-container+.project-links {
-    margin-top: 15px !important;
-    /* Force more space with !important */
-}
-
-/* Additional spacing for mobile */
-@media screen and (max-width: 480px) {
-    .date-container+.project-links {
-        margin-top: 20px !important;
-        /* Even more space on mobile */
-    }
-}
-
-/* Add proper padding and spacing for paper-note about-me sections */
-.paper-note.about-me {
-    padding: var(--line-height) 30px 20px 40px;
-    margin: 0;
-    /* Remove margins and let flex handle spacing */
-    flex: 1;
-    /* Allow flexible growth */
-    display: flex;
-    flex-direction: column;
-    min-width: 250px;
-    /* Ensure minimum readable width */
-    max-width: 400px;
-    /* Prevent getting too wide */
-}
-
-.paper-note.about-me .text-about-me,
-.paper-note.about-me .links-about-me {
-    margin-bottom: 10px;
-    position: relative;
-    z-index: 2;
-}
-
-/* Style for the density plot container - adjusted dimensions */
-.paper-note.density-plot-container {
-    padding: 15px 10px 0px 35px;
-    margin: 0;
-    /* Remove margins and let flex handle spacing */
-    text-align: center;
-    width: 320px;
-    /* Fixed width rather than max-width */
-    flex: 1;
-    /* Allow flexible growth */
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-/* Ensure the density plot image fits properly and is positioned correctly */
-.paper-note.density-plot-container img {
-    max-width: 100%;
-    height: auto;
-    position: relative;
-    top: auto;
-    left: auto;
-    margin: 0 auto;
-    z-index: 3;
-    /* Higher than paper-lines and other effects */
-    mix-blend-mode: normal;
-    /* Override any blend mode that might be applied */
-}
-
-/* Style for the section title container */
-.paper-note.section-title-container {
-    padding: var(--line-height) 40px 10px;
-    /* Increased from 35px to 40px */
-    margin: 20px auto;
-    text-align: center;
-    max-width: 450px;
-    /* Increased from 300px to 450px to accommodate longer titles */
-    display: inline-block;
-}
-
-/* Adjust the section title within the paper note */
-.paper-note.section-title-container .section-title {
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    line-height: 1.3;
-    /* Add line height for better spacing when text wraps */
-}
-
-/* Style for the footer paper note */
-.paper-note.bottom-container {
-    padding: var(--line-height) 40px 10px;
-    /* Increased from 35px to 40px */
-    margin: 20px auto;
-    text-align: center;
-    max-width: 300px;
-}
-
-/* Cool stuff section styles */
-.cool-stuff-section {
-    margin-top: 40px;
-    margin-bottom: 40px;
-    display: flex;
-    flex-direction: column;
+    height: var(--line-height); /* Make button height match line height */
+    padding-top: 0; /* Adjust padding to vertically center content */
+    padding-bottom: 0;
+    display: inline-flex; /* To allow vertical alignment of content */
     align-items: center;
 }
 
-.cool-stuff-container {
-    max-width: 1000px;
-    /* Increased from 800px to 1000px */
-    margin: 0 auto;
-    padding: var(--line-height) 30px 20px 40px;
-    position: relative;
-    transform: rotate(-0.3deg);
-    /* Slight rotation for paper effect */
-    background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(210, 210, 210, 0.8);
-}
-
-.cool-stuff-links {
-    position: relative;
-    z-index: 2;
-}
-
-.cool-stuff-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    transition: transform 0.2s ease;
-    padding-left: 10px;
-}
-
-.cool-stuff-item:hover {
-    transform: translateX(5px);
-    color: var(--dark-accent);
-}
-
-.cool-stuff-item .iconify {
-    min-width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cool-stuff-item p {
-    margin: 0;
-    padding: 0;
-}
-
-/* Update existing links-cool-stuff class to be compatible */
-.links-cool-stuff,
-.cool-stuff-item {
-    text-align: left;
-    font-size: 0.9em;
-    line-height: var(--line-height);
-    position: relative;
-    margin-bottom: 0 !important;
-}
-
-/* Responsive adjustments for cool stuff */
-@media screen and (max-width: 768px) {
-    .cool-stuff-container {
-        max-width: 90%;
-        padding: var(--line-height) 20px 20px 30px;
-    }
-
-    .cool-stuff-item {
-        font-size: 0.85em;
-    }
-}
-
-/* Additional specific styling for the cool stuff section title */
-#cool-stuff .section-title-container {
-    padding-left: 50px;
-    padding-right: 50px;
+/* Cool stuff section title responsive adjustments */
+#cool-stuff .section-title-container.paper-note {
     max-width: 600px;
-    /* Increased from 450px to 600px for even more width */
 }
 
-/* Responsive adjustment for mobile */
 @media screen and (max-width: 480px) {
-    #cool-stuff .section-title-container {
-        padding-left: 20px;
-        padding-right: 20px;
+    #cool-stuff .section-title-container.paper-note {
+        max-width: 90%; /* Take more width on small screens */
     }
-
     .paper-note.section-title-container .section-title {
         font-size: 1.9em;
-        /* Slightly smaller font on mobile */
-        line-height: 1.4;
-        /* Increased line height for better readability */
+        line-height: 1.4; /* Adjust for readability if text wraps */
     }
 }
 
-/* Ensure the paper lines don't scroll with the page */
-.paper-lines:not(.in-card) {
-    position: absolute; /* Change from fixed to absolute */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 0;
+/* General text alignment within .paper-note */
+.paper-note p,
+.paper-note .text-about-me,
+.paper-note .project-description,
+.paper-note .links-cool-stuff, /* If it's a block of text/links */
+.paper-note .links-about-me,
+.paper-note .bottom-container p {
+    line-height: var(--line-height);
+    margin-bottom: 0; /* Spacing handled by line-height or container padding */
+    /* padding-top: var(--quarter-line); */ /* May not be needed if parent sets line-height */
+}
+
+/* Specific adjustments if elements inside .paper-note have different font sizes */
+.paper-note .project-title {
+    /* line-height: 1.2; already set, might not perfectly align with base lines */
+}
+.paper-note .date-container {
+    /* line-height: var(--line-height); Ensure it aligns */
+}
+.paper-note .cool-stuff-item {
+    /* line-height: var(--line-height); */
+}
+.paper-note .cool-stuff-item p {
+    /* padding-top: 0; Text within item already aligned by item's line-height */
+}
+
+/* Fix for info-link-button to ensure text is centered */
+.info-link-button span {
+    display: inline-block;
+    vertical-align: middle;
+}
+.info-link-button .iconify {
+    margin-right: 5px; /* Space between icon and text */
 }
