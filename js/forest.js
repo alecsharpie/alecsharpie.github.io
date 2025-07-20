@@ -14,21 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setClearColor(0x000000, 0);
 
-    // Enhanced Dusk/Night Lighting
-    const ambientLight = new THREE.AmbientLight(0x404080, 0.5); // Increased ambient light
+    // Nighttime Moonlight Lighting
+    const ambientLight = new THREE.AmbientLight(0x202040, 0.2); // Dark blue ambient for night
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xff8c42, 0.8); // Increased main light
-    directionalLight.position.set(-10, 15, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
-    scene.add(directionalLight);
+    // Main moonlight - cool white light from above
+    const moonLight = new THREE.DirectionalLight(0xc8d4e8, 0.7); // Cool white moonlight
+    moonLight.position.set(5, 20, 3);
+    moonLight.castShadow = true;
+    moonLight.shadow.mapSize.width = 2048;
+    moonLight.shadow.mapSize.height = 2048;
+    moonLight.shadow.camera.near = 0.1;
+    moonLight.shadow.camera.far = 50;
+    moonLight.shadow.camera.left = -30;
+    moonLight.shadow.camera.right = 30;
+    moonLight.shadow.camera.top = 30;
+    moonLight.shadow.camera.bottom = -30;
+    scene.add(moonLight);
 
-    // Add some purple rim lighting
-    const rimLight = new THREE.DirectionalLight(0x8a2be2, 0.4); // Increased rim light
-    rimLight.position.set(10, 5, -5);
-    scene.add(rimLight);
+    // Subtle secondary moonlight for softer shadows
+    const secondaryMoonLight = new THREE.DirectionalLight(0xa8b8d0, 0.3); // Softer cool light
+    secondaryMoonLight.position.set(-8, 15, -5);
+    scene.add(secondaryMoonLight);
 
     // Create starfield
     function createStarfield() {
@@ -58,18 +65,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const starfield = createStarfield();
 
-    // Ground plane
-    const groundGeometry = new THREE.PlaneGeometry(100, 100);
-    const groundMaterial = new THREE.MeshLambertMaterial({ 
-        color: 0x2d4a22,
-        transparent: true,
-        opacity: 0.8
-    });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -3;
-    ground.receiveShadow = true;
-    scene.add(ground);
+    // Layered ground for more natural terrain
+    function createGroundLayers() {
+        // Main ground layer
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
+        const groundMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x1a2818, // Much darker green for night
+            transparent: true,
+            opacity: 0.9
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -3;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Additional ground patches for variation
+        for (let i = 0; i < 8; i++) {
+            const patchGeometry = new THREE.PlaneGeometry(20 + Math.random() * 30, 20 + Math.random() * 30);
+            const patchMaterial = new THREE.MeshLambertMaterial({ 
+                color: new THREE.Color().setHSL(0.25 + Math.random() * 0.1, 0.3, 0.08 + Math.random() * 0.05),
+                transparent: true,
+                opacity: 0.7
+            });
+            const patch = new THREE.Mesh(patchGeometry, patchMaterial);
+            patch.rotation.x = -Math.PI / 2;
+            patch.position.y = -2.95 + Math.random() * 0.1; // Slight height variation
+            patch.position.x = (Math.random() - 0.5) * 80;
+            patch.position.z = (Math.random() - 0.5) * 80;
+            patch.receiveShadow = true;
+            scene.add(patch);
+        }
+    }
+    
+    createGroundLayers();
 
     // Tree loading and forest creation
     const trees = [];
@@ -199,6 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle scroll
     window.addEventListener('scroll', updateCameraOnScroll);
     
-    // Add some fog for depth
-    scene.fog = new THREE.Fog(0x1a1a2e, 15, 50); // Closer fog for forest feel
+    // Atmospheric fog for softer transitions
+    scene.fog = new THREE.Fog(0x0f1020, 8, 35); // Darker, closer fog for night atmosphere
 }); 
