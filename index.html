@@ -7,39 +7,57 @@
     <title>Alec Sharp</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="images/favicon.ico">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    
+    <!-- Three.js libraries -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Alec Sharp</h1>
-        <p>I like bridging the gap between people and data.</p>
-        <p>From New Zealand, living in Melbourne.</p>
-        <p>
-            <a href="mailto:alecsharpie@gmail.com">Email</a> |
-            <a href="https://github.com/alecsharpie">GitHub</a> |
-            <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
-        </p>
-    </header>
+    <!-- 3D Forest Background -->
+    <div id="forest-container">
+        <canvas id="forest-canvas"></canvas>
+    </div>
 
-    <main>
-        <h1>Projects</h1>
-        <div id="projects"></div>
+    <!-- Main content overlay -->
+    <div id="content-overlay">
+        <header>
+            <h1>Alec Sharp</h1>
+            <p>I like bridging the gap between people and data.</p>
+            <p>From New Zealand, living in Melbourne.</p>
+            <p>
+                <a href="mailto:alecsharpie@gmail.com">Email</a> |
+                <a href="https://github.com/alecsharpie">GitHub</a> |
+                <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
+            </p>
+        </header>
 
-        <h1>Cool Stuff</h1>
-        <ul>
-            <li><a href="https://happenfilms.com/fools-and-dreamers">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
-            <li><a href="https://earth.nullschool.net/">Global weather visualization</a></li>
-            <li><a href="https://www.photopea.com/">Free photoshop alternative in browser</a></li>
-            <li><a href="https://work-with-nature.com/en/b">Work With Nature: Biodiversity foundation</a></li>
-            <li><a href="https://www.onepercentcollective.org/">One Percent Collective: Charity donation</a></li>
-            <li><a href="https://www.security.org/resources/data-tech-companies-have/">Data big tech has about you</a></li>
-            <li><a href="https://www.3blue1brown.com/">3Blue1Brown: Math animations</a></li>
-        </ul>
-    </main>
+        <main>
+            <h1>Projects</h1>
+            <div id="projects"></div>
 
-    <footer>
-        <p>&copy; <span id="year"></span> Alec Sharp</p>
-    </footer>
+            <h1>Cool Stuff</h1>
+            <ul>
+                <li><a href="https://happenfilms.com/fools-and-dreamers">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
+                <li><a href="https://earth.nullschool.net/">Global weather visualization</a></li>
+                <li><a href="https://www.photopea.com/">Free photoshop alternative in browser</a></li>
+                <li><a href="https://work-with-nature.com/en/b">Work With Nature: Biodiversity foundation</a></li>
+                <li><a href="https://www.onepercentcollective.org/">One Percent Collective: Charity donation</a></li>
+                <li><a href="https://www.security.org/resources/data-tech-companies-have/">Data big tech has about you</a></li>
+                <li><a href="https://www.3blue1brown.com/">3Blue1Brown: Math animations</a></li>
+            </ul>
+        </main>
+
+        <footer>
+            <p>&copy; <span id="year"></span> Alec Sharp</p>
+        </footer>
+    </div>
 
     <script src="js/index.js"></script>
+    <script src="js/forest.js"></script>
 </body>
 </html>

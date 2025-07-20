@@ -21,6 +21,15 @@ fetch('data/projects.json')
             html += `<h2>${project.title}</h2>`;
             html += `<p><small>${date}</small></p>`;
             
+            // Tags removed for now
+            // if (project.tags && project.tags.length > 0) {
+            //     html += '<p class="tags"><small>';
+            //     project.tags.forEach(tag => {
+            //         html += `#${tag} `;
+            //     });
+            //     html += '</small></p>';
+            // }
+            
             // Add description
             html += `<p>${project.description}</p>`;
             
@@ -31,15 +40,6 @@ fetch('data/projects.json')
                 html += `<a href="${link}" target="_blank">${text}</a> `;
             }
             html += '</p>';
-            
-            // Add tags
-            if (project.tags && project.tags.length > 0) {
-                html += '<p><small>';
-                project.tags.forEach(tag => {
-                    html += `#${tag} `;
-                });
-                html += '</small></p>';
-            }
             
             div.innerHTML = html;
             container.appendChild(div);
