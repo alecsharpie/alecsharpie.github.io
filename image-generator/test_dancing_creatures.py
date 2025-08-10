@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Test Notice Board Generator - Dancing Creatures
-Single project test using Google's Imagen 3 with OCR verification.
+Single project test using Google's Imagen 4 with OCR verification.
 """
 
 import json
@@ -11,8 +11,8 @@ import re
 from pathlib import Path
 from PIL import Image
 import pytesseract
-import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel
+from google import genai
+from google.genai import types
 from difflib import SequenceMatcher
 
 def clean_text_for_comparison(text):
@@ -64,7 +64,7 @@ Tags: {tags_text}"""
     return full_text
 
 def generate_imagen_prompt(project):
-    """Generate a detailed prompt for Imagen 3 including the project text."""
+    """Generate a detailed prompt for Imagen 4 including the project text."""
     project_text = format_project_text(project)
     
     prompt = f"""A photograph of a lined piece of notebook paper pinned to a cork notice board. The camera angle is perpendicular to the notice board, no tilt. The piece of paper takes up most of the image and has the following text written on it in neat, legible handwriting with a pen:
@@ -75,18 +75,20 @@ The handwriting should be clear, consistent, and easy to read. The text should f
     
     return prompt, project_text
 
-def generate_image_imagen3(project, output_path, max_retries=3):
-    """Generate image using Google's Imagen 3 with OCR verification."""
+def generate_image_imagen4(project, output_path, max_retries=3):
+    """Generate image using Google's Imagen 4 with OCR verification."""
     
     try:
-        # Initialize Vertex AI
+        # Initialize Google Gen AI client for Vertex AI
         project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
+        location = os.getenv('GOOGLE_CLOUD_LOCATION', 'us-central1')
+        
         if not project_id:
             print("❌ GOOGLE_CLOUD_PROJECT_ID not set. Please set your Google Cloud project ID.")
             print("Run: export GOOGLE_CLOUD_PROJECT_ID='image-generator-web-page'")
             return False, None
             
-        vertexai.init(project=project_id, location="us-central1")
+        client = genai.Client(vertexai=True, project=project_id, location=location)
         
         prompt, expected_text = generate_imagen_prompt(project)
         
@@ -99,28 +101,40 @@ def generate_image_imagen3(project, output_path, max_retries=3):
             print(f"\n🎨 Generation attempt {attempt + 1}/{max_retries}")
             
             try:
-                # Generate image with Imagen 3
-                generation_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
-                
-                images = generation_model.generate_images(
+                # Generate image with Imagen 4
+                response = client.models.generate_images(
+                    model="imagen-4.0-generate-preview-06-06",
                     prompt=prompt,
-                    number_of_images=1,
-                    aspect_ratio="1:1",
-                    safety_filter_level="block_some",
-                    person_generation="dont_allow"
+                    config=types.GenerateImagesConfig(
+                        number_of_images=1,
+                        aspect_ratio="1:1",
+                        image_size="2K",
+                        enhance_prompt=True,  # Let Imagen 4 enhance our prompt for better results
+                        safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
+                        person_generation="DONT_ALLOW",
+                        add_watermark=True
+                    ),
                 )
                 
                 # Save the generated image
-                if images:
-                    generated_image = images[0]
-                    generated_image.save(location=output_path)
+                if response.generated_images:
+                    generated_image = response.generated_images[0]
+                    pil_image = generated_image.image._pil_image
+                    
+                    # Convert to RGB if needed and save
+                    if pil_image.mode != "RGB":
+                        pil_image = pil_image.convert("RGB")
+                    pil_image.save(output_path)
                     
                     print(f"✅ Image generated, now verifying text...")
                     
+                    # Print enhanced prompt if available
+                    if hasattr(generated_image, 'enhanced_prompt') and generated_image.enhanced_prompt:
+                        print(f"🔧 Enhanced prompt: {generated_image.enhanced_prompt[:100]}...")
+                    
                     # OCR verification
                     try:
-                        with Image.open(output_path) as img:
-                            ocr_text = pytesseract.image_to_string(img)
+                        ocr_text = pytesseract.image_to_string(pil_image)
                             
                         similarity = similarity_score(expected_text, ocr_text)
                         print(f"📊 Text similarity: {similarity:.2%}")
@@ -153,7 +167,7 @@ def generate_image_imagen3(project, output_path, max_retries=3):
         return False, None
         
     except Exception as e:
-        print(f"❌ Error with Imagen 3: {e}")
+        print(f"❌ Error with Imagen 4: {e}")
         return False, None
 
 def downscale_with_jpeg(input_path, output_path, quality=85):
@@ -195,18 +209,18 @@ def create_test_directories():
 def main():
     """Test with Dancing Creatures project."""
     print("🎨 Testing Notice Board Generator with Dancing Creatures")
-    print("🚀 Using Google Imagen 3 + OCR Verification")
+    print("🚀 Using Google Imagen 4 + OCR Verification")
     print("=" * 60)
     
     # Check dependencies
     try:
         import pytesseract
-        import vertexai
-        from vertexai.preview.vision_models import ImageGenerationModel
+        from google import genai
+        from google.genai import types
         print("✅ All dependencies available")
     except ImportError as e:
         print(f"❌ Missing dependency: {e}")
-        print("Please install: uv add pytesseract google-cloud-aiplatform")
+        print("Please install: uv add pytesseract google-genai")
         return
     
     # Create test directories
@@ -229,6 +243,7 @@ def main():
         print(f"2. gcloud services enable aiplatform.googleapis.com")
         print(f"3. gcloud auth application-default login")
         print(f"4. export GOOGLE_CLOUD_PROJECT_ID='image-generator-web-page'")
+        print(f"5. export GOOGLE_CLOUD_LOCATION='us-central1'  # Optional, defaults to us-central1")
         return
     
     # Generate test image
@@ -238,7 +253,7 @@ def main():
     print(f"\n🔄 Processing: {project['title']}")
     
     # Generate image with text
-    success, ocr_text = generate_image_imagen3(project, original_path)
+    success, ocr_text = generate_image_imagen4(project, original_path)
     
     if success:
         print(f"🎉 Generation successful!")
