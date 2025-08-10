@@ -43,23 +43,12 @@ def format_project_text(project):
     """Format project information for the notice board."""
     title = project['title']
     date = project['date']
-    # Keep description shorter for better generation
-    description = project['description'][:150] + "..." if len(project['description']) > 150 else project['description']
+    description = project['description']  # No truncation - use full description
     
-    # Format links simply
-    links_text = ""
-    for link_name, url in project['links'].items():
-        links_text += f"{link_name}: {url}\n"
-    
-    # Format tags
-    tags_text = " ".join([f"#{tag}" for tag in project.get('tags', [])])
-    
-    full_text = f"""Title: {title}
-Date: {date}
-Description: {description}
-Links:
-{links_text.strip()}
-Tags: {tags_text}"""
+    # Simple, clean format without headers, links, or tags
+    full_text = f"""{title}
+{date}
+{description}"""
     
     return full_text
 
@@ -75,8 +64,12 @@ The handwriting should be clear, consistent, and easy to read. The text should f
     
     return prompt, project_text
 
-def generate_image_imagen4(project, output_path, max_retries=3):
-    """Generate image using Google's Imagen 4 with OCR verification."""
+def generate_image_imagen4(project, output_path, base_dir, max_retries=10):
+    """Generate image using Google's Imagen 4 with comprehensive OCR verification and logging."""
+    
+    # Storage for all attempts
+    all_attempts = []
+    project_name = project['title'].replace(' ', '_').lower()
     
     try:
         # Initialize Google Gen AI client for Vertex AI
@@ -86,7 +79,7 @@ def generate_image_imagen4(project, output_path, max_retries=3):
         if not project_id:
             print("❌ GOOGLE_CLOUD_PROJECT_ID not set. Please set your Google Cloud project ID.")
             print("Run: export GOOGLE_CLOUD_PROJECT_ID='image-generator-web-page'")
-            return False, None
+            return False, None, all_attempts
             
         client = genai.Client(vertexai=True, project=project_id, location=location)
         
@@ -99,6 +92,17 @@ def generate_image_imagen4(project, output_path, max_retries=3):
         
         for attempt in range(max_retries):
             print(f"\n🎨 Generation attempt {attempt + 1}/{max_retries}")
+            attempt_data = {
+                'attempt': attempt + 1,
+                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+                'success': False,
+                'error': None,
+                'similarity': 0.0,
+                'ocr_text': '',
+                'enhanced_prompt': '',
+                'image_path': '',
+                'ocr_result_path': ''
+            }
             
             try:
                 # Generate image with Imagen 4
@@ -116,33 +120,65 @@ def generate_image_imagen4(project, output_path, max_retries=3):
                     ),
                 )
                 
-                # Save the generated image
+                # Save the generated image for this attempt
                 if response.generated_images:
                     generated_image = response.generated_images[0]
                     pil_image = generated_image.image._pil_image
                     
-                    # Convert to RGB if needed and save
+                    # Convert to RGB if needed
                     if pil_image.mode != "RGB":
                         pil_image = pil_image.convert("RGB")
-                    pil_image.save(output_path)
                     
-                    print(f"✅ Image generated, now verifying text...")
+                    # Save this attempt
+                    attempt_image_path = f"{base_dir}/all_attempts/{project_name}_attempt_{attempt + 1}.png"
+                    pil_image.save(attempt_image_path)
+                    attempt_data['image_path'] = attempt_image_path
                     
-                    # Print enhanced prompt if available
+                    print(f"✅ Image generated and saved: {attempt_image_path}")
+                    
+                    # Store enhanced prompt if available
                     if hasattr(generated_image, 'enhanced_prompt') and generated_image.enhanced_prompt:
+                        attempt_data['enhanced_prompt'] = generated_image.enhanced_prompt
                         print(f"🔧 Enhanced prompt: {generated_image.enhanced_prompt[:100]}...")
                     
                     # OCR verification
                     try:
                         ocr_text = pytesseract.image_to_string(pil_image)
+                        attempt_data['ocr_text'] = ocr_text
                             
                         similarity = similarity_score(expected_text, ocr_text)
+                        attempt_data['similarity'] = similarity
                         print(f"📊 Text similarity: {similarity:.2%}")
+                        
+                        # Save OCR results for this attempt
+                        ocr_result_path = f"{base_dir}/ocr_results/{project_name}_attempt_{attempt + 1}_ocr.txt"
+                        attempt_data['ocr_result_path'] = ocr_result_path
+                        
+                        with open(ocr_result_path, 'w') as f:
+                            f.write(f"Project: {project['title']}\n")
+                            f.write(f"Attempt: {attempt + 1}\n")
+                            f.write(f"Timestamp: {attempt_data['timestamp']}\n")
+                            f.write(f"Similarity Score: {similarity:.2%}\n")
+                            f.write(f"Success: {'Yes' if similarity >= 0.6 else 'No'}\n")
+                            f.write(f"\n--- Original Prompt ---\n{prompt}\n")
+                            if attempt_data['enhanced_prompt']:
+                                f.write(f"\n--- Enhanced Prompt ---\n{attempt_data['enhanced_prompt']}\n")
+                            f.write(f"\n--- Expected Text ---\n{expected_text}\n")
+                            f.write(f"\n--- OCR Result ---\n{ocr_text}\n")
+                        
+                        print(f"📄 OCR results saved: {ocr_result_path}")
                         
                         if similarity >= 0.6:  # Lower threshold for testing
                             print(f"✅ Text verification passed!")
                             print(f"📝 OCR detected: {ocr_text[:100]}...")
-                            return True, ocr_text
+                            attempt_data['success'] = True
+                            
+                            # Copy successful image to final location
+                            pil_image.save(output_path)
+                            print(f"🎉 Final successful image saved: {output_path}")
+                            
+                            all_attempts.append(attempt_data)
+                            return True, ocr_text, all_attempts
                         else:
                             print(f"❌ Text similarity too low ({similarity:.2%} < 60%)")
                             print(f"Expected: {expected_text[:80]}...")
@@ -153,22 +189,27 @@ def generate_image_imagen4(project, output_path, max_retries=3):
                                 time.sleep(2)
                     
                     except Exception as ocr_error:
+                        attempt_data['error'] = f"OCR error: {str(ocr_error)}"
                         print(f"❌ OCR error: {ocr_error}")
                         if attempt < max_retries - 1:
                             print(f"🔄 Retrying...")
             
             except Exception as gen_error:
+                attempt_data['error'] = f"Generation error: {str(gen_error)}"
                 print(f"❌ Generation error: {gen_error}")
                 if attempt < max_retries - 1:
                     print(f"🔄 Retrying...")
                     time.sleep(2)
+            
+            # Store this attempt's data
+            all_attempts.append(attempt_data)
         
         print(f"❌ Failed after {max_retries} attempts")
-        return False, None
+        return False, None, all_attempts
         
     except Exception as e:
         print(f"❌ Error with Imagen 4: {e}")
-        return False, None
+        return False, None, all_attempts
 
 def downscale_with_jpeg(input_path, output_path, quality=85):
     """Downscale image to 50% and compress with JPEG."""
@@ -196,15 +237,22 @@ def downscale_with_jpeg(input_path, output_path, quality=85):
         return False
 
 def create_test_directories():
-    """Create test directories."""
+    """Create unique test directories with timestamp."""
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    base_dir = f"test_results/run_{timestamp}"
+    
     directories = [
-        '../images/test_notice_boards/original',
-        '../images/test_notice_boards/compressed'
+        f'{base_dir}/original',
+        f'{base_dir}/compressed',
+        f'{base_dir}/all_attempts',
+        f'{base_dir}/ocr_results'
     ]
     
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
         print(f"📁 Created directory: {directory}")
+    
+    return base_dir
 
 def main():
     """Test with Dancing Creatures project."""
@@ -224,7 +272,7 @@ def main():
         return
     
     # Create test directories
-    create_test_directories()
+    base_dir = create_test_directories()
     
     # Load Dancing Creatures project
     try:
@@ -247,37 +295,99 @@ def main():
         return
     
     # Generate test image
-    original_path = "../images/test_notice_boards/original/dancing_creatures.png"
-    compressed_path = "../images/test_notice_boards/compressed/dancing_creatures.jpg"
+    original_path = f"{base_dir}/original/dancing_creatures.png"
+    compressed_path = f"{base_dir}/compressed/dancing_creatures.jpg"
     
     print(f"\n🔄 Processing: {project['title']}")
+    print(f"📁 Test run directory: {base_dir}")
     
     # Generate image with text
-    success, ocr_text = generate_image_imagen4(project, original_path)
+    success, ocr_text, all_attempts = generate_image_imagen4(project, original_path, base_dir)
+    
+    # Create comprehensive summary of all attempts
+    summary_path = f"{base_dir}/{project['title'].replace(' ', '_').lower()}_comprehensive_summary.txt"
+    with open(summary_path, 'w') as f:
+        f.write(f"🎨 COMPREHENSIVE TEST RESULTS\n")
+        f.write(f"=" * 50 + "\n")
+        f.write(f"Project: {project['title']}\n")
+        f.write(f"Test Date: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Total Attempts: {len(all_attempts)}\n")
+        f.write(f"Final Success: {'✅ Yes' if success else '❌ No'}\n\n")
+        
+        if success:
+            successful_attempts = [a for a in all_attempts if a['success']]
+            f.write(f"Successful Attempts: {len(successful_attempts)}\n")
+            f.write(f"Success Rate: {len(successful_attempts)/len(all_attempts)*100:.1f}%\n\n")
+        
+        f.write(f"ATTEMPT DETAILS:\n")
+        f.write(f"-" * 30 + "\n")
+        
+        for attempt in all_attempts:
+            f.write(f"\n🔄 Attempt {attempt['attempt']} - {attempt['timestamp']}\n")
+            f.write(f"Status: {'✅ SUCCESS' if attempt['success'] else '❌ FAILED'}\n")
+            f.write(f"Similarity Score: {attempt['similarity']:.2%}\n")
+            f.write(f"Image Saved: {attempt['image_path']}\n")
+            f.write(f"OCR Result File: {attempt['ocr_result_path']}\n")
+            
+            if attempt['error']:
+                f.write(f"Error: {attempt['error']}\n")
+            
+            if attempt['enhanced_prompt']:
+                f.write(f"Enhanced Prompt: {attempt['enhanced_prompt'][:200]}...\n")
+            
+            if attempt['ocr_text']:
+                f.write(f"OCR Preview: {attempt['ocr_text'][:100]}...\n")
+            
+            f.write(f"-" * 30 + "\n")
+        
+        # Statistics
+        similarities = [a['similarity'] for a in all_attempts if a['similarity'] > 0]
+        if similarities:
+            f.write(f"\n📊 STATISTICS:\n")
+            f.write(f"Average Similarity: {sum(similarities)/len(similarities):.2%}\n")
+            f.write(f"Best Similarity: {max(similarities):.2%}\n")
+            f.write(f"Worst Similarity: {min(similarities):.2%}\n")
+        
+        f.write(f"\n📁 ALL FILES GENERATED:\n")
+        for attempt in all_attempts:
+            if attempt['image_path']:
+                f.write(f"  - {attempt['image_path']}\n")
+            if attempt['ocr_result_path']:
+                f.write(f"  - {attempt['ocr_result_path']}\n")
+    
+    print(f"\n📋 Comprehensive summary saved: {summary_path}")
     
     if success:
         print(f"🎉 Generation successful!")
         
-        # Save OCR results
-        with open("../images/test_notice_boards/dancing_creatures_ocr.txt", 'w') as f:
-            expected_text = format_project_text(project)
-            similarity = similarity_score(expected_text, ocr_text)
-            f.write(f"Project: {project['title']}\n")
-            f.write(f"Similarity Score: {similarity:.2%}\n")
-            f.write(f"\n--- Expected Text ---\n{expected_text}\n")
-            f.write(f"\n--- OCR Result ---\n{ocr_text}\n")
-        
-        # Downscale and compress
+        # Downscale and compress the final successful image
         if downscale_with_jpeg(original_path, compressed_path):
             print(f"✅ Test complete!")
-            print(f"📁 Original: {original_path}")
-            print(f"📁 Compressed: {compressed_path}")
-            print(f"📄 OCR analysis: ../images/test_notice_boards/dancing_creatures_ocr.txt")
+            print(f"📁 Final successful image: {original_path}")
+            print(f"📁 Compressed version: {compressed_path}")
         else:
             print(f"⚠️  Generation successful but compression failed")
     else:
         print(f"❌ Test failed - could not generate acceptable image")
         print(f"💡 This is normal for experimental text generation!")
+    
+    # Print summary of what was saved
+    print(f"\n📊 COMPREHENSIVE RESULTS SUMMARY:")
+    print(f"   🎯 Total attempts: {len(all_attempts)}")
+    print(f"   📸 Images saved: {len([a for a in all_attempts if a['image_path']])}")
+    print(f"   📄 OCR results: {len([a for a in all_attempts if a['ocr_result_path']])}")
+    print(f"   ✅ Successful attempts: {len([a for a in all_attempts if a['success']])}")
+    
+    similarities = [a['similarity'] for a in all_attempts if a['similarity'] > 0]
+    if similarities:
+        print(f"   📊 Average similarity: {sum(similarities)/len(similarities):.2%}")
+        print(f"   🏆 Best similarity: {max(similarities):.2%}")
+    
+    print(f"\n📁 All files saved in: {base_dir}/")
+    print(f"   📂 all_attempts/ - Every generated image")
+    print(f"   📂 ocr_results/ - Individual OCR analysis for each attempt")
+    print(f"   📄 comprehensive_summary.txt - Complete test overview")
+    print(f"   🕒 Test run timestamp: {base_dir.split('_')[-1]}")
 
 if __name__ == "__main__":
     main() 

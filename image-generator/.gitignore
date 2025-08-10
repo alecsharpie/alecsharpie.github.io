@@ -1,0 +1,13 @@
+# Test Results - Generated Images and Data
+test_results/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.env 
