@@ -107,7 +107,7 @@ def generate_image_imagen4(project, output_path, base_dir, max_retries=10):
             try:
                 # Generate image with Imagen 4
                 response = client.models.generate_images(
-                    model="imagen-4.0-generate-preview-06-06",
+                    model="imagen-4.0-ultra-generate-preview-06-06", #"imagen-4.0-generate-preview-06-06",
                     prompt=prompt,
                     config=types.GenerateImagesConfig(
                         number_of_images=1,
