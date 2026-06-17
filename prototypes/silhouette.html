@@ -27,6 +27,9 @@
   .stage-front{z-index:20}
   .layer{position:absolute;inset:0;will-change:transform}
   .layer svg{width:100%;height:100%;display:block}
+  /* spaced sheets (~1cm apart) cast soft shadows on the sheet behind them */
+  #mid{filter:drop-shadow(0 6px 7px rgba(0,0,0,.45))}
+  .stage-front .layer{filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
 
   .vignette{position:fixed;inset:0;z-index:34;pointer-events:none;
     background:radial-gradient(96% 86% at 50% 42%,
@@ -67,11 +70,10 @@
     <path fill="var(--far)" d="M0,560 L150,470 L250,520 L360,430 L470,520 L560,450 L660,540 L770,455 L880,535 L980,470 L1100,520 L1200,475 L1200,800 L0,800 Z"/></svg></div>
   <div class="layer" data-depth="0.08"><svg id="mtn2"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <path fill="var(--mid)" d="M0,600 L120,520 L240,585 L330,500 L430,585 L520,515 L620,590 L720,505 L820,585 L930,525 L1040,590 L1140,535 L1200,575 L1200,800 L0,800 Z"/></svg></div>
-  <div class="layer" data-depth="0.12"><svg id="hills" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <path fill="var(--hill)" d="M0,650 Q150,590 300,635 Q450,585 600,640 Q780,590 940,640 Q1080,600 1200,645 L1200,800 L0,800 Z"/></svg></div>
-  <div class="layer" data-depth="0.16"><svg id="river" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.22"><svg id="kiwi"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.10"><svg id="river" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.13"><svg id="hills" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.30"><svg id="mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.34"><svg id="kiwi"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
 
 <header class="intro">
@@ -156,10 +158,13 @@
   function kiwi(cx,cy,s,fill){
     const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
     let g=`<g fill="${fill}">`;
-    g+=`<path d="M${P(-46,-2)} C${P(-50,-30)} ${P(-20,-46)} ${P(6,-44)} C${P(30,-42)} ${P(44,-30)} ${P(44,-8)} C${P(44,12)} ${P(20,22)} ${P(-8,22)} C${P(-34,22)} ${P(-44,12)} ${P(-46,-2)} Z"/>`;
-    g+=`<path d="M${P(32,-32)} C${P(44,-42)} ${P(58,-42)} ${P(64,-36)} C${P(82,-28)} ${P(98,-4)} ${P(106,20)} L${P(101,22)} C${P(90,0)} ${P(74,-20)} ${P(58,-26)} C${P(50,-28)} ${P(42,-28)} ${P(36,-26)} Z"/>`;
-    g+=`<path d="M${P(-6,20)} L${P(-1,20)} L${P(-1,42)} L${P(-8,42)} L${P(-9,38)} Z"/>`;
-    g+=`<path d="M${P(14,20)} L${P(19,20)} L${P(19,42)} L${P(12,42)} L${P(11,38)} Z"/>`;
+    // plump body, wider than tall, slight tail point at the back (left)
+    g+=`<path d="M${P(-54,-4)} C${P(-55,-26)} ${P(-32,-39)} ${P(-2,-39)} C${P(27,-39)} ${P(49,-27)} ${P(50,-7)} C${P(51,16)} ${P(28,28)} ${P(-6,28)} C${P(-36,28)} ${P(-54,17)} ${P(-54,-4)} Z"/>`;
+    // long down-curved beak from the front
+    g+=`<path d="M${P(40,-27)} C${P(62,-31)} ${P(82,-18)} ${P(100,28)} L${P(92,31)} C${P(76,-7)} ${P(58,-18)} ${P(38,-16)} Z"/>`;
+    // two stubby legs
+    g+=`<path d="M${P(-8,25)} L${P(-2,25)} L${P(-2,47)} L${P(-10,47)} Z"/>`;
+    g+=`<path d="M${P(13,25)} L${P(19,25)} L${P(19,47)} L${P(11,47)} Z"/>`;
     return g+`</g>`;
   }
 
@@ -189,20 +194,43 @@
   $('river').innerHTML=`<path fill="#d8d1bd" d="M560,800 C540,720 640,690 600,632 C566,584 470,562 540,524
     C600,492 700,504 660,476 L742,476 C702,510 614,524 660,560 C720,600 588,628 636,672 C676,712 700,742 700,800 Z"/>`;
 
-  // atmospheric mist drifting between the receding ranges (sells the depth)
-  $('hills').insertAdjacentHTML('afterbegin',
+  // ---- the river is NOT a painted shape: it is the lit floor of the box,
+  //      revealed through a winding channel cut out of every sheet in front of it ----
+  function ribbon(pts,hw){
+    let d='M'+(pts[0][0]-hw[0]).toFixed(1)+','+pts[0][1].toFixed(1);
+    for(let i=1;i<pts.length;i++) d+=' L'+(pts[i][0]-hw[i]).toFixed(1)+','+pts[i][1].toFixed(1);
+    for(let i=pts.length-1;i>=0;i--) d+=' L'+(pts[i][0]+hw[i]).toFixed(1)+','+pts[i][1].toFixed(1);
+    return d+' Z';
+  }
+  // gentle meander: |Δx| stays under the channel half-width so the banks never cross
+  const cpts=[[600,816],[585,756],[612,702],[600,652],[607,606],[601,576],[600,550]];
+  const chw =[ 92,        72,        57,        46,        36,        28,        19 ];
+  const CHANNEL=ribbon(cpts,chw);                         // banks: hole cut from foreground sheets
+  const WATER  =ribbon(cpts,chw.map(h=>Math.max(2,h-7))); // lit floor seen through the channel
+  // mask = "show the whole sheet except the river channel" (robust cut, any sheet height)
+  const cutMask=id=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800"><rect width="1200" height="800" fill="#fff"/><path d="${CHANNEL}" fill="#000"/></mask>`;
+
+  // lit floor: dim at the front, brightening toward the light at the back
+  $('river').innerHTML=`<defs><linearGradient id="rl" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#8d9193"/><stop offset="0.5" stop-color="#cdd0d0"/><stop offset="1" stop-color="#f1f2f0"/></linearGradient></defs>
+    <path fill="url(#rl)" d="${WATER}"/>`;
+
+  // distant hills sheet: silhouette card with the river channel masked out
+  $('hills').innerHTML=
     `<defs><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#eef0ee" stop-opacity="0"/>
       <stop offset="0.55" stop-color="#eef0ee" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#eef0ee" stop-opacity="0"/></linearGradient></defs>
-    <rect x="0" y="498" width="1200" height="130" fill="url(#mist)"/>
-    <rect x="0" y="430" width="1200" height="92" fill="url(#mist)" opacity="0.45"/>`);
+      <stop offset="1" stop-color="#eef0ee" stop-opacity="0"/></linearGradient>${cutMask('cut-h')}</defs>
+     <rect x="0" y="498" width="1200" height="130" fill="url(#mist)"/>
+     <rect x="0" y="430" width="1200" height="92" fill="url(#mist)" opacity="0.45"/>
+     <path fill="var(--hill)" mask="url(#cut-h)"
+       d="M0,650 Q150,590 300,635 Q450,585 600,640 Q780,590 940,640 Q1080,600 1200,645 L1200,800 L0,800 Z"/>`;
 
-  // kiwi as a crisp focal silhouette on the lit river, facing in
-  $('kiwi').innerHTML=`<g transform="translate(1380,0) scale(-1,1)">`+kiwi(690,712,1.15,'#0c0e12')+`</g>`;
+  // kiwi as a crisp focal silhouette on the left bank, beak toward the lit water
+  $('kiwi').innerHTML=kiwi(505,690,1.0,'#0c0e12');
 
-  // midground bush band + cabbage trees + a deeper tree fern
-  let mid=`<g fill="var(--forest)"><path d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/></g>`;
+  // midground bush band (river channel cut out) + cabbage trees + a deeper tree fern
+  let mid=`<defs>${cutMask('cut-m')}</defs><path fill="var(--forest)" mask="url(#cut-m)" d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/>`;
   mid+=cabbageTree(330,652,118,'var(--forest)',12)+cabbageTree(760,650,138,'var(--forest)',31)+cabbageTree(905,656,96,'var(--forest)',48);
   mid+=treeFern(210,656,150,8,118,'var(--forest)',61,-70,150)+treeFern(1010,654,140,8,112,'var(--forest)',77,-110,150);
   $('mid').innerHTML=mid;
@@ -218,11 +246,13 @@
   $('frame-trees').innerHTML=ft;
 
   // foreground: fern fringe + grass + a fantail perched
-  let fg=`<g fill="#010102"><path d="M0,800 L0,742 Q120,704 240,736 Q360,704 480,734 Q620,704 760,736 Q900,704 1040,734 Q1130,708 1200,736 L1200,800 Z"/></g>`;
+  // foreground bank sheet, river channel cut out (even-odd)
+  let fg=`<defs>${cutMask('cut-f')}</defs><path fill="#010102" mask="url(#cut-f)" d="M0,800 L0,742 Q120,704 240,736 Q360,704 480,734 Q620,704 760,736 Q900,704 1040,734 Q1130,708 1200,736 L1200,800 Z"/>`;
   const rg=rng(9);
   fg+=`<g fill="var(--black)">`;
-  for(let i=0;i<7;i++){const x=40+i*180+rg()*60, len=70+rg()*60, a=-100+(rg()-0.5)*40;
-    fg+=`<g transform="translate(${x.toFixed(0)},748) rotate(${a.toFixed(0)})"><path d="${frondPath({len,curl:len*0.4,leaves:13,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;}
+  // fronds sit on the banks, kept clear of the water channel
+  for(const x of [50,160,290,410, 800,915,1030,1150]){const len=70+rg()*60, a=-100+(rg()-0.5)*40;
+    fg+=`<g transform="translate(${x},748) rotate(${a.toFixed(0)})"><path d="${frondPath({len,curl:len*0.4,leaves:13,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;}
   fg+=`</g>`;
   fg+=fantail(250,690,1.1,'var(--black)');
   $('fg').innerHTML=fg;
