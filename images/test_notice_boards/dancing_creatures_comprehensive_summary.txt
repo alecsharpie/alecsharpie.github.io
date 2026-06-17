@@ -1,0 +1,72 @@
+🎨 COMPREHENSIVE TEST RESULTS
+==================================================
+Project: Dancing Creatures
+Test Date: 2025-08-10 23:33:35
+Total Attempts: 3
+Final Success: ❌ No
+
+ATTEMPT DETAILS:
+------------------------------
+
+🔄 Attempt 1 - 2025-08-10 23:32:39
+Status: ❌ FAILED
+Similarity Score: 44.62%
+Image Saved: ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_1.png
+OCR Result File: ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_1_ocr.txt
+Enhanced Prompt: Dancing Creatures
+2025-03-01
+Real-time multi-pose detection using ML, rendered to a 2D canvas animation. I was inspired by ACMI's Beings exhibit: 'Move, dance, and play to interact with a vibrant arra...
+OCR Preview: 2025-03-01
+
+Dancing Creatures
+
+Real-time multi-pose detetction using ML
+
+Nove, dance, and play, py a...
+------------------------------
+
+🔄 Attempt 2 - 2025-08-10 23:32:55
+Status: ❌ FAILED
+Similarity Score: 23.30%
+Image Saved: ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_2.png
+OCR Result File: ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_2_ocr.txt
+Enhanced Prompt: ## A photograph of a lined piece of notebook paper pinned to a cork notice board.
+
+**Image description:**
+
+The photograph captures a piece of lined notebook paper pinned to a cork notice board. The ca...
+OCR Preview: Real-time multi-pose detection ustion using ML,
+rendered to a 2D canvas animation. I was inspired
+in...
+------------------------------
+
+🔄 Attempt 3 - 2025-08-10 23:33:17
+Status: ❌ FAILED
+Similarity Score: 35.28%
+Image Saved: ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_3.png
+OCR Result File: ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_3_ocr.txt
+Enhanced Prompt: ```
+A photograph of a lined piece of notebook paper, pinned to a cork notice board. The camera is positioned perpendicularly to the notice board, with no tilt, capturing the paper head-on. The piece o...
+OCR Preview: Dancing Creatures
+
+2025-03-08
+
+Real-time multi-posetiection using ML,
+
+rendered to a 2D canvas
+
+| wa...
+------------------------------
+
+📊 STATISTICS:
+Average Similarity: 34.40%
+Best Similarity: 44.62%
+Worst Similarity: 23.30%
+
+📁 ALL FILES GENERATED:
+  - ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_1.png
+  - ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_1_ocr.txt
+  - ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_2.png
+  - ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_2_ocr.txt
+  - ../images/test_notice_boards/all_attempts/dancing_creatures_attempt_3.png
+  - ../images/test_notice_boards/ocr_results/dancing_creatures_attempt_3_ocr.txt

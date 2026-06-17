@@ -27,17 +27,17 @@ def similarity_score(text1, text2):
     clean2 = clean_text_for_comparison(text2)
     return SequenceMatcher(None, clean1, clean2).ratio()
 
-def load_dancing_creatures_project():
+def load_project(project_name):
     """Load just the Dancing Creatures project from JSON file."""
     with open('../data/projects.json', 'r') as f:
         data = json.load(f)
     
     # Find Dancing Creatures project
     for project in data['projects']:
-        if project['title'] == "Dancing Creatures":
+        if project['title'] == project_name:
             return project
     
-    raise ValueError("Dancing Creatures project not found!")
+    raise ValueError(f"{project_name} project not found!")
 
 def format_project_text(project):
     """Format project information for the notice board."""
@@ -111,7 +111,7 @@ def generate_image_imagen4(project, output_path, base_dir, max_retries=10):
                     prompt=prompt,
                     config=types.GenerateImagesConfig(
                         number_of_images=1,
-                        aspect_ratio="1:1",
+                        aspect_ratio="16:9", # wide aspect ratio
                         image_size="2K",
                         enhance_prompt=True,  # Let Imagen 4 enhance our prompt for better results
                         safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
@@ -168,7 +168,7 @@ def generate_image_imagen4(project, output_path, base_dir, max_retries=10):
                         
                         print(f"📄 OCR results saved: {ocr_result_path}")
                         
-                        if similarity >= 0.6:  # Lower threshold for testing
+                        if similarity >= 0.95:  # Lower threshold for testing
                             print(f"✅ Text verification passed!")
                             print(f"📝 OCR detected: {ocr_text[:100]}...")
                             attempt_data['success'] = True
@@ -276,7 +276,7 @@ def main():
     
     # Load Dancing Creatures project
     try:
-        project = load_dancing_creatures_project()
+        project = load_project('Graphing Bike Polo Tournament Results')
         print(f"📋 Loaded project: {project['title']}")
     except Exception as e:
         print(f"❌ Error loading project: {e}")
@@ -295,8 +295,8 @@ def main():
         return
     
     # Generate test image
-    original_path = f"{base_dir}/original/dancing_creatures.png"
-    compressed_path = f"{base_dir}/compressed/dancing_creatures.jpg"
+    original_path = f"{base_dir}/original/{project['title'].replace(' ', '_').lower()}.png"
+    compressed_path = f"{base_dir}/compressed/{project['title'].replace(' ', '_').lower()}.jpg"
     
     print(f"\n🔄 Processing: {project['title']}")
     print(f"📁 Test run directory: {base_dir}")
