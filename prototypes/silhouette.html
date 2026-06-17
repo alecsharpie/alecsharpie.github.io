@@ -3,240 +3,238 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alec Sharp — diorama prototype</title>
+<title>Alec Sharp — light-box diorama</title>
 <style>
   :root{
-    --sky-0:#141f3a;   /* zenith */
-    --sky-1:#243456;
-    --sky-2:#3a4a78;
-    --sky-3:#b5663f;   /* warm horizon */
-    --sky-4:#e89a5b;   /* glow */
-    --card:#070a14;    /* black paper */
-    --text:#f2e8d6;
-    --muted:#bfae93;
-    --warm:#ffce8f;
+    /* monochrome layer ramp: back (catches light) -> front (black paper) */
+    --far:#9aa0a6; --mid:#6f757d; --hill:#474d56; --forest:#262a31;
+    --near:#13151a; --front:#070809; --black:#000;
+    --ink:#15140f; --ink-soft:#3a382e;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--sky-0)}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;
-  }
+  html,body{background:#000}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-  /* fixed dusk sky = the light the cards are held in front of */
-  .sky{position:fixed;inset:0;z-index:0;
-    background:linear-gradient(to bottom,
-      var(--sky-0) 0%, var(--sky-1) 38%, var(--sky-2) 64%,
-      var(--sky-3) 86%, var(--sky-4) 100%);}
-  /* moon lives in the sky near the top and scrolls away (absolute, not fixed) */
-  .moon{position:absolute;top:9vh;left:50%;width:110px;height:110px;border-radius:50%;
-    background:radial-gradient(circle at 38% 38%,#fff7e8,#f6e3bd 60%,#f0d29a 100%);
-    box-shadow:0 0 70px 20px rgba(246,227,189,.30);z-index:0;transform:translateX(-50%)}
+  /* the light source behind the cut paper */
+  .glow{position:fixed;inset:0;z-index:0;
+    background:radial-gradient(78% 70% at 50% 38%,
+      #eef0ee 0%, #ccd0d2 13%, #9a9fa2 27%, #696e72 45%,
+      #3e4145 63%, #1e2023 81%, #08090a 100%);}
 
-  /* frame holders: fixed, span the viewport, sit in front of/behind content */
-  .frame{position:fixed;inset:0;pointer-events:none}
-  .frame-back{z-index:1}
-  .frame-front{z-index:3}
-  .layer{position:absolute;will-change:transform}
-  .layer svg path{fill:var(--card)}
+  .stage{position:fixed;inset:0;pointer-events:none}
+  .stage-back{z-index:1}
+  .stage-front{z-index:20}
+  .layer{position:absolute;inset:0;will-change:transform}
+  .layer svg{width:100%;height:100%;display:block}
 
-  /* bottom horizon bands, centred & overscanned so parallax never shows an edge */
-  .horizon{left:50%;bottom:0;width:148%;transform:translate3d(-50%,0,0);line-height:0}
-  .horizon svg{width:100%;height:auto;display:block}
+  .vignette{position:fixed;inset:0;z-index:34;pointer-events:none;
+    background:radial-gradient(96% 86% at 50% 42%,
+      transparent 40%, rgba(0,0,0,.34) 64%, rgba(0,0,0,.72) 84%, rgba(0,0,0,.95) 100%);}
 
-  /* side foliage columns frame the margins the full height of the viewport */
-  .side{top:-4%;bottom:-4%;width:clamp(150px,19vw,320px)}
-  .side.left{left:-12px}
-  .side.right{right:-12px}
-  .side svg{width:100%;height:100%;display:block}
-  .side.right svg{transform:scaleX(-1)}
-  /* top fronds hang in from the corners */
-  .canopy{top:-8px;left:0;right:0;height:34vh}
-  .canopy svg{width:100%;height:100%;display:block}
+  .frame{position:fixed;inset:0;z-index:40;pointer-events:none;
+    border:20px solid #0b0b0b;
+    box-shadow:inset 0 0 0 2px #1c1c1c, inset 0 0 0 12px #060606,
+      inset 0 0 0 13px #222, inset 0 0 70px 26px rgba(0,0,0,.7);}
 
-  /* ---- content runs down the centre channel ---- */
-  .intro{position:relative;z-index:2;text-align:center;padding:30vh 24px 24vh}
-  .intro h1{font-size:clamp(2.6rem,8vw,4.6rem);font-weight:800;letter-spacing:-.03em;
-    text-shadow:0 2px 30px rgba(8,12,26,.6)}
-  .intro p{margin-top:.6rem;font-size:clamp(1rem,2.3vw,1.2rem);color:#f7ecda;
-    text-shadow:0 1px 16px rgba(8,12,26,.6)}
-  .intro .links{margin-top:1.2rem}
-  .intro .links a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:1px}
-  .intro .links a:hover{border-color:#fff}
-
-  .content{position:relative;z-index:2;max-width:600px;margin:0 auto;padding:0 28px 30vh}
-  .content h2{font-size:1.6rem;margin-bottom:1rem;letter-spacing:-.01em;
-    text-shadow:0 1px 14px rgba(8,12,26,.55)}
-  .proj{padding:20px 0;border-top:1px solid rgba(255,235,205,.14)}
-  .proj h3{font-size:1.15rem;margin-bottom:.15rem;color:#fff}
-  .proj .date{font-size:.78rem;color:var(--muted)}
-  .proj p{margin:.45rem 0;color:#e6d8bf;font-size:.96rem;line-height:1.5}
-  .proj a,.cool a{color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(255,206,143,.35)}
-  .cool ul{list-style:none}
-  .cool li{padding:9px 0;border-top:1px solid rgba(255,235,205,.1)}
-  footer{position:relative;z-index:2;text-align:center;color:var(--muted);font-size:.8rem;padding:0 24px 40px}
-
-  /* mobile: drop the side columns (they'd crowd text), keep canopy + horizon */
-  @media (max-width:760px){
-    .side{display:none}
-    .content,.intro{padding-left:18px;padding-right:18px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    .moon{animation:none}
-  }
+  /* content: black paper-cut text floating in the lit centre */
+  /* soft backlight halo so the dark paper-cut text stays legible over any layer */
+  .intro h1,.intro p,.content h2,.content h3,.proj p,.cool a,.intro .links a{
+    text-shadow:0 0 12px rgba(238,240,238,.85),0 0 4px rgba(238,240,238,.9)}
+  .intro{position:relative;z-index:10;text-align:center;padding:24vh 24px 30vh}
+  .intro h1{font-size:clamp(2.6rem,8vw,4.8rem);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+  .intro p{margin-top:.55rem;font-size:clamp(1rem,2.3vw,1.18rem);color:var(--ink-soft)}
+  .intro .links{margin-top:1.1rem}
+  .intro .links a{color:#15140f;text-decoration:none;border-bottom:1px solid rgba(20,18,10,.4)}
+  .content{position:relative;z-index:10;max-width:560px;margin:0 auto;padding:0 28px 34vh}
+  .content h2{font-size:1.55rem;margin-bottom:.9rem;color:var(--ink)}
+  .proj{padding:18px 0;border-top:1px solid rgba(20,18,10,.16)}
+  .proj h3{font-size:1.12rem;margin-bottom:.1rem;color:#0e0d09}
+  .proj .date{font-size:.78rem;color:#615c4d}
+  .proj p{margin:.4rem 0;color:#2c2a22;font-size:.95rem;line-height:1.5}
+  .proj a,.cool a{color:#1a1810;border-bottom:1px solid rgba(20,18,10,.3);text-decoration:none}
+  .cool ul{list-style:none}.cool li{padding:8px 0;border-top:1px solid rgba(20,18,10,.12)}
+  footer{position:relative;z-index:10;text-align:center;color:#6b6655;font-size:.8rem;padding:0 24px 36px}
 </style>
 </head>
 <body>
 
-<div class="sky"></div>
-<div class="moon"></div>
+<div class="glow"></div>
 
-<!-- BEHIND the content -->
-<div class="frame frame-back">
-  <div class="layer horizon" data-depth="0.06">
-    <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,300 L0,150 L120,90 L210,140 L320,70 L430,150 L520,100 L640,170 L760,110 L880,165 L1000,120 L1100,160 L1200,130 L1200,300 Z"/>
-    </svg>
-  </div>
-  <div class="layer horizon" data-depth="0.12">
-    <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,300 L0,205 L150,150 L260,205 L400,140 L520,210 L660,160 L820,215 L960,165 L1110,210 L1200,180 L1200,300 Z"/>
-    </svg>
-  </div>
-  <div class="layer side left"  data-depth="0.10"><svg id="fl-back"  viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer side right" data-depth="0.10"><svg id="fr-back"  viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+<div class="stage stage-back">
+  <div class="layer" data-depth="0.03"><svg id="sky"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.05"><svg id="mtn1"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path fill="var(--far)" d="M0,560 L150,470 L250,520 L360,430 L470,520 L560,450 L660,540 L770,455 L880,535 L980,470 L1100,520 L1200,475 L1200,800 L0,800 Z"/></svg></div>
+  <div class="layer" data-depth="0.08"><svg id="mtn2"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path fill="var(--mid)" d="M0,600 L120,520 L240,585 L330,500 L430,585 L520,515 L620,590 L720,505 L820,585 L930,525 L1040,590 L1140,535 L1200,575 L1200,800 L0,800 Z"/></svg></div>
+  <div class="layer" data-depth="0.12"><svg id="hills" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path fill="var(--hill)" d="M0,650 Q150,590 300,635 Q450,585 600,640 Q780,590 940,640 Q1080,600 1200,645 L1200,800 L0,800 Z"/></svg></div>
+  <div class="layer" data-depth="0.16"><svg id="river" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.22"><svg id="kiwi"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.30"><svg id="mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
 
-<!-- the readable centre channel -->
 <header class="intro">
   <h1>Alec Sharp</h1>
   <p>I like bridging the gap between people and data.</p>
   <p>From New Zealand, living in Melbourne.</p>
-  <p class="links">
-    <a href="mailto:alecsharpie@gmail.com">Email</a> ·
-    <a href="https://github.com/alecsharpie">GitHub</a> ·
-    <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
-  </p>
+  <p class="links"><a href="mailto:alecsharpie@gmail.com">Email</a> · <a href="https://github.com/alecsharpie">GitHub</a> · <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a></p>
 </header>
 
 <main class="content">
   <h2>Projects</h2>
-  <div class="proj"><h3>Dancing Creatures</h3><div class="date">2025</div><p>A sample project card living in the centre channel, framed by the silhouette margins on either side. <a href="#">link</a></p></div>
-  <div class="proj"><h3>Graphing Bike Polo Results</h3><div class="date">2024</div><p>The readable column stays calm and clean while the diorama frames it the whole way down the page.</p></div>
-  <div class="proj"><h3>Another project</h3><div class="date">2023</div><p>More body text to give the page some length so we can see the side foliage framing a long scroll.</p></div>
-
-  <section class="cool" style="margin-top:2.5rem">
-    <h2>Cool Stuff</h2>
-    <ul>
-      <li><a href="#">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
-      <li><a href="#">Global weather visualization</a></li>
-      <li><a href="#">Free photoshop alternative in browser</a></li>
-      <li><a href="#">3Blue1Brown: Math animations</a></li>
-    </ul>
-  </section>
+  <div class="proj"><h3>Dancing Creatures</h3><div class="date">2025</div><p>A sample project card in the lit centre channel, framed by the cut-paper scene. <a href="#">link</a></p></div>
+  <div class="proj"><h3>Graphing Bike Polo Results</h3><div class="date">2024</div><p>Black paper-cut text reads against the backlight while the diorama frames the page.</p></div>
+  <div class="proj"><h3>Another project</h3><div class="date">2023</div><p>Some length so we can watch the frame hold around a long scroll.</p></div>
+  <section class="cool" style="margin-top:2.2rem"><h2>Cool Stuff</h2><ul>
+    <li><a href="#">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
+    <li><a href="#">Global weather visualization</a></li>
+    <li><a href="#">3Blue1Brown: Math animations</a></li>
+  </ul></section>
 </main>
 
-<footer>© <span id="year"></span> Alec Sharp · diorama prototype</footer>
+<footer>© <span id="year"></span> Alec Sharp · light-box diorama</footer>
 
-<!-- IN FRONT of the content -->
-<div class="frame frame-front">
-  <div class="layer side left"  data-depth="0.42"><svg id="fl-front" viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer side right" data-depth="0.42"><svg id="fr-front" viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer canopy" data-depth="0.30"><svg id="canopy" viewBox="0 0 1200 340" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg></div>
-  <div class="layer horizon" data-depth="0.72">
-    <svg viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,200 L0,120 q90,-30 180,4 q90,-40 190,2 q90,-34 184,6 q90,-38 186,0 q90,-32 182,6 q90,-36 184,2 L1200,200 Z"/>
-    </svg>
-  </div>
+<div class="stage stage-front">
+  <div class="layer" data-depth="0.46"><svg id="frame-trees" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.74"><svg id="fg"          viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
+
+<div class="vignette"></div>
+<div class="frame"></div>
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+  const $=id=>document.getElementById(id);
+  function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
-  /* ---------- procedural fern frond (pinnate silhouette) ---------- */
-  function rachis(len,curl,t){
-    const cx=len*0.5, cy=-curl, x1=len;
-    const mt=1-t;
-    const x=2*mt*t*cx+t*t*x1;
-    const y=2*mt*t*cy;            // y0=y1=0
-    let dx=2*mt*cx+2*t*(x1-cx);
-    let dy=2*mt*cy-2*t*cy;
-    const L=Math.hypot(dx,dy)||1;
-    return {x,y,tx:dx/L,ty:dy/L};
-  }
-  function frond({len=150,curl=46,leaves=15,leafLen=40,leafAngle=0.75,rib=2.4}){
-    let d=''; const ribbon=[];
-    for(let i=0;i<=leaves;i++){
-      const t=i/leaves, p=rachis(len,curl,t);
-      const nx=-p.ty, ny=p.tx, w=rib*(1-t)+0.4;
-      ribbon.push([p.x+nx*w,p.y+ny*w]);
-      ribbon.unshift([p.x-nx*w,p.y-ny*w]);   // build closed ribbon outline
+  /* ---------- pinnate fern frond (the NZ detail element) ---------- */
+  function rachis(len,curl,t){const cx=len*0.5,cy=-curl,x1=len;const mt=1-t;
+    const x=2*mt*t*cx+t*t*x1, y=2*mt*t*cy;
+    let dx=2*mt*cx+2*t*(x1-cx), dy=2*mt*cy-2*t*cy;const L=Math.hypot(dx,dy)||1;return{x,y,tx:dx/L,ty:dy/L};}
+  function frondPath({len=150,curl=46,leaves=15,leafLen=30,leafAngle=0.72,rib=3}){
+    let d='';const rb=[];
+    for(let i=0;i<=leaves;i++){const t=i/leaves,p=rachis(len,curl,t);const nx=-p.ty,ny=p.tx,w=rib*(1-t)+0.4;
+      rb.push([p.x+nx*w,p.y+ny*w]);rb.unshift([p.x-nx*w,p.y-ny*w]);}
+    d+='M'+rb.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z ';
+    for(let i=1;i<=leaves;i++){const t=i/leaves,p=rachis(len,curl,t);const nx=-p.ty,ny=p.tx,ll=leafLen*(1-t*0.82);
+      for(const side of[1,-1]){let dxx=nx*side+p.tx*leafAngle,dyy=ny*side+p.ty*leafAngle;const L=Math.hypot(dxx,dyy)||1;dxx/=L;dyy/=L;
+        const ax=p.x+dxx*ll,ay=p.y+dyy*ll,bw=ll*0.16+1.3;
+        const cxp=p.x+dxx*ll*0.5+p.tx*ll*0.16, cyp=p.y+dyy*ll*0.5+p.ty*ll*0.16;
+        d+=`M${(p.x+p.tx*bw).toFixed(1)},${(p.y+p.ty*bw).toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${ax.toFixed(1)},${ay.toFixed(1)} L${(p.x-p.tx*bw).toFixed(1)},${(p.y-p.ty*bw).toFixed(1)} Z `;}}
+    return d;}
+
+  /* ---------- tree fern / ponga: trunk + crown of arching fronds ---------- */
+  function treeFern(x,baseY,trunkH,fronds,frondLen,fill,seed,baseAng=-90,spread=150){
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    g+=`<path d="M${(x-trunkH*0.05).toFixed(1)},${baseY} L${(x-3).toFixed(1)},${(baseY-trunkH).toFixed(1)} L${(x+3).toFixed(1)},${(baseY-trunkH).toFixed(1)} L${(x+trunkH*0.05).toFixed(1)},${baseY} Z"/>`;
+    const topY=baseY-trunkH;
+    for(let i=0;i<fronds;i++){
+      const a=baseAng+((i/(fronds-1))-0.5)*spread+(r()-0.5)*7;
+      const len=frondLen*(0.8+r()*0.36);
+      g+=`<g transform="translate(${x.toFixed(1)},${topY.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.36,leaves:15,leafLen:len*0.2,leafAngle:0.72,rib:len*0.022})}"/></g>`;
     }
-    d+='M'+ribbon.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z ';
-    for(let i=1;i<=leaves;i++){
-      const t=i/leaves, p=rachis(len,curl,t);
-      const nx=-p.ty, ny=p.tx, ll=leafLen*(1-t*0.85);
-      for(const side of [1,-1]){
-        let dxx=nx*side+p.tx*leafAngle, dyy=ny*side+p.ty*leafAngle;
-        const L=Math.hypot(dxx,dyy)||1; dxx/=L; dyy/=L;
-        const ax=p.x+dxx*ll, ay=p.y+dyy*ll;
-        const bw=ll*0.18+1.4;
-        const cxp=p.x+dxx*ll*0.5+p.tx*ll*0.18, cyp=p.y+dyy*ll*0.5+p.ty*ll*0.18;
-        d+=`M${(p.x+p.tx*bw).toFixed(1)},${(p.y+p.ty*bw).toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${ax.toFixed(1)},${ay.toFixed(1)} L${(p.x-p.tx*bw).toFixed(1)},${(p.y-p.ty*bw).toFixed(1)} Z `;
-      }
-    }
-    return d;
-  }
-  function place(svg, fronds){
-    const buf=fronds.map(f=>
-      `<g transform="translate(${f.x},${f.y}) rotate(${f.rot}) scale(${f.s})"><path d="${frond(f.opts||{})}"/></g>`
-    ).join('');
-    svg.insertAdjacentHTML('beforeend', buf);
+    return g+`</g>`;
   }
 
-  // left side columns: fronds rooted at the left edge, leaning up & inward (toward +x)
-  // back layer = smaller/denser, front layer = larger/reaching further in
-  place(document.getElementById('fl-back'), [
-    {x:0,y:120,rot:-18,s:0.9},{x:-10,y:330,rot:8,s:1.0},{x:0,y:560,rot:-12,s:1.05},
-    {x:-8,y:790,rot:6,s:0.95},{x:0,y:980,rot:-20,s:1.0},
-  ]);
-  place(document.getElementById('fr-back'), [
-    {x:0,y:90,rot:-10,s:0.95},{x:-8,y:300,rot:10,s:1.0},{x:0,y:520,rot:-16,s:1.0},
-    {x:-6,y:740,rot:6,s:1.05},{x:0,y:950,rot:-14,s:0.95},
-  ]);
-  place(document.getElementById('fl-front'), [
-    {x:0,y:200,rot:-26,s:1.4,opts:{len:170,curl:60}},{x:-14,y:470,rot:14,s:1.5,opts:{len:180,curl:54}},
-    {x:0,y:720,rot:-20,s:1.45,opts:{len:175,curl:58}},{x:-10,y:980,rot:18,s:1.5,opts:{len:185,curl:50}},
-  ]);
-  place(document.getElementById('fr-front'), [
-    {x:0,y:150,rot:-16,s:1.45,opts:{len:175,curl:56}},{x:-12,y:430,rot:20,s:1.5,opts:{len:182,curl:52}},
-    {x:0,y:690,rot:-24,s:1.4,opts:{len:178,curl:58}},{x:-8,y:960,rot:12,s:1.5,opts:{len:188,curl:50}},
-  ]);
-  // canopy fronds hanging down from the top (rotated ~downward)
-  place(document.getElementById('canopy'), [
-    {x:60,y:-20,rot:80,s:1.6,opts:{len:180,curl:50}},{x:230,y:-30,rot:108,s:1.3,opts:{len:150,curl:44}},
-    {x:1140,y:-20,rot:100,s:1.6,opts:{len:180,curl:50}},{x:980,y:-30,rot:74,s:1.3,opts:{len:150,curl:44}},
-  ]);
+  /* ---------- cabbage tree / tī kōuka: trunk + spiky sword-leaf heads ---------- */
+  function cabbageTree(x,baseY,h,fill,seed){
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    g+=`<path d="M${(x-3.5).toFixed(1)},${baseY} L${(x-2).toFixed(1)},${(baseY-h).toFixed(1)} L${(x+2).toFixed(1)},${(baseY-h).toFixed(1)} L${(x+3.5).toFixed(1)},${baseY} Z"/>`;
+    const heads=[[x,baseY-h]];
+    if(r()<0.75){const fy=baseY-h*0.82;
+      g+=`<path d="M${x.toFixed(1)},${(baseY-h*0.62).toFixed(1)} L${(x-13).toFixed(1)},${(fy-8).toFixed(1)} L${(x-9).toFixed(1)},${(fy-12).toFixed(1)} L${x.toFixed(1)},${(baseY-h*0.56).toFixed(1)} Z"/>`;
+      heads.push([x-12,fy-10],[x+9,fy-3]);}
+    for(const [hx,hy] of heads){const n=12,base=20+r()*12;
+      for(let i=0;i<n;i++){const a=-Math.PI/2+((i/(n-1))-0.5)*Math.PI*1.55,ll=base*(0.7+r()*0.7);
+        const tx=hx+Math.cos(a)*ll,ty=hy+Math.sin(a)*ll,px=-Math.sin(a)*2.1,py=Math.cos(a)*2.1;
+        g+=`<path d="M${(hx+px).toFixed(1)},${(hy+py).toFixed(1)} L${tx.toFixed(1)},${ty.toFixed(1)} L${(hx-px).toFixed(1)},${(hy-py).toFixed(1)} Z"/>`;}}
+    return g+`</g>`;
+  }
 
-  /* ---------- smooth parallax: one rAF loop, transform-only, eased ---------- */
-  const layers=[...document.querySelectorAll('.layer')].map(el=>({
-    el, depth:parseFloat(el.dataset.depth),
-    centred:el.classList.contains('horizon')
-  }));
+  /* ---------- kiwi focal silhouette ---------- */
+  function kiwi(cx,cy,s,fill){
+    const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
+    let g=`<g fill="${fill}">`;
+    g+=`<path d="M${P(-46,-2)} C${P(-50,-30)} ${P(-20,-46)} ${P(6,-44)} C${P(30,-42)} ${P(44,-30)} ${P(44,-8)} C${P(44,12)} ${P(20,22)} ${P(-8,22)} C${P(-34,22)} ${P(-44,12)} ${P(-46,-2)} Z"/>`;
+    g+=`<path d="M${P(32,-32)} C${P(44,-42)} ${P(58,-42)} ${P(64,-36)} C${P(82,-28)} ${P(98,-4)} ${P(106,20)} L${P(101,22)} C${P(90,0)} ${P(74,-20)} ${P(58,-26)} C${P(50,-28)} ${P(42,-28)} ${P(36,-26)} Z"/>`;
+    g+=`<path d="M${P(-6,20)} L${P(-1,20)} L${P(-1,42)} L${P(-8,42)} L${P(-9,38)} Z"/>`;
+    g+=`<path d="M${P(14,20)} L${P(19,20)} L${P(19,42)} L${P(12,42)} L${P(11,38)} Z"/>`;
+    return g+`</g>`;
+  }
+
+  /* ---------- fantail / pīwakawaka ---------- */
+  function fantail(cx,cy,s,fill){
+    const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
+    let g=`<g fill="${fill}">`;
+    g+=`<path d="M${P(0,0)} C${P(-6,-9)} ${P(5,-15)} ${P(11,-10)} C${P(17,-5)} ${P(14,5)} ${P(5,6)} C${P(1,6)} ${P(-2,4)} ${P(0,0)} Z"/>`;
+    g+=`<path d="M${P(10,-12)} C${P(15,-19)} ${P(23,-16)} ${P(23,-10)} C${P(23,-6)} ${P(14,-6)} ${P(10,-8)} Z"/>`;
+    g+=`<path d="M${P(23,-12)} L${P(31,-11)} L${P(23,-9)} Z"/>`;
+    for(let i=0;i<6;i++){const a=Math.PI*0.72+i*0.13,ln=24,tx=Math.cos(a)*ln,ty=-Math.sin(a)*ln;
+      g+=`<path d="M${P(-3,-1)} L${P(-3+tx-2,-1+ty)} L${P(-3+tx+2,-1+ty+2)} Z"/>`;}
+    return g+`</g>`;
+  }
+
+  /* ====================== build the scene ====================== */
+  // moon + stars
+  let sky=`<defs><radialGradient id="mg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fffdf4"/><stop offset="70%" stop-color="#f3ead2"/><stop offset="100%" stop-color="#e6d9b8"/></radialGradient>`
+    +`<mask id="moonmask"><circle cx="600" cy="195" r="48" fill="#fff"/><circle cx="625" cy="181" r="44" fill="#000"/></mask></defs>`;
+  sky+=`<circle cx="600" cy="195" r="48" fill="url(#mg)" mask="url(#moonmask)"/>`;
+  const rs=rng(3);
+  for(let i=0;i<80;i++){const x=rs()*1200,y=rs()*360,rr=rs()*1.4+0.4;
+    sky+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rr.toFixed(1)}" fill="#fdf8ea" opacity="${(0.35+rs()*0.6).toFixed(2)}"/>`;}
+  $('sky').innerHTML=sky;
+
+  // river (light ribbon catching the glow)
+  $('river').innerHTML=`<path fill="#d8d1bd" d="M560,800 C540,720 640,690 600,632 C566,584 470,562 540,524
+    C600,492 700,504 660,476 L742,476 C702,510 614,524 660,560 C720,600 588,628 636,672 C676,712 700,742 700,800 Z"/>`;
+
+  // atmospheric mist drifting between the receding ranges (sells the depth)
+  $('hills').insertAdjacentHTML('afterbegin',
+    `<defs><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef0ee" stop-opacity="0"/>
+      <stop offset="0.55" stop-color="#eef0ee" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#eef0ee" stop-opacity="0"/></linearGradient></defs>
+    <rect x="0" y="498" width="1200" height="130" fill="url(#mist)"/>
+    <rect x="0" y="430" width="1200" height="92" fill="url(#mist)" opacity="0.45"/>`);
+
+  // kiwi as a crisp focal silhouette on the lit river, facing in
+  $('kiwi').innerHTML=`<g transform="translate(1380,0) scale(-1,1)">`+kiwi(690,712,1.15,'#0c0e12')+`</g>`;
+
+  // midground bush band + cabbage trees + a deeper tree fern
+  let mid=`<g fill="var(--forest)"><path d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/></g>`;
+  mid+=cabbageTree(330,652,118,'var(--forest)',12)+cabbageTree(760,650,138,'var(--forest)',31)+cabbageTree(905,656,96,'var(--forest)',48);
+  mid+=treeFern(210,656,150,8,118,'var(--forest)',61,-70,150)+treeFern(1010,654,140,8,112,'var(--forest)',77,-110,150);
+  $('mid').innerHTML=mid;
+
+  // big framing tree ferns arching from the sides + tall cabbage trees (front, near-black)
+  // asymmetric framing so it reads as bush, not a mirror
+  let ft='';
+  ft+=treeFern(140,840,500,12,320,'var(--front)',101,-56,165);   // left, tall, crown arches in
+  ft+=treeFern(1062,840,430,10,280,'var(--front)',133,-124,150); // right, shorter
+  ft+=treeFern(55,840,240,8,175,'var(--front)',141,-38,150);     // lower left filler
+  ft+=treeFern(1148,840,300,9,200,'var(--front)',155,-142,155);  // lower right filler
+  ft+=cabbageTree(92,842,330,'var(--front)',166)+cabbageTree(1112,842,265,'var(--front)',177);
+  $('frame-trees').innerHTML=ft;
+
+  // foreground: fern fringe + grass + a fantail perched
+  let fg=`<g fill="#010102"><path d="M0,800 L0,742 Q120,704 240,736 Q360,704 480,734 Q620,704 760,736 Q900,704 1040,734 Q1130,708 1200,736 L1200,800 Z"/></g>`;
+  const rg=rng(9);
+  fg+=`<g fill="var(--black)">`;
+  for(let i=0;i<7;i++){const x=40+i*180+rg()*60, len=70+rg()*60, a=-100+(rg()-0.5)*40;
+    fg+=`<g transform="translate(${x.toFixed(0)},748) rotate(${a.toFixed(0)})"><path d="${frondPath({len,curl:len*0.4,leaves:13,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;}
+  fg+=`</g>`;
+  fg+=fantail(250,690,1.1,'var(--black)');
+  $('fg').innerHTML=fg;
+
+  /* ---------- smooth parallax ---------- */
+  const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   let tX=0,tY=0,cX=0,cY=0;
   addEventListener('mousemove',e=>{tX=(e.clientX/innerWidth-0.5)*2;tY=(e.clientY/innerHeight-0.5)*2;},{passive:true});
-  addEventListener('deviceorientation',e=>{if(e.gamma==null)return;tX=Math.max(-1,Math.min(1,e.gamma/30));tY=Math.max(-1,Math.min(1,(e.beta-45)/30));},{passive:true});
-  function frame(){
-    cX+=(tX-cX)*0.08; cY+=(tY-cY)*0.08;
-    for(const L of layers){
-      const mx=cX*L.depth*42, my=cY*L.depth*22;
-      L.el.style.transform = L.centred
-        ? `translate3d(calc(-50% + ${mx}px), ${my}px, 0)`
-        : `translate3d(${mx}px, ${my}px, 0)`;
-    }
-    requestAnimationFrame(frame);
-  }
+  function frame(){cX+=(tX-cX)*0.08;cY+=(tY-cY)*0.08;
+    for(const L of layers){L.el.style.transform=`translate3d(${(cX*L.depth*40).toFixed(2)}px,${(cY*L.depth*22).toFixed(2)}px,0)`;}
+    requestAnimationFrame(frame);}
   if(!reduce) requestAnimationFrame(frame);
 </script>
 </body>
