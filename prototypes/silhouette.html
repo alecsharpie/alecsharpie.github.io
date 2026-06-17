@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alec Sharp — silhouette prototype</title>
+<style>
+  :root{
+    /* dusk gradient sky */
+    --sky-top:#1d2a4a;
+    --sky-mid:#3a4a78;
+    --sky-low:#c97b5a;
+    --sky-glow:#f0a86e;
+    /* layer tints: far = hazy slate, near = black */
+    --l1:#5a6a92;  /* far mountains */
+    --l2:#414f78;  /* ranges */
+    --l3:#2c3759;  /* far treeline */
+    --l4:#1c2540;  /* mid forest */
+    --l5:#10162b;  /* near trees */
+    --l6:#070a16;  /* foreground fronds */
+    --ink:#0a0e1a;
+    --paper:#f3ede1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink)}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    height:100vh;
+    min-height:560px;
+    overflow:hidden;
+    background:linear-gradient(to bottom,
+      var(--sky-top) 0%,
+      var(--sky-mid) 42%,
+      var(--sky-low) 82%,
+      var(--sky-glow) 100%);
+  }
+  .moon{
+    position:absolute;
+    top:16%;left:50%;
+    width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle at 38% 38%, #fff7e8, #f6e3bd 60%, #f0d29a 100%);
+    box-shadow:0 0 60px 18px rgba(246,227,189,.35);
+    transform:translate(-50%,0);
+  }
+  /* each parallax layer is a full-width band pinned to the bottom */
+  .layer{
+    position:absolute;
+    left:50%;bottom:0;
+    width:140%;            /* extra width so parallax never reveals an edge */
+    transform:translate3d(-50%,0,0);
+    will-change:transform;
+    line-height:0;
+  }
+  .layer svg{width:100%;height:auto;display:block}
+  .l1 svg path{fill:var(--l1)}
+  .l2 svg path{fill:var(--l2)}
+  .l3 svg path{fill:var(--l3)}
+  .l4 svg path{fill:var(--l4)}
+  .l5 svg path{fill:var(--l5)}
+  .l6 svg path{fill:var(--l6)}
+
+  /* soft haze band where sky meets the far hills, sells the depth */
+  .haze{
+    position:absolute;left:0;right:0;bottom:30%;height:34%;
+    background:linear-gradient(to top, rgba(240,168,110,0) 0%, rgba(240,168,110,.28) 70%, rgba(240,168,110,0) 100%);
+    pointer-events:none;
+  }
+
+  /* ---------- CONTENT over the hero ---------- */
+  .intro{
+    position:absolute;
+    top:30%;left:0;right:0;
+    text-align:center;
+    padding:0 24px;
+    z-index:5;
+    text-shadow:0 2px 24px rgba(8,12,26,.55);
+  }
+  .intro h1{
+    font-size:clamp(2.4rem,7vw,4.2rem);
+    font-weight:700;letter-spacing:-.02em;
+  }
+  .intro p{
+    margin-top:.6rem;
+    font-size:clamp(1rem,2.4vw,1.2rem);
+    color:#f6ecdd;opacity:.92;
+  }
+  .intro .links{margin-top:1.1rem;font-size:1rem}
+  .intro .links a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:1px}
+  .intro .links a:hover{border-color:#fff}
+  .scroll-cue{
+    position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+    z-index:5;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(255,255,255,.65);animation:bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+  /* ---------- clean content below ---------- */
+  main{
+    max-width:640px;margin:0 auto;padding:72px 24px 96px;
+    color:var(--ink);
+  }
+  main{background:var(--paper)}
+  .sheet{background:var(--paper)}
+  main h2{font-size:1.5rem;margin:0 0 .4rem;letter-spacing:-.01em}
+  main .lead{color:#5a5347;margin-bottom:2.4rem}
+  .proj{padding:18px 0;border-top:1px solid #e0d8c8}
+  .proj h3{font-size:1.1rem;margin-bottom:.2rem}
+  .proj .date{font-size:.8rem;color:#9a8f7c}
+  .proj p{margin:.4rem 0;color:#4a4438;font-size:.95rem}
+  footer{text-align:center;color:#9a8f7c;font-size:.8rem;padding:28px}
+  @media (prefers-reduced-motion:reduce){
+    .layer{transition:none!important}
+    .scroll-cue{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<section class="hero" id="hero">
+  <div class="moon" data-depth="0.12"></div>
+  <div class="haze"></div>
+
+  <!-- L1 far mountains -->
+  <div class="layer l1" data-depth="0.06">
+    <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,300 L0,150 L120,90 L210,140 L320,70 L430,150 L520,100 L640,170 L760,110 L880,165 L1000,120 L1100,160 L1200,130 L1200,300 Z"/>
+    </svg>
+  </div>
+
+  <!-- L2 nearer ranges -->
+  <div class="layer l2" data-depth="0.11">
+    <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,300 L0,200 L150,150 L260,205 L400,140 L520,210 L660,160 L820,215 L960,165 L1110,210 L1200,180 L1200,300 Z"/>
+    </svg>
+  </div>
+
+  <!-- L3 far treeline -->
+  <div class="layer l3" data-depth="0.18">
+    <svg viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,240 L0,150
+        q20,-30 40,0 q18,-34 38,-2 q22,-40 42,-4 q20,-30 44,2 q24,-44 46,-6
+        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
+        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
+        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
+        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
+        q22,-30 44,0 L1200,240 Z"/>
+    </svg>
+  </div>
+
+  <!-- L4 mid forest with cabbage trees -->
+  <div class="layer l4" data-depth="0.30">
+    <svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <!-- canopy lumps -->
+      <path d="M0,260 L0,170 q40,-50 90,-30 q30,-55 80,-25 q50,-48 96,-12 q40,-50 92,-22
+        q44,-46 94,-14 q42,-48 92,-20 q46,-44 96,-10 q40,-50 92,-24 q44,-44 96,-12
+        q40,-48 90,-22 q40,-40 84,-8 L1200,260 Z"/>
+      <!-- cabbage tree silhouettes (trunk + spiky crown) -->
+      <g>
+        <path d="M250,260 L248,150 L252,150 Z M250,150
+          l-26,-14 l24,6 l-30,-22 l28,10 l-20,-30 l22,22 l-6,-34 l12,30 l8,-32 l4,34 l16,-26 l-10,30 l28,-18 l-24,24 l30,-8 l-32,18 l28,-2 Z"/>
+        <path d="M880,260 L878,140 L882,140 Z M880,140
+          l-24,-12 l22,4 l-28,-20 l26,8 l-18,-28 l20,20 l-6,-32 l12,28 l6,-30 l4,32 l16,-24 l-10,28 l26,-16 l-22,22 l28,-6 l-30,16 Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- L5 near trees + tree ferns -->
+  <div class="layer l5" data-depth="0.46">
+    <svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,260 L0,200 q60,-46 120,-18 q56,-52 124,-20 q70,-44 138,-10 q60,-50 130,-22
+        q66,-46 134,-14 q64,-48 134,-18 q70,-42 140,-8 q60,-50 130,-22 L1200,260 Z"/>
+      <!-- tree fern (ponga): bare trunk + radiating arched fronds -->
+      <g>
+        <path d="M170,260 L166,150 L174,150 Z"/>
+        <path d="M170,150 q-60,-6 -92,28 q44,-46 92,-28 q-50,-30 -96,-14 q40,-34 96,14
+          q-40,-44 -52,-86 q22,40 52,86 q4,-52 30,-92 q-12,52 -30,92 q44,-38 96,-26 q-48,30 -96,26
+          q52,-12 96,18 q-52,-16 -96,-18 Z"/>
+      </g>
+      <g>
+        <path d="M1040,260 L1036,158 L1044,158 Z"/>
+        <path d="M1040,158 q-56,-6 -86,26 q42,-42 86,-26 q-46,-28 -90,-12 q38,-32 90,12
+          q-38,-42 -48,-80 q20,38 48,80 q4,-48 28,-86 q-10,48 -28,86 q42,-36 90,-24 q-46,28 -90,24
+          q48,-10 90,16 q-50,-14 -90,-16 Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- L6 foreground fern fronds -->
+  <div class="layer l6" data-depth="0.72">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,200 L0,120 q90,-30 180,4 q90,-40 190,2 q90,-34 184,6 q90,-38 186,0
+        q90,-32 182,6 q90,-36 184,2 L1200,200 Z"/>
+      <!-- a couple of arching fern fronds reaching up from the bottom corners -->
+      <path d="M40,200 q10,-90 70,-150 q-30,70 -56,150
+        M70,90 q26,-8 52,8 q-30,2 -52,-8
+        M84,66 q24,-8 48,6 q-28,2 -48,-6
+        M98,44 q22,-8 44,4 q-26,2 -44,-4"/>
+      <path d="M1170,200 q-14,-96 -78,-156 q34,72 64,156
+        M1124,86 q-28,-8 -56,8 q32,2 56,-8
+        M1108,62 q-26,-8 -52,6 q30,2 52,-6"/>
+    </svg>
+  </div>
+
+  <div class="intro">
+    <h1>Alec Sharp</h1>
+    <p>I like bridging the gap between people and data.</p>
+    <p>From New Zealand, living in Melbourne.</p>
+    <p class="links">
+      <a href="mailto:alecsharpie@gmail.com">Email</a> ·
+      <a href="https://github.com/alecsharpie">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
+    </p>
+  </div>
+  <div class="scroll-cue">scroll</div>
+</section>
+
+<main class="sheet">
+  <h2>Projects</h2>
+  <p class="lead">A clean, readable column — the wow lives up top, the content stays calm.</p>
+  <div id="projects">
+    <div class="proj"><h3>Example project</h3><div class="date">2025</div><p>This sample card shows the readable content layer that sits below the silhouette hero. Your real projects.json would render here.</p></div>
+    <div class="proj"><h3>Another project</h3><div class="date">2024</div><p>Pure black-on-paper typography. No 3D fighting the text — depth is purely a hero affordance.</p></div>
+  </div>
+</main>
+
+<footer>© <span id="year"></span> Alec Sharp · silhouette prototype</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---- smooth parallax: ONE rAF loop, transform-only, eased ----
+  const hero   = document.getElementById('hero');
+  const layers = [...document.querySelectorAll('[data-depth]')].map(el => ({
+    el,
+    depth: parseFloat(el.dataset.depth),
+    baseX: el.classList.contains('layer') ? -50 : 0,   // .layer is centred via -50%
+    pct:   el.classList.contains('layer')              // translate units differ for centred bands
+  }));
+
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  // target (where we want to be) vs current (where we are) -> lerp = glide, never snap
+  let tX = 0, tY = 0, cX = 0, cY = 0, scrollT = 0, scrollC = 0;
+
+  window.addEventListener('mousemove', e => {
+    tX = (e.clientX / innerWidth  - 0.5) * 2;   // -1..1
+    tY = (e.clientY / innerHeight - 0.5) * 2;
+  }, {passive:true});
+
+  // device tilt on mobile
+  window.addEventListener('deviceorientation', e => {
+    if (e.gamma == null) return;
+    tX = Math.max(-1, Math.min(1, e.gamma / 30));
+    tY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+  }, {passive:true});
+
+  addEventListener('scroll', () => { scrollT = scrollY; }, {passive:true});
+
+  function frame(){
+    // ease current toward target (0.08 = buttery, higher = snappier)
+    cX += (tX - cX) * 0.08;
+    cY += (tY - cY) * 0.08;
+    scrollC += (scrollT - scrollC) * 0.12;
+
+    for (const L of layers){
+      const mx = cX * L.depth * 40;            // px from mouse
+      const my = cY * L.depth * 22;
+      const sy = scrollC * L.depth * 0.5;      // px from scroll (far moves less)
+      if (L.pct){
+        L.el.style.transform = `translate3d(calc(-50% + ${mx}px), ${my - sy}px, 0)`;
+      } else {
+        L.el.style.transform = `translate3d(${mx}px, ${my - sy}px, 0)`;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  if (!reduce) requestAnimationFrame(frame);
+</script>
+</body>
+</html>
