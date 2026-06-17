@@ -3,285 +3,241 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alec Sharp — silhouette prototype</title>
+<title>Alec Sharp — diorama prototype</title>
 <style>
   :root{
-    /* dusk gradient sky */
-    --sky-top:#1d2a4a;
-    --sky-mid:#3a4a78;
-    --sky-low:#c97b5a;
-    --sky-glow:#f0a86e;
-    /* layer tints: far = hazy slate, near = black */
-    --l1:#5a6a92;  /* far mountains */
-    --l2:#414f78;  /* ranges */
-    --l3:#2c3759;  /* far treeline */
-    --l4:#1c2540;  /* mid forest */
-    --l5:#10162b;  /* near trees */
-    --l6:#070a16;  /* foreground fronds */
-    --ink:#0a0e1a;
-    --paper:#f3ede1;
+    --sky-0:#141f3a;   /* zenith */
+    --sky-1:#243456;
+    --sky-2:#3a4a78;
+    --sky-3:#b5663f;   /* warm horizon */
+    --sky-4:#e89a5b;   /* glow */
+    --card:#070a14;    /* black paper */
+    --text:#f2e8d6;
+    --muted:#bfae93;
+    --warm:#ffce8f;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--ink)}
+  html,body{background:var(--sky-0)}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    color:var(--paper);
-    -webkit-font-smoothing:antialiased;
+    color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;
   }
 
-  /* ---------- HERO ---------- */
-  .hero{
-    position:relative;
-    height:100vh;
-    min-height:560px;
-    overflow:hidden;
+  /* fixed dusk sky = the light the cards are held in front of */
+  .sky{position:fixed;inset:0;z-index:0;
     background:linear-gradient(to bottom,
-      var(--sky-top) 0%,
-      var(--sky-mid) 42%,
-      var(--sky-low) 82%,
-      var(--sky-glow) 100%);
-  }
-  .moon{
-    position:absolute;
-    top:16%;left:50%;
-    width:120px;height:120px;border-radius:50%;
-    background:radial-gradient(circle at 38% 38%, #fff7e8, #f6e3bd 60%, #f0d29a 100%);
-    box-shadow:0 0 60px 18px rgba(246,227,189,.35);
-    transform:translate(-50%,0);
-  }
-  /* each parallax layer is a full-width band pinned to the bottom */
-  .layer{
-    position:absolute;
-    left:50%;bottom:0;
-    width:140%;            /* extra width so parallax never reveals an edge */
-    transform:translate3d(-50%,0,0);
-    will-change:transform;
-    line-height:0;
-  }
-  .layer svg{width:100%;height:auto;display:block}
-  .l1 svg path{fill:var(--l1)}
-  .l2 svg path{fill:var(--l2)}
-  .l3 svg path{fill:var(--l3)}
-  .l4 svg path{fill:var(--l4)}
-  .l5 svg path{fill:var(--l5)}
-  .l6 svg path{fill:var(--l6)}
+      var(--sky-0) 0%, var(--sky-1) 38%, var(--sky-2) 64%,
+      var(--sky-3) 86%, var(--sky-4) 100%);}
+  /* moon lives in the sky near the top and scrolls away (absolute, not fixed) */
+  .moon{position:absolute;top:9vh;left:50%;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(circle at 38% 38%,#fff7e8,#f6e3bd 60%,#f0d29a 100%);
+    box-shadow:0 0 70px 20px rgba(246,227,189,.30);z-index:0;transform:translateX(-50%)}
 
-  /* soft haze band where sky meets the far hills, sells the depth */
-  .haze{
-    position:absolute;left:0;right:0;bottom:30%;height:34%;
-    background:linear-gradient(to top, rgba(240,168,110,0) 0%, rgba(240,168,110,.28) 70%, rgba(240,168,110,0) 100%);
-    pointer-events:none;
-  }
+  /* frame holders: fixed, span the viewport, sit in front of/behind content */
+  .frame{position:fixed;inset:0;pointer-events:none}
+  .frame-back{z-index:1}
+  .frame-front{z-index:3}
+  .layer{position:absolute;will-change:transform}
+  .layer svg path{fill:var(--card)}
 
-  /* ---------- CONTENT over the hero ---------- */
-  .intro{
-    position:absolute;
-    top:30%;left:0;right:0;
-    text-align:center;
-    padding:0 24px;
-    z-index:5;
-    text-shadow:0 2px 24px rgba(8,12,26,.55);
-  }
-  .intro h1{
-    font-size:clamp(2.4rem,7vw,4.2rem);
-    font-weight:700;letter-spacing:-.02em;
-  }
-  .intro p{
-    margin-top:.6rem;
-    font-size:clamp(1rem,2.4vw,1.2rem);
-    color:#f6ecdd;opacity:.92;
-  }
-  .intro .links{margin-top:1.1rem;font-size:1rem}
+  /* bottom horizon bands, centred & overscanned so parallax never shows an edge */
+  .horizon{left:50%;bottom:0;width:148%;transform:translate3d(-50%,0,0);line-height:0}
+  .horizon svg{width:100%;height:auto;display:block}
+
+  /* side foliage columns frame the margins the full height of the viewport */
+  .side{top:-4%;bottom:-4%;width:clamp(150px,19vw,320px)}
+  .side.left{left:-12px}
+  .side.right{right:-12px}
+  .side svg{width:100%;height:100%;display:block}
+  .side.right svg{transform:scaleX(-1)}
+  /* top fronds hang in from the corners */
+  .canopy{top:-8px;left:0;right:0;height:34vh}
+  .canopy svg{width:100%;height:100%;display:block}
+
+  /* ---- content runs down the centre channel ---- */
+  .intro{position:relative;z-index:2;text-align:center;padding:30vh 24px 24vh}
+  .intro h1{font-size:clamp(2.6rem,8vw,4.6rem);font-weight:800;letter-spacing:-.03em;
+    text-shadow:0 2px 30px rgba(8,12,26,.6)}
+  .intro p{margin-top:.6rem;font-size:clamp(1rem,2.3vw,1.2rem);color:#f7ecda;
+    text-shadow:0 1px 16px rgba(8,12,26,.6)}
+  .intro .links{margin-top:1.2rem}
   .intro .links a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:1px}
   .intro .links a:hover{border-color:#fff}
-  .scroll-cue{
-    position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
-    z-index:5;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
-    color:rgba(255,255,255,.65);animation:bob 2.4s ease-in-out infinite;
-  }
-  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 
-  /* ---------- clean content below ---------- */
-  main{
-    max-width:640px;margin:0 auto;padding:72px 24px 96px;
-    color:var(--ink);
+  .content{position:relative;z-index:2;max-width:600px;margin:0 auto;padding:0 28px 30vh}
+  .content h2{font-size:1.6rem;margin-bottom:1rem;letter-spacing:-.01em;
+    text-shadow:0 1px 14px rgba(8,12,26,.55)}
+  .proj{padding:20px 0;border-top:1px solid rgba(255,235,205,.14)}
+  .proj h3{font-size:1.15rem;margin-bottom:.15rem;color:#fff}
+  .proj .date{font-size:.78rem;color:var(--muted)}
+  .proj p{margin:.45rem 0;color:#e6d8bf;font-size:.96rem;line-height:1.5}
+  .proj a,.cool a{color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(255,206,143,.35)}
+  .cool ul{list-style:none}
+  .cool li{padding:9px 0;border-top:1px solid rgba(255,235,205,.1)}
+  footer{position:relative;z-index:2;text-align:center;color:var(--muted);font-size:.8rem;padding:0 24px 40px}
+
+  /* mobile: drop the side columns (they'd crowd text), keep canopy + horizon */
+  @media (max-width:760px){
+    .side{display:none}
+    .content,.intro{padding-left:18px;padding-right:18px}
   }
-  main{background:var(--paper)}
-  .sheet{background:var(--paper)}
-  main h2{font-size:1.5rem;margin:0 0 .4rem;letter-spacing:-.01em}
-  main .lead{color:#5a5347;margin-bottom:2.4rem}
-  .proj{padding:18px 0;border-top:1px solid #e0d8c8}
-  .proj h3{font-size:1.1rem;margin-bottom:.2rem}
-  .proj .date{font-size:.8rem;color:#9a8f7c}
-  .proj p{margin:.4rem 0;color:#4a4438;font-size:.95rem}
-  footer{text-align:center;color:#9a8f7c;font-size:.8rem;padding:28px}
   @media (prefers-reduced-motion:reduce){
-    .layer{transition:none!important}
-    .scroll-cue{animation:none}
+    .moon{animation:none}
   }
 </style>
 </head>
 <body>
 
-<section class="hero" id="hero">
-  <div class="moon" data-depth="0.12"></div>
-  <div class="haze"></div>
+<div class="sky"></div>
+<div class="moon"></div>
 
-  <!-- L1 far mountains -->
-  <div class="layer l1" data-depth="0.06">
+<!-- BEHIND the content -->
+<div class="frame frame-back">
+  <div class="layer horizon" data-depth="0.06">
     <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
       <path d="M0,300 L0,150 L120,90 L210,140 L320,70 L430,150 L520,100 L640,170 L760,110 L880,165 L1000,120 L1100,160 L1200,130 L1200,300 Z"/>
     </svg>
   </div>
-
-  <!-- L2 nearer ranges -->
-  <div class="layer l2" data-depth="0.11">
+  <div class="layer horizon" data-depth="0.12">
     <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,300 L0,200 L150,150 L260,205 L400,140 L520,210 L660,160 L820,215 L960,165 L1110,210 L1200,180 L1200,300 Z"/>
+      <path d="M0,300 L0,205 L150,150 L260,205 L400,140 L520,210 L660,160 L820,215 L960,165 L1110,210 L1200,180 L1200,300 Z"/>
     </svg>
   </div>
+  <div class="layer side left"  data-depth="0.10"><svg id="fl-back"  viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer side right" data-depth="0.10"><svg id="fr-back"  viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+</div>
 
-  <!-- L3 far treeline -->
-  <div class="layer l3" data-depth="0.18">
-    <svg viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,240 L0,150
-        q20,-30 40,0 q18,-34 38,-2 q22,-40 42,-4 q20,-30 44,2 q24,-44 46,-6
-        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
-        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
-        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
-        q22,-30 44,0 q20,-36 42,-2 q24,-40 46,-4 q22,-30 44,2 q24,-42 46,-6
-        q22,-30 44,0 L1200,240 Z"/>
-    </svg>
-  </div>
+<!-- the readable centre channel -->
+<header class="intro">
+  <h1>Alec Sharp</h1>
+  <p>I like bridging the gap between people and data.</p>
+  <p>From New Zealand, living in Melbourne.</p>
+  <p class="links">
+    <a href="mailto:alecsharpie@gmail.com">Email</a> ·
+    <a href="https://github.com/alecsharpie">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
+  </p>
+</header>
 
-  <!-- L4 mid forest with cabbage trees -->
-  <div class="layer l4" data-depth="0.30">
-    <svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <!-- canopy lumps -->
-      <path d="M0,260 L0,170 q40,-50 90,-30 q30,-55 80,-25 q50,-48 96,-12 q40,-50 92,-22
-        q44,-46 94,-14 q42,-48 92,-20 q46,-44 96,-10 q40,-50 92,-24 q44,-44 96,-12
-        q40,-48 90,-22 q40,-40 84,-8 L1200,260 Z"/>
-      <!-- cabbage tree silhouettes (trunk + spiky crown) -->
-      <g>
-        <path d="M250,260 L248,150 L252,150 Z M250,150
-          l-26,-14 l24,6 l-30,-22 l28,10 l-20,-30 l22,22 l-6,-34 l12,30 l8,-32 l4,34 l16,-26 l-10,30 l28,-18 l-24,24 l30,-8 l-32,18 l28,-2 Z"/>
-        <path d="M880,260 L878,140 L882,140 Z M880,140
-          l-24,-12 l22,4 l-28,-20 l26,8 l-18,-28 l20,20 l-6,-32 l12,28 l6,-30 l4,32 l16,-24 l-10,28 l26,-16 l-22,22 l28,-6 l-30,16 Z"/>
-      </g>
-    </svg>
-  </div>
-
-  <!-- L5 near trees + tree ferns -->
-  <div class="layer l5" data-depth="0.46">
-    <svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,260 L0,200 q60,-46 120,-18 q56,-52 124,-20 q70,-44 138,-10 q60,-50 130,-22
-        q66,-46 134,-14 q64,-48 134,-18 q70,-42 140,-8 q60,-50 130,-22 L1200,260 Z"/>
-      <!-- tree fern (ponga): bare trunk + radiating arched fronds -->
-      <g>
-        <path d="M170,260 L166,150 L174,150 Z"/>
-        <path d="M170,150 q-60,-6 -92,28 q44,-46 92,-28 q-50,-30 -96,-14 q40,-34 96,14
-          q-40,-44 -52,-86 q22,40 52,86 q4,-52 30,-92 q-12,52 -30,92 q44,-38 96,-26 q-48,30 -96,26
-          q52,-12 96,18 q-52,-16 -96,-18 Z"/>
-      </g>
-      <g>
-        <path d="M1040,260 L1036,158 L1044,158 Z"/>
-        <path d="M1040,158 q-56,-6 -86,26 q42,-42 86,-26 q-46,-28 -90,-12 q38,-32 90,12
-          q-38,-42 -48,-80 q20,38 48,80 q4,-48 28,-86 q-10,48 -28,86 q42,-36 90,-24 q-46,28 -90,24
-          q48,-10 90,16 q-50,-14 -90,-16 Z"/>
-      </g>
-    </svg>
-  </div>
-
-  <!-- L6 foreground fern fronds -->
-  <div class="layer l6" data-depth="0.72">
-    <svg viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <path d="M0,200 L0,120 q90,-30 180,4 q90,-40 190,2 q90,-34 184,6 q90,-38 186,0
-        q90,-32 182,6 q90,-36 184,2 L1200,200 Z"/>
-      <!-- a couple of arching fern fronds reaching up from the bottom corners -->
-      <path d="M40,200 q10,-90 70,-150 q-30,70 -56,150
-        M70,90 q26,-8 52,8 q-30,2 -52,-8
-        M84,66 q24,-8 48,6 q-28,2 -48,-6
-        M98,44 q22,-8 44,4 q-26,2 -44,-4"/>
-      <path d="M1170,200 q-14,-96 -78,-156 q34,72 64,156
-        M1124,86 q-28,-8 -56,8 q32,2 56,-8
-        M1108,62 q-26,-8 -52,6 q30,2 52,-6"/>
-    </svg>
-  </div>
-
-  <div class="intro">
-    <h1>Alec Sharp</h1>
-    <p>I like bridging the gap between people and data.</p>
-    <p>From New Zealand, living in Melbourne.</p>
-    <p class="links">
-      <a href="mailto:alecsharpie@gmail.com">Email</a> ·
-      <a href="https://github.com/alecsharpie">GitHub</a> ·
-      <a href="https://www.linkedin.com/in/alecsharpie/">LinkedIn</a>
-    </p>
-  </div>
-  <div class="scroll-cue">scroll</div>
-</section>
-
-<main class="sheet">
+<main class="content">
   <h2>Projects</h2>
-  <p class="lead">A clean, readable column — the wow lives up top, the content stays calm.</p>
-  <div id="projects">
-    <div class="proj"><h3>Example project</h3><div class="date">2025</div><p>This sample card shows the readable content layer that sits below the silhouette hero. Your real projects.json would render here.</p></div>
-    <div class="proj"><h3>Another project</h3><div class="date">2024</div><p>Pure black-on-paper typography. No 3D fighting the text — depth is purely a hero affordance.</p></div>
-  </div>
+  <div class="proj"><h3>Dancing Creatures</h3><div class="date">2025</div><p>A sample project card living in the centre channel, framed by the silhouette margins on either side. <a href="#">link</a></p></div>
+  <div class="proj"><h3>Graphing Bike Polo Results</h3><div class="date">2024</div><p>The readable column stays calm and clean while the diorama frames it the whole way down the page.</p></div>
+  <div class="proj"><h3>Another project</h3><div class="date">2023</div><p>More body text to give the page some length so we can see the side foliage framing a long scroll.</p></div>
+
+  <section class="cool" style="margin-top:2.5rem">
+    <h2>Cool Stuff</h2>
+    <ul>
+      <li><a href="#">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
+      <li><a href="#">Global weather visualization</a></li>
+      <li><a href="#">Free photoshop alternative in browser</a></li>
+      <li><a href="#">3Blue1Brown: Math animations</a></li>
+    </ul>
+  </section>
 </main>
 
-<footer>© <span id="year"></span> Alec Sharp · silhouette prototype</footer>
+<footer>© <span id="year"></span> Alec Sharp · diorama prototype</footer>
+
+<!-- IN FRONT of the content -->
+<div class="frame frame-front">
+  <div class="layer side left"  data-depth="0.42"><svg id="fl-front" viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer side right" data-depth="0.42"><svg id="fr-front" viewBox="0 0 300 1000" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer canopy" data-depth="0.30"><svg id="canopy" viewBox="0 0 1200 340" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg></div>
+  <div class="layer horizon" data-depth="0.72">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0,200 L0,120 q90,-30 180,4 q90,-40 190,2 q90,-34 184,6 q90,-38 186,0 q90,-32 182,6 q90,-36 184,2 L1200,200 Z"/>
+    </svg>
+  </div>
+</div>
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // ---- smooth parallax: ONE rAF loop, transform-only, eased ----
-  const hero   = document.getElementById('hero');
-  const layers = [...document.querySelectorAll('[data-depth]')].map(el => ({
-    el,
-    depth: parseFloat(el.dataset.depth),
-    baseX: el.classList.contains('layer') ? -50 : 0,   // .layer is centred via -50%
-    pct:   el.classList.contains('layer')              // translate units differ for centred bands
-  }));
-
-  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-
-  // target (where we want to be) vs current (where we are) -> lerp = glide, never snap
-  let tX = 0, tY = 0, cX = 0, cY = 0, scrollT = 0, scrollC = 0;
-
-  window.addEventListener('mousemove', e => {
-    tX = (e.clientX / innerWidth  - 0.5) * 2;   // -1..1
-    tY = (e.clientY / innerHeight - 0.5) * 2;
-  }, {passive:true});
-
-  // device tilt on mobile
-  window.addEventListener('deviceorientation', e => {
-    if (e.gamma == null) return;
-    tX = Math.max(-1, Math.min(1, e.gamma / 30));
-    tY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
-  }, {passive:true});
-
-  addEventListener('scroll', () => { scrollT = scrollY; }, {passive:true});
-
-  function frame(){
-    // ease current toward target (0.08 = buttery, higher = snappier)
-    cX += (tX - cX) * 0.08;
-    cY += (tY - cY) * 0.08;
-    scrollC += (scrollT - scrollC) * 0.12;
-
-    for (const L of layers){
-      const mx = cX * L.depth * 40;            // px from mouse
-      const my = cY * L.depth * 22;
-      const sy = scrollC * L.depth * 0.5;      // px from scroll (far moves less)
-      if (L.pct){
-        L.el.style.transform = `translate3d(calc(-50% + ${mx}px), ${my - sy}px, 0)`;
-      } else {
-        L.el.style.transform = `translate3d(${mx}px, ${my - sy}px, 0)`;
+  /* ---------- procedural fern frond (pinnate silhouette) ---------- */
+  function rachis(len,curl,t){
+    const cx=len*0.5, cy=-curl, x1=len;
+    const mt=1-t;
+    const x=2*mt*t*cx+t*t*x1;
+    const y=2*mt*t*cy;            // y0=y1=0
+    let dx=2*mt*cx+2*t*(x1-cx);
+    let dy=2*mt*cy-2*t*cy;
+    const L=Math.hypot(dx,dy)||1;
+    return {x,y,tx:dx/L,ty:dy/L};
+  }
+  function frond({len=150,curl=46,leaves=15,leafLen=40,leafAngle=0.75,rib=2.4}){
+    let d=''; const ribbon=[];
+    for(let i=0;i<=leaves;i++){
+      const t=i/leaves, p=rachis(len,curl,t);
+      const nx=-p.ty, ny=p.tx, w=rib*(1-t)+0.4;
+      ribbon.push([p.x+nx*w,p.y+ny*w]);
+      ribbon.unshift([p.x-nx*w,p.y-ny*w]);   // build closed ribbon outline
+    }
+    d+='M'+ribbon.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z ';
+    for(let i=1;i<=leaves;i++){
+      const t=i/leaves, p=rachis(len,curl,t);
+      const nx=-p.ty, ny=p.tx, ll=leafLen*(1-t*0.85);
+      for(const side of [1,-1]){
+        let dxx=nx*side+p.tx*leafAngle, dyy=ny*side+p.ty*leafAngle;
+        const L=Math.hypot(dxx,dyy)||1; dxx/=L; dyy/=L;
+        const ax=p.x+dxx*ll, ay=p.y+dyy*ll;
+        const bw=ll*0.18+1.4;
+        const cxp=p.x+dxx*ll*0.5+p.tx*ll*0.18, cyp=p.y+dyy*ll*0.5+p.ty*ll*0.18;
+        d+=`M${(p.x+p.tx*bw).toFixed(1)},${(p.y+p.ty*bw).toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${ax.toFixed(1)},${ay.toFixed(1)} L${(p.x-p.tx*bw).toFixed(1)},${(p.y-p.ty*bw).toFixed(1)} Z `;
       }
+    }
+    return d;
+  }
+  function place(svg, fronds){
+    const buf=fronds.map(f=>
+      `<g transform="translate(${f.x},${f.y}) rotate(${f.rot}) scale(${f.s})"><path d="${frond(f.opts||{})}"/></g>`
+    ).join('');
+    svg.insertAdjacentHTML('beforeend', buf);
+  }
+
+  // left side columns: fronds rooted at the left edge, leaning up & inward (toward +x)
+  // back layer = smaller/denser, front layer = larger/reaching further in
+  place(document.getElementById('fl-back'), [
+    {x:0,y:120,rot:-18,s:0.9},{x:-10,y:330,rot:8,s:1.0},{x:0,y:560,rot:-12,s:1.05},
+    {x:-8,y:790,rot:6,s:0.95},{x:0,y:980,rot:-20,s:1.0},
+  ]);
+  place(document.getElementById('fr-back'), [
+    {x:0,y:90,rot:-10,s:0.95},{x:-8,y:300,rot:10,s:1.0},{x:0,y:520,rot:-16,s:1.0},
+    {x:-6,y:740,rot:6,s:1.05},{x:0,y:950,rot:-14,s:0.95},
+  ]);
+  place(document.getElementById('fl-front'), [
+    {x:0,y:200,rot:-26,s:1.4,opts:{len:170,curl:60}},{x:-14,y:470,rot:14,s:1.5,opts:{len:180,curl:54}},
+    {x:0,y:720,rot:-20,s:1.45,opts:{len:175,curl:58}},{x:-10,y:980,rot:18,s:1.5,opts:{len:185,curl:50}},
+  ]);
+  place(document.getElementById('fr-front'), [
+    {x:0,y:150,rot:-16,s:1.45,opts:{len:175,curl:56}},{x:-12,y:430,rot:20,s:1.5,opts:{len:182,curl:52}},
+    {x:0,y:690,rot:-24,s:1.4,opts:{len:178,curl:58}},{x:-8,y:960,rot:12,s:1.5,opts:{len:188,curl:50}},
+  ]);
+  // canopy fronds hanging down from the top (rotated ~downward)
+  place(document.getElementById('canopy'), [
+    {x:60,y:-20,rot:80,s:1.6,opts:{len:180,curl:50}},{x:230,y:-30,rot:108,s:1.3,opts:{len:150,curl:44}},
+    {x:1140,y:-20,rot:100,s:1.6,opts:{len:180,curl:50}},{x:980,y:-30,rot:74,s:1.3,opts:{len:150,curl:44}},
+  ]);
+
+  /* ---------- smooth parallax: one rAF loop, transform-only, eased ---------- */
+  const layers=[...document.querySelectorAll('.layer')].map(el=>({
+    el, depth:parseFloat(el.dataset.depth),
+    centred:el.classList.contains('horizon')
+  }));
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let tX=0,tY=0,cX=0,cY=0;
+  addEventListener('mousemove',e=>{tX=(e.clientX/innerWidth-0.5)*2;tY=(e.clientY/innerHeight-0.5)*2;},{passive:true});
+  addEventListener('deviceorientation',e=>{if(e.gamma==null)return;tX=Math.max(-1,Math.min(1,e.gamma/30));tY=Math.max(-1,Math.min(1,(e.beta-45)/30));},{passive:true});
+  function frame(){
+    cX+=(tX-cX)*0.08; cY+=(tY-cY)*0.08;
+    for(const L of layers){
+      const mx=cX*L.depth*42, my=cY*L.depth*22;
+      L.el.style.transform = L.centred
+        ? `translate3d(calc(-50% + ${mx}px), ${my}px, 0)`
+        : `translate3d(${mx}px, ${my}px, 0)`;
     }
     requestAnimationFrame(frame);
   }
-  if (!reduce) requestAnimationFrame(frame);
+  if(!reduce) requestAnimationFrame(frame);
 </script>
 </body>
 </html>
