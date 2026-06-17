@@ -6,10 +6,10 @@
 <title>Alec Sharp — light-box diorama</title>
 <style>
   :root{
-    /* monochrome layer ramp: back (catches light) -> front (black paper) */
-    --far:#9aa0a6; --mid:#6f757d; --hill:#474d56; --forest:#262a31;
-    --near:#13151a; --front:#070809; --black:#000;
-    --ink:#15140f; --ink-soft:#3a382e;
+    /* warm sunset ramp: back sheets catch the amber light -> front sheets go black */
+    --far:#e0a868; --mid:#bd7d3c; --hill:#854f24; --forest:#4d2c13;
+    --near:#2a1709; --front:#160a03; --black:#0a0402;
+    --ink:#231405; --ink-soft:#5b3a1c;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:#000}
@@ -18,9 +18,9 @@
 
   /* the light source behind the cut paper */
   .glow{position:fixed;inset:0;z-index:0;
-    background:radial-gradient(78% 70% at 50% 38%,
-      #eef0ee 0%, #ccd0d2 13%, #9a9fa2 27%, #696e72 45%,
-      #3e4145 63%, #1e2023 81%, #08090a 100%);}
+    background:radial-gradient(80% 72% at 50% 40%,
+      #fff4da 0%, #ffe1a0 13%, #f4b061 29%, #d57f37 46%,
+      #9b5021 63%, #59260e 82%, #1c0a04 100%);}
 
   .stage{position:fixed;inset:0;pointer-events:none}
   .stage-back{z-index:1}
@@ -43,7 +43,7 @@
   /* content: black paper-cut text floating in the lit centre */
   /* soft backlight halo so the dark paper-cut text stays legible over any layer */
   .intro h1,.intro p,.content h2,.content h3,.proj p,.cool a,.intro .links a{
-    text-shadow:0 0 12px rgba(238,240,238,.85),0 0 4px rgba(238,240,238,.9)}
+    text-shadow:0 0 12px rgba(255,244,222,.9),0 0 4px rgba(255,244,222,.95)}
   .intro{position:relative;z-index:10;text-align:center;padding:24vh 24px 30vh}
   .intro h1{font-size:clamp(2.6rem,8vw,4.8rem);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
   .intro p{margin-top:.55rem;font-size:clamp(1rem,2.3vw,1.18rem);color:var(--ink-soft)}
@@ -154,6 +154,42 @@
     return g+`</g>`;
   }
 
+  /* ---------- tall conifer (kahikatea / rimu): slender trunk + feathered tiers ---------- */
+  function conifer(x,baseY,h,fill,seed,opts={}){
+    const {droop=23,density=1,taper=2.2}=opts;
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    const top=baseY-h;
+    g+=`<path d="M${(x-taper).toFixed(1)},${baseY} L${(x-0.8).toFixed(1)},${top.toFixed(1)} L${(x+0.8).toFixed(1)},${top.toFixed(1)} L${(x+taper).toFixed(1)},${baseY} Z"/>`;
+    const tiers=Math.max(7,Math.round(h/19*density));
+    for(let i=0;i<tiers;i++){
+      const t=i/(tiers-1);                       // 0 top -> 1 base
+      const ty=top+Math.pow(t,1.05)*h*0.9;
+      const len=12+t*h*0.17;                     // longer toward the base -> spire shape
+      for(const side of[1,-1]){
+        const a=(side>0?droop:180-droop)+(r()-0.5)*9;
+        g+=`<g transform="translate(${x.toFixed(1)},${ty.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.5,leaves:Math.max(7,Math.round(len/4.3)),leafLen:len*0.2,leafAngle:0.62,rib:Math.max(0.5,len*0.02)})}"/></g>`;
+      }
+    }
+    g+=`<g transform="translate(${x.toFixed(1)},${(top-1).toFixed(1)}) rotate(-90)"><path d="${frondPath({len:Math.min(28,h*0.12),curl:4,leaves:6,leafLen:3.4,leafAngle:0.45,rib:0.6})}"/></g>`;
+    return g+`</g>`;
+  }
+
+  /* ---------- grass / reed tuft ---------- */
+  function grass(x,baseY,w,h,n,fill,seed){
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    for(let i=0;i<n;i++){
+      const bx=x+(r()-0.5)*w,lean=(r()-0.5)*0.6,bh=h*(0.45+r()*0.75);
+      const tipx=bx+lean*bh,tipy=baseY-bh,bw=1.3+r()*1.5,mx=bx+lean*bh*0.5,my=baseY-bh*0.55;
+      g+=`<path d="M${(bx-bw).toFixed(1)},${baseY} Q${(mx-bw*0.5).toFixed(1)},${my.toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} Q${(mx+bw*0.5).toFixed(1)},${my.toFixed(1)} ${(bx+bw).toFixed(1)},${baseY} Z"/>`;
+    }
+    return g+`</g>`;
+  }
+
+  /* ---------- distant bird (little gull) ---------- */
+  function bird(x,y,s,fill){
+    return `<path d="M${(x-7*s).toFixed(1)},${y.toFixed(1)} Q${(x-3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${x.toFixed(1)},${(y-0.5*s).toFixed(1)} Q${(x+3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${(x+7*s).toFixed(1)},${y.toFixed(1)}" fill="none" stroke="${fill}" stroke-width="${(1.5*s).toFixed(2)}" stroke-linecap="round"/>`;
+  }
+
   /* ---------- kiwi focal silhouette ---------- */
   function kiwi(cx,cy,s,fill){
     const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
@@ -181,18 +217,16 @@
   }
 
   /* ====================== build the scene ====================== */
-  // moon + stars
-  let sky=`<defs><radialGradient id="mg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fffdf4"/><stop offset="70%" stop-color="#f3ead2"/><stop offset="100%" stop-color="#e6d9b8"/></radialGradient>`
-    +`<mask id="moonmask"><circle cx="600" cy="195" r="48" fill="#fff"/><circle cx="625" cy="181" r="44" fill="#000"/></mask></defs>`;
-  sky+=`<circle cx="600" cy="195" r="48" fill="url(#mg)" mask="url(#moonmask)"/>`;
-  const rs=rng(3);
-  for(let i=0;i<80;i++){const x=rs()*1200,y=rs()*360,rr=rs()*1.4+0.4;
-    sky+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rr.toFixed(1)}" fill="#fdf8ea" opacity="${(0.35+rs()*0.6).toFixed(2)}"/>`;}
+  // warm low sun + a few birds (the bright open centre)
+  let sky=`<defs><radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff9ea"/><stop offset="52%" stop-color="#ffeac0" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffd98f" stop-opacity="0"/></radialGradient></defs>`;
+  sky+=`<circle cx="600" cy="432" r="140" fill="url(#sun)"/>`;          // glow halo
+  sky+=`<circle cx="600" cy="432" r="54" fill="#fff5d8"/>`;             // sun disc
+  const rb=rng(5);
+  for(const [bx,by,bs] of [[470,250,1.1],[520,232,0.9],[700,238,1.2],[760,262,0.85],[640,205,1.0],[840,290,0.8]])
+    sky+=bird(bx,by,bs,'var(--forest)');
   $('sky').innerHTML=sky;
-
-  // river (light ribbon catching the glow)
-  $('river').innerHTML=`<path fill="#d8d1bd" d="M560,800 C540,720 640,690 600,632 C566,584 470,562 540,524
-    C600,492 700,504 660,476 L742,476 C702,510 614,524 660,560 C720,600 588,628 636,672 C676,712 700,742 700,800 Z"/>`;
 
   // ---- the river is NOT a painted shape: it is the lit floor of the box,
   //      revealed through a winding channel cut out of every sheet in front of it ----
@@ -212,15 +246,15 @@
 
   // lit floor: dim at the front, brightening toward the light at the back
   $('river').innerHTML=`<defs><linearGradient id="rl" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#8d9193"/><stop offset="0.5" stop-color="#cdd0d0"/><stop offset="1" stop-color="#f1f2f0"/></linearGradient></defs>
+      <stop offset="0" stop-color="#c2823c"/><stop offset="0.5" stop-color="#f3bd72"/><stop offset="1" stop-color="#fff0cf"/></linearGradient></defs>
     <path fill="url(#rl)" d="${WATER}"/>`;
 
   // distant hills sheet: silhouette card with the river channel masked out
   $('hills').innerHTML=
     `<defs><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#eef0ee" stop-opacity="0"/>
-      <stop offset="0.55" stop-color="#eef0ee" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#eef0ee" stop-opacity="0"/></linearGradient>${cutMask('cut-h')}</defs>
+      <stop offset="0" stop-color="#ffe9c0" stop-opacity="0"/>
+      <stop offset="0.55" stop-color="#ffe9c0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffe9c0" stop-opacity="0"/></linearGradient>${cutMask('cut-h')}</defs>
      <rect x="0" y="498" width="1200" height="130" fill="url(#mist)"/>
      <rect x="0" y="430" width="1200" height="92" fill="url(#mist)" opacity="0.45"/>
      <path fill="var(--hill)" mask="url(#cut-h)"
@@ -231,40 +265,49 @@
 
   // midground bush band (river channel cut out) + cabbage trees + a deeper tree fern
   let mid=`<defs>${cutMask('cut-m')}</defs><path fill="var(--forest)" mask="url(#cut-m)" d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/>`;
-  mid+=cabbageTree(330,652,118,'var(--forest)',12)+cabbageTree(760,650,138,'var(--forest)',31)+cabbageTree(905,656,96,'var(--forest)',48);
-  mid+=treeFern(210,656,150,8,118,'var(--forest)',61,-70,150)+treeFern(1010,654,140,8,112,'var(--forest)',77,-110,150);
+  mid+=cabbageTree(300,652,118,'var(--forest)',12)+cabbageTree(944,656,108,'var(--forest)',48);
+  mid+=conifer(250,656,156,'var(--forest)',62,{droop:22,density:0.9})+conifer(958,654,144,'var(--forest)',63,{droop:22,density:0.9});
+  // little distant firs flanking the river's vanishing point (low, by the water)
+  mid+=conifer(548,612,72,'var(--hill)',64,{droop:20})+conifer(672,612,64,'var(--hill)',65,{droop:20});
   $('mid').innerHTML=mid;
 
-  // big framing tree ferns arching from the sides + tall cabbage trees (front, near-black)
-  // asymmetric framing so it reads as bush, not a mirror
+  // tall trees framing the MARGINS only (left & right) — centre kept open for text
   let ft='';
-  ft+=treeFern(140,840,500,12,320,'var(--front)',101,-56,165);   // left, tall, crown arches in
-  ft+=treeFern(1062,840,430,10,280,'var(--front)',133,-124,150); // right, shorter
-  ft+=treeFern(55,840,240,8,175,'var(--front)',141,-38,150);     // lower left filler
-  ft+=treeFern(1148,840,300,9,200,'var(--front)',155,-142,155);  // lower right filler
-  ft+=cabbageTree(92,842,330,'var(--front)',166)+cabbageTree(1112,842,265,'var(--front)',177);
+  // left margin
+  ft+=conifer(122,864,712,'var(--front)',101,{droop:24});
+  ft+=conifer(44,864,548,'var(--front)',102,{droop:27,density:0.85});
+  ft+=treeFern(198,856,330,11,132,'var(--front)',103,-62,150);
+  ft+=cabbageTree(90,864,318,'var(--front)',104);
+  // right margin (varied, not a mirror)
+  ft+=conifer(1082,864,664,'var(--front)',111,{droop:24});
+  ft+=conifer(1160,864,500,'var(--front)',112,{droop:27,density:0.85});
+  ft+=treeFern(1010,856,300,11,132,'var(--front)',113,-118,150);
+  ft+=cabbageTree(1116,864,278,'var(--front)',114);
   $('frame-trees').innerHTML=ft;
 
   // foreground: fern fringe + grass + a fantail perched
   // foreground bank sheet, river channel cut out (even-odd)
   let fg=`<defs>${cutMask('cut-f')}</defs><path fill="#010102" mask="url(#cut-f)" d="M0,800 L0,742 Q120,704 240,736 Q360,704 480,734 Q620,704 760,736 Q900,704 1040,734 Q1130,708 1200,736 L1200,800 Z"/>`;
   const rg=rng(9);
+  // reed tufts + a couple of fern fronds in the bottom corners, clear of the water
+  fg+=grass(82,780,176,98,20,'var(--black)',201)+grass(1124,782,176,94,20,'var(--black)',202);
   fg+=`<g fill="var(--black)">`;
-  // fronds sit on the banks, kept clear of the water channel
-  for(const x of [50,160,290,410, 800,915,1030,1150]){const len=70+rg()*60, a=-100+(rg()-0.5)*40;
-    fg+=`<g transform="translate(${x},748) rotate(${a.toFixed(0)})"><path d="${frondPath({len,curl:len*0.4,leaves:13,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;}
+  for(const [x,a,len] of [[36,-72,120],[150,-96,150],[300,-90,108],[1052,-108,150],[1176,-114,120]])
+    fg+=`<g transform="translate(${x},752) rotate(${a})"><path d="${frondPath({len,curl:len*0.42,leaves:14,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;
   fg+=`</g>`;
-  fg+=fantail(250,690,1.1,'var(--black)');
+  fg+=fantail(168,700,1.1,'var(--black)');
   $('fg').innerHTML=fg;
 
-  /* ---------- smooth parallax ---------- */
+  /* ---------- parallax: vertical, on scroll only (eased) ---------- */
   const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let tX=0,tY=0,cX=0,cY=0;
-  addEventListener('mousemove',e=>{tX=(e.clientX/innerWidth-0.5)*2;tY=(e.clientY/innerHeight-0.5)*2;},{passive:true});
-  function frame(){cX+=(tX-cX)*0.08;cY+=(tY-cY)*0.08;
-    for(const L of layers){L.el.style.transform=`translate3d(${(cX*L.depth*40).toFixed(2)}px,${(cY*L.depth*22).toFixed(2)}px,0)`;}
-    requestAnimationFrame(frame);}
+  let sT=0,sC=0;
+  addEventListener('scroll',()=>{sT=window.scrollY;},{passive:true});
+  function frame(){
+    sC+=(sT-sC)*0.12;                                  // ease toward scroll position
+    for(const L of layers){ L.el.style.transform=`translate3d(0, ${(-sC*L.depth*0.08).toFixed(2)}px, 0)`; } // nearer sheets drift more
+    requestAnimationFrame(frame);
+  }
   if(!reduce) requestAnimationFrame(frame);
 </script>
 </body>
