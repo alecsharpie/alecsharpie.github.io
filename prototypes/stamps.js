@@ -7,8 +7,12 @@
    placed by its BASE point (x, baseY) and a height/scale, so the same
    stamp can sit on any sheet at any size.
 
-   Signature convention:
-     stamp(x, baseY, h, fill, seed [, opts])  ->  "<g fill=…>…</g>"
+   Signature convention — two families:
+     • ground stamps:   stamp(x, baseY, h, fill, seed [, opts])  — placed by
+       BASE point, sized by height, jittered by seed (the plants).
+     • creature stamps: stamp(cx, cy, s, fill)  — placed by CENTRE, sized by a
+       scale, deterministic line-art with no seed (kiwi/fantail/tui/bird).
+   Both return  "<g fill=…>…</g>".
 
    The catalogue (CATALOGUE.md / catalogue.html) renders every stamp on
    the lit panel so each shape can be perfected in isolation.
@@ -172,9 +176,9 @@ function toetoe(x,baseY,h,fill,seed){
     g+=`<path d="M${(x-1.4).toFixed(1)},${baseY} Q${(x+lean*len*0.4-1).toFixed(1)},${(baseY-len*0.55).toFixed(1)} ${(tipx-1).toFixed(1)},${tipy.toFixed(1)} L${(tipx+1).toFixed(1)},${tipy.toFixed(1)} Q${(x+lean*len*0.4+1).toFixed(1)},${(baseY-len*0.55).toFixed(1)} ${(x+1.4).toFixed(1)},${baseY} Z"/>`;
     // plume — a bold feathery flame: a tapered spine with soft barbs both sides
     const pl=len*0.6;
-    const dirx=lean, diry=-1, L=Math.hypot(dirx,diry); const ux=dirx/L, uy=diry/L; const px=-uy, py=ux;
+    const ang=Math.atan2(-1,lean)*180/Math.PI;   // plume aligned with the stem's lean
     const nb=9;
-    g+=`<path d="${frondPath({len:pl,curl:pl*0.08,leaves:nb,leafLen:pl*0.34,leafAngle:0.78,rib:pl*0.05})}" transform="translate(${tipx.toFixed(1)},${tipy.toFixed(1)}) rotate(${(Math.atan2(uy,ux)*180/Math.PI).toFixed(1)})"/>`;}
+    g+=`<path d="${frondPath({len:pl,curl:pl*0.08,leaves:nb,leafLen:pl*0.34,leafAngle:0.78,rib:pl*0.05})}" transform="translate(${tipx.toFixed(1)},${tipy.toFixed(1)}) rotate(${ang.toFixed(1)})"/>`;}
   return g+`</g>`;
 }
 

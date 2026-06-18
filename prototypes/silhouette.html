@@ -228,6 +228,7 @@
         }
         div.innerHTML=h+'</p>';c.appendChild(div);
       }
+      readMax?.();   // page grew — refresh the cached scroll range for parallax
     })
     .catch(()=>{$('projects').innerHTML='<p>Failed to load projects.</p>';});
 
@@ -237,22 +238,27 @@
   const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const AMP=150;                                   // px of spread at the very top
-  let target=0, cur=0;
+  let target=0, cur=0, max=0, running=false;
+  function readMax(){ max=document.documentElement.scrollHeight-window.innerHeight; }
   function readProgress(){
-    const max=document.documentElement.scrollHeight-window.innerHeight;
     target=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+    kick();
   }
-  addEventListener('scroll',readProgress,{passive:true});
-  addEventListener('resize',readProgress);
-  readProgress();
+  // run the rAF loop only while the ease is catching up; scroll/resize re-kick it.
+  // (without this it churns transforms on all layers forever, even at rest.)
+  function kick(){ if(!running && !reduce){ running=true; requestAnimationFrame(frame); } }
   function frame(){
     cur+=(target-cur)*0.12;                         // ease for buttery motion
     const amp=(1-cur)*AMP;
     for(const L of layers) L.el.style.transform=`translate3d(0,${(L.depth*amp).toFixed(2)}px,0)`;
-    requestAnimationFrame(frame);
+    if(Math.abs(target-cur)>0.0004){ requestAnimationFrame(frame); }
+    else { cur=target; running=false; }            // settled — stop until next scroll
   }
+  addEventListener('scroll',readProgress,{passive:true});
+  addEventListener('resize',()=>{readMax();readProgress();});
+  readMax(); readProgress();
   if(reduce){ for(const L of layers) L.el.style.transform='none'; }
-  else requestAnimationFrame(frame);
+  else kick();
 </script>
 </body>
 </html>
