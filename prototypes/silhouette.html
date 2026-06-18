@@ -126,15 +126,18 @@
         d+=`M${(p.x+p.tx*bw).toFixed(1)},${(p.y+p.ty*bw).toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${ax.toFixed(1)},${ay.toFixed(1)} L${(p.x-p.tx*bw).toFixed(1)},${(p.y-p.ty*bw).toFixed(1)} Z `;}}
     return d;}
 
-  /* ---------- tree fern / ponga: trunk + crown of arching fronds ---------- */
+  /* ---------- tree fern / ponga: stout fibrous trunk + crown of bold arching fronds ---------- */
   function treeFern(x,baseY,trunkH,fronds,frondLen,fill,seed,baseAng=-90,spread=150){
     const r=rng(seed);let g=`<g fill="${fill}">`;
-    g+=`<path d="M${(x-trunkH*0.05).toFixed(1)},${baseY} L${(x-3).toFixed(1)},${(baseY-trunkH).toFixed(1)} L${(x+3).toFixed(1)},${(baseY-trunkH).toFixed(1)} L${(x+trunkH*0.05).toFixed(1)},${baseY} Z"/>`;
-    const topY=baseY-trunkH;
+    const tw=Math.max(5,trunkH*0.055), topY=baseY-trunkH;
+    // trunk: slightly flared base, narrows up to the crown
+    g+=`<path d="M${(x-tw*1.5).toFixed(1)},${baseY} C${(x-tw*0.7).toFixed(1)},${(baseY-trunkH*0.5).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(topY+10).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${topY.toFixed(1)} L${(x+tw*0.5).toFixed(1)},${topY.toFixed(1)} C${(x+tw*0.5).toFixed(1)},${(topY+10).toFixed(1)} ${(x+tw*0.7).toFixed(1)},${(baseY-trunkH*0.5).toFixed(1)} ${(x+tw*1.5).toFixed(1)},${baseY} Z"/>`;
+    // solid crown knob so every frond base joins into one piece of paper
+    g+=`<circle cx="${x.toFixed(1)}" cy="${topY.toFixed(1)}" r="${Math.max(7,frondLen*0.07).toFixed(1)}"/>`;
     for(let i=0;i<fronds;i++){
-      const a=baseAng+((i/(fronds-1))-0.5)*spread+(r()-0.5)*7;
-      const len=frondLen*(0.8+r()*0.36);
-      g+=`<g transform="translate(${x.toFixed(1)},${topY.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.36,leaves:15,leafLen:len*0.2,leafAngle:0.72,rib:len*0.022})}"/></g>`;
+      const a=baseAng+((i/(fronds-1))-0.5)*spread+(r()-0.5)*6;
+      const len=frondLen*(0.82+r()*0.3);
+      g+=`<g transform="translate(${x.toFixed(1)},${topY.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.42,leaves:Math.max(9,Math.round(len/11)),leafLen:len*0.28,leafAngle:0.66,rib:Math.max(2,len*0.035)})}"/></g>`;
     }
     return g+`</g>`;
   }
@@ -147,10 +150,13 @@
     if(r()<0.75){const fy=baseY-h*0.82;
       g+=`<path d="M${x.toFixed(1)},${(baseY-h*0.62).toFixed(1)} L${(x-13).toFixed(1)},${(fy-8).toFixed(1)} L${(x-9).toFixed(1)},${(fy-12).toFixed(1)} L${x.toFixed(1)},${(baseY-h*0.56).toFixed(1)} Z"/>`;
       heads.push([x-12,fy-10],[x+9,fy-3]);}
-    for(const [hx,hy] of heads){const n=12,base=20+r()*12;
-      for(let i=0;i<n;i++){const a=-Math.PI/2+((i/(n-1))-0.5)*Math.PI*1.55,ll=base*(0.7+r()*0.7);
-        const tx=hx+Math.cos(a)*ll,ty=hy+Math.sin(a)*ll,px=-Math.sin(a)*2.1,py=Math.cos(a)*2.1;
-        g+=`<path d="M${(hx+px).toFixed(1)},${(hy+py).toFixed(1)} L${tx.toFixed(1)},${ty.toFixed(1)} L${(hx-px).toFixed(1)},${(hy-py).toFixed(1)} Z"/>`;}}
+    for(const [hx,hy] of heads){const n=13,base=24+r()*16;
+      g+=`<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="5.5"/>`;            // solid core joins the leaves
+      for(let i=0;i<n;i++){const a=-Math.PI/2+((i/(n-1))-0.5)*Math.PI*1.6,ll=base*(0.7+r()*0.7);
+        const tx=hx+Math.cos(a)*ll,ty=hy+Math.sin(a)*ll,px=-Math.sin(a)*3.1,py=Math.cos(a)*3.1;
+        // slight droop curve at the leaf tip
+        const mx=hx+Math.cos(a)*ll*0.55,my=hy+Math.sin(a)*ll*0.55+ll*0.12;
+        g+=`<path d="M${(hx+px).toFixed(1)},${(hy+py).toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)} L${(hx-px).toFixed(1)},${(hy-py).toFixed(1)} Z"/>`;}}
     return g+`</g>`;
   }
 
@@ -171,6 +177,41 @@
       }
     }
     g+=`<g transform="translate(${x.toFixed(1)},${(top-1).toFixed(1)}) rotate(-90)"><path d="${frondPath({len:Math.min(28,h*0.12),curl:4,leaves:6,leafLen:3.4,leafAngle:0.45,rib:0.6})}"/></g>`;
+    return g+`</g>`;
+  }
+
+  /* ---------- lumpy foliage blob (one solid scalloped mass = a clean paper cut) ---------- */
+  function blob(cx,cy,rx,ry,lobes,r){
+    const P=[];
+    for(let i=0;i<lobes;i++){const a=i/lobes*2*Math.PI,k=0.8+r()*0.42;P.push([cx+Math.cos(a)*rx*k,cy+Math.sin(a)*ry*k]);}
+    let d=`M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
+    for(let i=0;i<lobes;i++){const nxt=P[(i+1)%lobes],ma=(i+0.5)/lobes*2*Math.PI,bulge=1.12+r()*0.18;
+      d+=` Q${(cx+Math.cos(ma)*rx*bulge).toFixed(1)},${(cy+Math.sin(ma)*ry*bulge).toFixed(1)} ${nxt[0].toFixed(1)},${nxt[1].toFixed(1)}`;}
+    return d+' Z';
+  }
+
+  /* ---------- broadleaf / podocarp canopy tree (rimu/rātā): trunk + solid lumpy crown ---------- */
+  function canopyTree(x,baseY,h,fill,seed){
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    const trunkH=h*0.38,crownH=h-trunkH,cy=baseY-trunkH-crownH*0.46,tw=Math.max(3.5,h*0.02);
+    g+=`<path d="M${(x-tw).toFixed(1)},${baseY} C${(x-tw*0.6).toFixed(1)},${(baseY-trunkH*0.6).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(baseY-trunkH).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(baseY-trunkH-8).toFixed(1)} L${(x+tw*0.5).toFixed(1)},${(baseY-trunkH-8).toFixed(1)} C${(x+tw*0.5).toFixed(1)},${(baseY-trunkH).toFixed(1)} ${(x+tw*0.6).toFixed(1)},${(baseY-trunkH*0.6).toFixed(1)} ${(x+tw).toFixed(1)},${baseY} Z"/>`;
+    const rx=h*0.28,ry=crownH*0.52;
+    g+=`<path d="${blob(x,cy,rx,ry,12,r)}"/>`;
+    g+=`<path d="${blob(x-rx*0.52,cy+ry*0.28,rx*0.6,ry*0.66,9,r)}"/>`;
+    g+=`<path d="${blob(x+rx*0.56,cy+ry*0.2,rx*0.58,ry*0.7,9,r)}"/>`;
+    g+=`<path d="${blob(x+rx*0.04,cy-ry*0.46,rx*0.62,ry*0.62,10,r)}"/>`;
+    return g+`</g>`;
+  }
+
+  /* ---------- nīkau palm: ringed trunk + bulge + radiating fan of fronds ---------- */
+  function nikau(x,baseY,h,fill,seed,baseAng=-90,spread=130){
+    const r=rng(seed);let g=`<g fill="${fill}">`;
+    const tw=Math.max(3.5,h*0.022),topY=baseY-h;
+    g+=`<path d="M${(x-tw).toFixed(1)},${baseY} L${(x-tw*0.7).toFixed(1)},${(topY+h*0.12).toFixed(1)} L${(x+tw*0.7).toFixed(1)},${(topY+h*0.12).toFixed(1)} L${(x+tw).toFixed(1)},${baseY} Z"/>`;
+    g+=`<ellipse cx="${x.toFixed(1)}" cy="${(topY+h*0.1).toFixed(1)}" rx="${(tw*1.9).toFixed(1)}" ry="${(h*0.05).toFixed(1)}"/>`; // crownshaft bulge
+    const cy=topY+h*0.06,fr=7,fl=h*0.46;
+    for(let i=0;i<fr;i++){const a=baseAng+((i/(fr-1))-0.5)*spread+(r()-0.5)*8; const len=fl*(0.78+r()*0.34);
+      g+=`<g transform="translate(${x.toFixed(1)},${cy.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.5,leaves:Math.max(11,Math.round(len/8)),leafLen:len*0.14,leafAngle:0.5,rib:Math.max(1.4,len*0.018)})}"/></g>`;}
     return g+`</g>`;
   }
 
@@ -271,18 +312,21 @@
   mid+=conifer(548,612,72,'var(--hill)',64,{droop:20})+conifer(672,612,64,'var(--hill)',65,{droop:20});
   $('mid').innerHTML=mid;
 
-  // tall trees framing the MARGINS only (left & right) — centre kept open for text
+  // NZ native bush framing the MARGINS only — centre kept open for text
   let ft='';
-  // left margin
-  ft+=conifer(122,864,712,'var(--front)',101,{droop:24});
-  ft+=conifer(44,864,548,'var(--front)',102,{droop:27,density:0.85});
-  ft+=treeFern(198,856,330,11,132,'var(--front)',103,-62,150);
-  ft+=cabbageTree(90,864,318,'var(--front)',104);
+  // connected ground bush so the margin reads as one continuous cut, not floating fronds
+  ft+=canopyTree(52,876,156,'var(--front)',120)+canopyTree(140,878,130,'var(--front)',121)+canopyTree(206,880,104,'var(--front)',122);
+  ft+=canopyTree(1148,876,156,'var(--front)',130)+canopyTree(1060,878,134,'var(--front)',131)+canopyTree(996,880,104,'var(--front)',132);
+  // left margin: nīkau height + arching ponga + canopy mass + cabbage tree
+  ft+=nikau(48,868,600,'var(--front)',101,-104,116);
+  ft+=treeFern(176,860,372,12,150,'var(--front)',102,-58,150);
+  ft+=canopyTree(98,868,300,'var(--front)',103);
+  ft+=cabbageTree(210,868,300,'var(--front)',104);
   // right margin (varied, not a mirror)
-  ft+=conifer(1082,864,664,'var(--front)',111,{droop:24});
-  ft+=conifer(1160,864,500,'var(--front)',112,{droop:27,density:0.85});
-  ft+=treeFern(1010,856,300,11,132,'var(--front)',113,-118,150);
-  ft+=cabbageTree(1116,864,278,'var(--front)',114);
+  ft+=treeFern(1036,860,392,12,150,'var(--front)',111,-122,150);
+  ft+=nikau(1162,868,560,'var(--front)',112,-76,116);
+  ft+=canopyTree(1108,868,320,'var(--front)',113);
+  ft+=cabbageTree(1000,868,266,'var(--front)',114);
   $('frame-trees').innerHTML=ft;
 
   // foreground: fern fringe + grass + a fantail perched

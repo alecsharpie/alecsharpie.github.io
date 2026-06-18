@@ -25,10 +25,13 @@ const url = process.env.URL || `http://${HOST}:${PORT}${path}`;
 // paint the frame once at the top. Instead we capture viewport shots at several
 // scroll fractions to see how the frame holds around the content the whole way down.
 const shots = [
-  { name: 'desktop-top',    w: 1440, h: 900, scroll: 0.0, mouse: [1180, 180] },
+  { name: 'desktop-top',    w: 1440, h: 900, scroll: 0.0 },
   { name: 'desktop-mid',    w: 1440, h: 900, scroll: 0.5 },
   { name: 'desktop-bottom', w: 1440, h: 900, scroll: 1.0 },
   { name: 'mobile-top',     w: 390,  h: 844, scroll: 0.0 },
+  // close-ups to judge the cut-paper edge quality of the margin foliage
+  { name: 'detail-left',    w: 1440, h: 900, scroll: 0.0, clip: { x: 0,    y: 30, width: 380, height: 820 } },
+  { name: 'detail-right',   w: 1440, h: 900, scroll: 0.0, clip: { x: 1060, y: 30, width: 380, height: 820 } },
 ];
 
 const browser = await chromium.launch();
@@ -45,10 +48,9 @@ for (const s of shots) {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     window.scrollTo(0, Math.round(max * f));
   }, s.scroll);
-  if (s.mouse) await page.mouse.move(s.mouse[0], s.mouse[1]);
   await page.waitForTimeout(800); // let eased parallax settle
   const file = resolve(outDir, `${s.name}.png`);
-  await page.screenshot({ path: file });
+  await page.screenshot({ path: file, ...(s.clip ? { clip: s.clip } : {}) });
   console.log(`  -> ${s.name}.png`);
   await ctx.close();
 }
