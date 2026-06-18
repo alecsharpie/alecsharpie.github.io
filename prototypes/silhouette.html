@@ -232,6 +232,21 @@
     return g+`</g>`;
   }
 
+  /* ---------- koru / unfurling fern crozier: one tapered spiral cut ---------- */
+  function koru(x,baseY,h,fill,seed,dir=1){
+    const pts=[[x,baseY],[x+dir*h*0.03,baseY-h*0.3],[x,baseY-h*0.55]];
+    const ccx=x+dir*h*0.20, ccy=baseY-h*0.7, turns=1.5, n=44, thMax=turns*2*Math.PI, r0=h*0.27;
+    for(let i=0;i<=n;i++){const t=i/n,th=(dir>0?Math.PI:0)+dir*t*thMax,rad=r0*(1-0.6*t);
+      pts.push([ccx+Math.cos(th)*rad,ccy+Math.sin(th)*rad]);}
+    const N=pts.length,wid=k=>Math.max(0.8,h*0.05*(1-k*0.92)),L=[],R=[];
+    for(let i=0;i<N;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(N-1,i+1)];
+      let dx=b[0]-a[0],dy=b[1]-a[1];const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m;
+      const w=wid(i/(N-1));L.push([pts[i][0]-dy*w,pts[i][1]+dx*w]);R.push([pts[i][0]+dy*w,pts[i][1]-dx*w]);}
+    let d='M'+L.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' L'+R.reverse().map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z';
+    const tip=pts[N-1];
+    return `<g fill="${fill}"><path d="${d}"/><circle cx="${tip[0].toFixed(1)}" cy="${tip[1].toFixed(1)}" r="${(h*0.052).toFixed(1)}"/></g>`;
+  }
+
   /* ---------- distant bird (little gull) ---------- */
   function bird(x,y,s,fill){
     return `<path d="M${(x-7*s).toFixed(1)},${y.toFixed(1)} Q${(x-3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${x.toFixed(1)},${(y-0.5*s).toFixed(1)} Q${(x+3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${(x+7*s).toFixed(1)},${y.toFixed(1)}" fill="none" stroke="${fill}" stroke-width="${(1.5*s).toFixed(2)}" stroke-linecap="round"/>`;
@@ -345,6 +360,7 @@
   for(const [x,a,len] of [[36,-72,120],[150,-96,150],[300,-90,108],[1052,-108,150],[1176,-114,120]])
     fg+=`<g transform="translate(${x},752) rotate(${a})"><path d="${frondPath({len,curl:len*0.42,leaves:14,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;
   fg+=`</g>`;
+  fg+=koru(232,792,128,'var(--black)',211,1)+koru(986,792,118,'var(--black)',212,-1);
   fg+=fantail(168,700,1.1,'var(--black)');
   $('fg').innerHTML=fg;
 
