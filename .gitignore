@@ -1,5 +1,6 @@
 *.DS_Store
 images/drafts/*
 assets/drafts/*
-tooling/screenshot/node_modules/
-tooling/screenshot/shots/
+shots/
+goal/
+goal.png
