@@ -3,66 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alec Sharp — light-box diorama</title>
+<title>Alec Sharp — shadow box</title>
 <style>
   :root{
-    /* warm sunset ramp: back sheets catch the amber light -> front sheets go black */
-    --far:#e0a868; --mid:#bd7d3c; --hill:#854f24; --forest:#4d2c13;
-    --near:#2a1709; --front:#160a03; --black:#0a0402;
-    --ink:#231405; --ink-soft:#5b3a1c;
+    /* ONE light, then a ramp of flat black cards.
+       --light is the diffused light panel + EVERY hole (sun, birds): one constant
+       brightness, never a gradient. Every other value is a single flat card whose
+       tone is set ONLY by its depth in the box. Strictly monotonic, back -> front:
+         light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore               */
+    --light:#ffe7b4;   /* 0 — flat diffused light panel (and sun + bird holes)    */
+    --sky:#e0a455;     /* 1 — sky card                                            */
+    --far:#bd7e3c;     /* 2 — far range card                                      */
+    --mid:#8a5729;     /* 3 — mid range card                                      */
+    --bush:#562e14;    /* 4 — bush band + focal kiwi                              */
+    --margin:#2a1809;  /* 5 — framing trees (margins)                             */
+    --fore:#120a04;    /* 6 — foreground bank (nearly black)                      */
+    --ink:#231506; --ink-soft:#5b3a1c;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:#000}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
     color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-  /* the light source behind the cut paper */
-  .glow{position:fixed;inset:0;z-index:0;
-    background:radial-gradient(80% 72% at 50% 40%,
-      #fff4da 0%, #ffe1a0 13%, #f4b061 29%, #d57f37 46%,
-      #9b5021 63%, #59260e 82%, #1c0a04 100%);}
+  /* the back of the box: a single flat panel of even diffused light.
+     this is the ONLY light. it shows through every hole cut in the cards. */
+  .glow{position:fixed;inset:0;z-index:0;background:var(--light)}
 
   .stage{position:fixed;inset:0;pointer-events:none}
   .stage-back{z-index:1}
   .stage-front{z-index:20}
   .layer{position:absolute;inset:0;will-change:transform}
   .layer svg{width:100%;height:100%;display:block}
-  /* spaced sheets (~1cm apart) cast soft shadows on the sheet behind them */
-  #mid{filter:drop-shadow(0 6px 7px rgba(0,0,0,.45))}
-  .stage-front .layer{filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+  /* ~1cm air gap between sheets: each sheet drops a soft shadow on the one behind.
+     nearer sheets sit further from the back, so their shadow throw grows. */
+  #l-mid   {filter:drop-shadow(0 5px 6px rgba(0,0,0,.40))}
+  #l-bush  {filter:drop-shadow(0 8px 9px rgba(0,0,0,.46))}
+  #l-margin{filter:drop-shadow(0 12px 13px rgba(0,0,0,.52))}
+  #l-fore  {filter:drop-shadow(0 16px 16px rgba(0,0,0,.58))}
 
-  .vignette{position:fixed;inset:0;z-index:34;pointer-events:none;
-    background:radial-gradient(96% 86% at 50% 42%,
-      transparent 40%, rgba(0,0,0,.34) 64%, rgba(0,0,0,.72) 84%, rgba(0,0,0,.95) 100%);}
+  /* the box edge. the depth illusion comes from the real stacked sheets now,
+     so there is no faked stepped mat — just the frame around the opening. */
+  .frame{position:fixed;inset:0;z-index:60;pointer-events:none;
+    border:14px solid #0a0a09;
+    box-shadow:inset 0 0 0 1px #2b2620, inset 0 0 0 8px #050504, inset 0 0 0 9px #221e17;}
 
-  /* rounded mat aperture: fill outside a rounded rect with frame colour + bevel */
-  .mat{position:fixed;inset:24px;z-index:38;pointer-events:none;border-radius:26px;
-    box-shadow:0 0 0 100vmax #0c0c0c,
-      inset 0 0 0 2px rgba(255,221,160,.10),
-      inset 0 0 0 10px rgba(0,0,0,.35),
-      inset 0 0 46px 14px rgba(0,0,0,.55);}
-  .frame{position:fixed;inset:0;z-index:40;pointer-events:none;
-    border:18px solid #0b0b0b;
-    box-shadow:inset 0 0 0 2px #1f1c18, inset 0 0 0 10px #060606, inset 0 0 0 11px #211d17;}
-
-  /* content: black paper-cut text floating in the lit centre */
-  /* soft backlight halo so the dark paper-cut text stays legible over any layer */
-  .intro h1,.intro p,.content h2,.content h3,.proj p,.cool a,.intro .links a{
-    text-shadow:0 0 12px rgba(255,244,222,.9),0 0 4px rgba(255,244,222,.95)}
-  .intro{position:relative;z-index:10;text-align:center;padding:24vh 24px 30vh}
+  /* content: black paper-cut text floating in the lit central clearing */
+  .intro h1,.intro p,.content h2,.content h3,.proj p,.proj .meta,.cool a,.intro .links a{
+    text-shadow:0 0 13px rgba(255,244,222,.92),0 0 5px rgba(255,244,222,.95)}
+  .intro{position:relative;z-index:10;text-align:center;padding:23vh 24px 26vh}
   .intro h1{font-size:clamp(2.6rem,8vw,4.8rem);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
   .intro p{margin-top:.55rem;font-size:clamp(1rem,2.3vw,1.18rem);color:var(--ink-soft)}
   .intro .links{margin-top:1.1rem}
   .intro .links a{color:#15140f;text-decoration:none;border-bottom:1px solid rgba(20,18,10,.4)}
-  .content{position:relative;z-index:10;max-width:560px;margin:0 auto;padding:0 28px 34vh}
+  .content{position:relative;z-index:10;max-width:520px;margin:0 auto;padding:0 28px 30vh}
   .content h2{font-size:1.55rem;margin-bottom:.9rem;color:var(--ink)}
   .proj{padding:18px 0;border-top:1px solid rgba(20,18,10,.16)}
-  .proj h3{font-size:1.12rem;margin-bottom:.1rem;color:#0e0d09}
-  .proj .date{font-size:.78rem;color:#615c4d}
+  .proj h3{font-size:1.12rem;margin-bottom:.15rem;color:#0e0d09}
+  .proj .meta{font-size:.78rem;color:#5c4a30;margin-bottom:.3rem}
   .proj p{margin:.4rem 0;color:#2c2a22;font-size:.95rem;line-height:1.5}
   .proj a,.cool a{color:#1a1810;border-bottom:1px solid rgba(20,18,10,.3);text-decoration:none}
   .cool ul{list-style:none}.cool li{padding:8px 0;border-top:1px solid rgba(20,18,10,.12)}
-  footer{position:relative;z-index:10;text-align:center;color:#6b6655;font-size:.8rem;padding:0 24px 36px}
+  footer{position:relative;z-index:10;text-align:center;color:#6b6655;font-size:.8rem;padding:0 24px 34px}
 </style>
 </head>
 <body>
@@ -70,15 +71,10 @@
 <div class="glow"></div>
 
 <div class="stage stage-back">
-  <div class="layer" data-depth="0.03"><svg id="sky"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.05"><svg id="mtn1"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <path fill="var(--far)" d="M0,560 L150,470 L250,520 L360,430 L470,520 L560,450 L660,540 L770,455 L880,535 L980,470 L1100,520 L1200,475 L1200,800 L0,800 Z"/></svg></div>
-  <div class="layer" data-depth="0.08"><svg id="mtn2"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <path fill="var(--mid)" d="M0,600 L120,520 L240,585 L330,500 L430,585 L520,515 L620,590 L720,505 L820,585 L930,525 L1040,590 L1140,535 L1200,575 L1200,800 L0,800 Z"/></svg></div>
-  <div class="layer" data-depth="0.10"><svg id="river" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.13"><svg id="hills" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.30"><svg id="mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.34"><svg id="kiwi"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.02"><svg id="l-sky"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.06"><svg id="l-far"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.11"><svg id="l-mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.22"><svg id="l-bush"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
 
 <header class="intro">
@@ -90,303 +86,173 @@
 
 <main class="content">
   <h2>Projects</h2>
-  <div class="proj"><h3>Dancing Creatures</h3><div class="date">2025</div><p>A sample project card in the lit centre channel, framed by the cut-paper scene. <a href="#">link</a></p></div>
-  <div class="proj"><h3>Graphing Bike Polo Results</h3><div class="date">2024</div><p>Black paper-cut text reads against the backlight while the diorama frames the page.</p></div>
-  <div class="proj"><h3>Another project</h3><div class="date">2023</div><p>Some length so we can watch the frame hold around a long scroll.</p></div>
-  <section class="cool" style="margin-top:2.2rem"><h2>Cool Stuff</h2><ul>
-    <li><a href="#">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
-    <li><a href="#">Global weather visualization</a></li>
-    <li><a href="#">3Blue1Brown: Math animations</a></li>
+  <div id="projects"></div>
+  <section class="cool" style="margin-top:2.4rem"><h2>Cool Stuff</h2><ul>
+    <li><a href="https://happenfilms.com/fools-and-dreamers">Man spends 30 years turning degraded land into massive forest in NZ</a></li>
+    <li><a href="https://earth.nullschool.net/">Global weather visualization</a></li>
+    <li><a href="https://www.3blue1brown.com/">3Blue1Brown: Math animations</a></li>
   </ul></section>
 </main>
 
-<footer>© <span id="year"></span> Alec Sharp · light-box diorama</footer>
+<footer>© <span id="year"></span> Alec Sharp</footer>
 
 <div class="stage stage-front">
-  <div class="layer" data-depth="0.46"><svg id="frame-trees" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-  <div class="layer" data-depth="0.74"><svg id="fg"          viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.40"><svg id="l-margin" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.70"><svg id="l-fore"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
 
-<div class="vignette"></div>
-<div class="mat"></div>
 <div class="frame"></div>
 
+<script src="stamps.js"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
   const $=id=>document.getElementById(id);
-  function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
-  /* ---------- pinnate fern frond (the NZ detail element) ---------- */
-  function rachis(len,curl,t){const cx=len*0.5,cy=-curl,x1=len;const mt=1-t;
-    const x=2*mt*t*cx+t*t*x1, y=2*mt*t*cy;
-    let dx=2*mt*cx+2*t*(x1-cx), dy=2*mt*cy-2*t*cy;const L=Math.hypot(dx,dy)||1;return{x,y,tx:dx/L,ty:dy/L};}
-  function frondPath({len=150,curl=46,leaves=15,leafLen=30,leafAngle=0.72,rib=3}){
-    let d='';const rb=[];
-    for(let i=0;i<=leaves;i++){const t=i/leaves,p=rachis(len,curl,t);const nx=-p.ty,ny=p.tx,w=rib*(1-t)+0.4;
-      rb.push([p.x+nx*w,p.y+ny*w]);rb.unshift([p.x-nx*w,p.y-ny*w]);}
-    d+='M'+rb.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z ';
-    for(let i=1;i<=leaves;i++){const t=i/leaves,p=rachis(len,curl,t);const nx=-p.ty,ny=p.tx,ll=leafLen*(1-t*0.82);
-      for(const side of[1,-1]){let dxx=nx*side+p.tx*leafAngle,dyy=ny*side+p.ty*leafAngle;const L=Math.hypot(dxx,dyy)||1;dxx/=L;dyy/=L;
-        const ax=p.x+dxx*ll,ay=p.y+dyy*ll,bw=ll*0.16+1.3;
-        const cxp=p.x+dxx*ll*0.5+p.tx*ll*0.16, cyp=p.y+dyy*ll*0.5+p.ty*ll*0.16;
-        d+=`M${(p.x+p.tx*bw).toFixed(1)},${(p.y+p.ty*bw).toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${ax.toFixed(1)},${ay.toFixed(1)} L${(p.x-p.tx*bw).toFixed(1)},${(p.y-p.ty*bw).toFixed(1)} Z `;}}
-    return d;}
+  /* =====================================================================
+     THE SHADOW BOX, SHEET BY SHEET
+     Physical rules — do not break (see RULES.md):
+       • ONE light only: a flat panel of even diffused light at the very back
+         (.glow / --light). Never a gradient.
+       • Every other layer is ONE sheet of black card => a single flat colour,
+         NEVER a gradient. A card's tone is set only by its depth on the ramp.
+       • Anything BRIGHT is a HOLE cut in the cards revealing the light behind:
+         the sun and the birds. Both are exactly --light. Nothing bright is painted.
+       • Every shape is a full, natural paper-cut — NO flat margin cut-offs. The page
+         text reads in a CENTRAL CLEARING that the front sheets (mid / bush / fore)
+         naturally open around: their masses rise in the margins and dive away from
+         the centre on organic curves, so the text always floats over the plain far /
+         sky backdrop and nothing dark crosses it. (No rectangular reading-window.)
+     Stack, back -> front:
+       0  .glow     flat diffused light panel               (fixed, no parallax)
+       1  l-sky     SKY card        · holes: sun + birds     depth 0.02
+       2  l-far     FAR RANGE card  · full rolling backdrop  depth 0.06
+       3  l-mid     MID RANGE card  · valley opening centre  depth 0.11
+       4  l-bush    BUSH band       · side masses + trees    depth 0.22
+       5  l-margin  FRAMING trees (margins only)             depth 0.40
+       6  l-fore    FOREGROUND bank · side banks + kiwi       depth 0.70
+     ===================================================================== */
 
-  /* ---------- tree fern / ponga: stout fibrous trunk + crown of bold arching fronds ---------- */
-  function treeFern(x,baseY,trunkH,fronds,frondLen,fill,seed,baseAng=-90,spread=150){
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    const tw=Math.max(5,trunkH*0.055), topY=baseY-trunkH;
-    // trunk: slightly flared base, narrows up to the crown
-    g+=`<path d="M${(x-tw*1.5).toFixed(1)},${baseY} C${(x-tw*0.7).toFixed(1)},${(baseY-trunkH*0.5).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(topY+10).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${topY.toFixed(1)} L${(x+tw*0.5).toFixed(1)},${topY.toFixed(1)} C${(x+tw*0.5).toFixed(1)},${(topY+10).toFixed(1)} ${(x+tw*0.7).toFixed(1)},${(baseY-trunkH*0.5).toFixed(1)} ${(x+tw*1.5).toFixed(1)},${baseY} Z"/>`;
-    // solid crown knob so every frond base joins into one piece of paper
-    g+=`<circle cx="${x.toFixed(1)}" cy="${topY.toFixed(1)}" r="${Math.max(7,frondLen*0.07).toFixed(1)}"/>`;
-    for(let i=0;i<fronds;i++){
-      const a=baseAng+((i/(fronds-1))-0.5)*spread+(r()-0.5)*6;
-      const len=frondLen*(0.82+r()*0.3);
-      g+=`<g transform="translate(${x.toFixed(1)},${topY.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.42,leaves:Math.max(9,Math.round(len/11)),leafLen:len*0.28,leafAngle:0.66,rib:Math.max(2,len*0.035)})}"/></g>`;
-    }
-    return g+`</g>`;
-  }
+  const SUN={cx:236,cy:214,r:58};   // sun hole, in the left sky, clear of the clearing
 
-  /* ---------- cabbage tree / tī kōuka: trunk + spiky sword-leaf heads ---------- */
-  function cabbageTree(x,baseY,h,fill,seed){
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    g+=`<path d="M${(x-3.5).toFixed(1)},${baseY} L${(x-2).toFixed(1)},${(baseY-h).toFixed(1)} L${(x+2).toFixed(1)},${(baseY-h).toFixed(1)} L${(x+3.5).toFixed(1)},${baseY} Z"/>`;
-    const heads=[[x,baseY-h]];
-    if(r()<0.75){const fy=baseY-h*0.82;
-      g+=`<path d="M${x.toFixed(1)},${(baseY-h*0.62).toFixed(1)} L${(x-13).toFixed(1)},${(fy-8).toFixed(1)} L${(x-9).toFixed(1)},${(fy-12).toFixed(1)} L${x.toFixed(1)},${(baseY-h*0.56).toFixed(1)} Z"/>`;
-      heads.push([x-12,fy-10],[x+9,fy-3]);}
-    for(const [hx,hy] of heads){const n=13,base=24+r()*16;
-      g+=`<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="5.5"/>`;            // solid core joins the leaves
-      for(let i=0;i<n;i++){const a=-Math.PI/2+((i/(n-1))-0.5)*Math.PI*1.6,ll=base*(0.7+r()*0.7);
-        const tx=hx+Math.cos(a)*ll,ty=hy+Math.sin(a)*ll,px=-Math.sin(a)*3.1,py=Math.cos(a)*3.1;
-        // slight droop curve at the leaf tip
-        const mx=hx+Math.cos(a)*ll*0.55,my=hy+Math.sin(a)*ll*0.55+ll*0.12;
-        g+=`<path d="M${(hx+px).toFixed(1)},${(hy+py).toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)} L${(hx-px).toFixed(1)},${(hy-py).toFixed(1)} Z"/>`;}}
-    return g+`</g>`;
-  }
+  // ---- SHEET 1 · SKY CARD ---------------------------------------------------
+  // a flat sky-toned card filling the whole frame. the sun AND the birds are holes
+  // cut in this one sheet, so every bright thing is the same light. (a free-floating
+  // dark bird can't exist on a single sheet — it would fall out — so the birds are
+  // little bright cuts, not painted shapes.) both sit in the side sky.
+  const BIRDS=[[930,228,1.0],[1006,202,1.1],[1066,246,0.8],[978,270,0.85]];
+  $('l-sky').innerHTML=
+    `<defs><mask id="cut-sky" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">
+       <rect width="1200" height="800" fill="#fff"/>
+       <circle cx="${SUN.cx}" cy="${SUN.cy}" r="${SUN.r}" fill="#000"/>
+       ${BIRDS.map(([x,y,s])=>bird(x,y,s,'#000')).join('')}
+     </mask></defs>
+     <rect width="1200" height="800" fill="var(--sky)" mask="url(#cut-sky)"/>`;
 
-  /* ---------- tall conifer (kahikatea / rimu): slender trunk + feathered tiers ---------- */
-  function conifer(x,baseY,h,fill,seed,opts={}){
-    const {droop=23,density=1,taper=2.2}=opts;
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    const top=baseY-h;
-    g+=`<path d="M${(x-taper).toFixed(1)},${baseY} L${(x-0.8).toFixed(1)},${top.toFixed(1)} L${(x+0.8).toFixed(1)},${top.toFixed(1)} L${(x+taper).toFixed(1)},${baseY} Z"/>`;
-    const tiers=Math.max(7,Math.round(h/19*density));
-    for(let i=0;i<tiers;i++){
-      const t=i/(tiers-1);                       // 0 top -> 1 base
-      const ty=top+Math.pow(t,1.05)*h*0.9;
-      const len=12+t*h*0.17;                     // longer toward the base -> spire shape
-      for(const side of[1,-1]){
-        const a=(side>0?droop:180-droop)+(r()-0.5)*9;
-        g+=`<g transform="translate(${x.toFixed(1)},${ty.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.5,leaves:Math.max(7,Math.round(len/4.3)),leafLen:len*0.2,leafAngle:0.62,rib:Math.max(0.5,len*0.02)})}"/></g>`;
-      }
-    }
-    g+=`<g transform="translate(${x.toFixed(1)},${(top-1).toFixed(1)}) rotate(-90)"><path d="${frondPath({len:Math.min(28,h*0.12),curl:4,leaves:6,leafLen:3.4,leafAngle:0.45,rib:0.6})}"/></g>`;
-    return g+`</g>`;
-  }
+  // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
+  // one flat card; soft rolling ridge across the whole frame. NO opening — together
+  // with the sky it is the plain backdrop the page text reads on.
+  $('l-far').innerHTML=
+    `<path fill="var(--far)" d="M0,800 L0,470 Q120,436 240,452 Q380,478 520,452
+       Q660,428 800,452 Q940,478 1060,448 Q1140,432 1200,456 L1200,800 Z"/>`;
 
-  /* ---------- lumpy foliage blob (one solid scalloped mass = a clean paper cut) ---------- */
-  function blob(cx,cy,rx,ry,lobes,r){
-    const P=[];
-    for(let i=0;i<lobes;i++){const a=i/lobes*2*Math.PI,k=0.8+r()*0.42;P.push([cx+Math.cos(a)*rx*k,cy+Math.sin(a)*ry*k]);}
-    let d=`M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
-    for(let i=0;i<lobes;i++){const nxt=P[(i+1)%lobes],ma=(i+0.5)/lobes*2*Math.PI,bulge=1.12+r()*0.18;
-      d+=` Q${(cx+Math.cos(ma)*rx*bulge).toFixed(1)},${(cy+Math.sin(ma)*ry*bulge).toFixed(1)} ${nxt[0].toFixed(1)},${nxt[1].toFixed(1)}`;}
-    return d+' Z';
-  }
+  // ---- SHEET 3 · MID RANGE CARD --------------------------------------------
+  // two mountain shoulders that dive on smooth curves into a central valley, opening
+  // the clearing the text reads through (revealing the far range + sky behind).
+  $('l-mid').innerHTML=
+    `<path fill="var(--mid)" d="M0,800 L0,556 Q120,520 240,544 Q330,562 360,640
+       Q372,712 352,800 Z M1200,800 L1200,556 Q1080,520 960,544 Q870,562 840,640
+       Q828,712 848,800 Z"/>`;
 
-  /* ---------- broadleaf / podocarp canopy tree (rimu/rātā): trunk + solid lumpy crown ---------- */
-  function canopyTree(x,baseY,h,fill,seed){
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    const trunkH=h*0.38,crownH=h-trunkH,cy=baseY-trunkH-crownH*0.46,tw=Math.max(3.5,h*0.02);
-    g+=`<path d="M${(x-tw).toFixed(1)},${baseY} C${(x-tw*0.6).toFixed(1)},${(baseY-trunkH*0.6).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(baseY-trunkH).toFixed(1)} ${(x-tw*0.5).toFixed(1)},${(baseY-trunkH-8).toFixed(1)} L${(x+tw*0.5).toFixed(1)},${(baseY-trunkH-8).toFixed(1)} C${(x+tw*0.5).toFixed(1)},${(baseY-trunkH).toFixed(1)} ${(x+tw*0.6).toFixed(1)},${(baseY-trunkH*0.6).toFixed(1)} ${(x+tw).toFixed(1)},${baseY} Z"/>`;
-    const rx=h*0.28,ry=crownH*0.52;
-    g+=`<path d="${blob(x,cy,rx,ry,12,r)}"/>`;
-    g+=`<path d="${blob(x-rx*0.52,cy+ry*0.28,rx*0.6,ry*0.66,9,r)}"/>`;
-    g+=`<path d="${blob(x+rx*0.56,cy+ry*0.2,rx*0.58,ry*0.7,9,r)}"/>`;
-    g+=`<path d="${blob(x+rx*0.04,cy-ry*0.46,rx*0.62,ry*0.62,10,r)}"/>`;
-    return g+`</g>`;
-  }
+  // ---- SHEET 4 · BUSH BAND -------------------------------------------------
+  // a bush band massed in the margins, diving away from the centre. bold trees rise
+  // from each side mass; the centre stays open. (full natural shapes, no cut.)
+  let bush=`<path fill="var(--bush)" d="M0,800 L0,664 Q110,632 230,656 Q320,672 360,748
+      Q374,772 366,800 Z M1200,800 L1200,664 Q1090,632 970,656 Q880,672 840,748
+      Q826,772 834,800 Z"/>`;
+  bush+=cabbageTree(300,660,158,'var(--bush)',12)+treeFern(216,662,182,'var(--bush)',13,{baseAng:-70,spread:150});
+  bush+=cabbageTree(902,662,150,'var(--bush)',48)+conifer(948,660,184,'var(--bush)',49,{droop:22,density:0.9});
+  $('l-bush').innerHTML=bush;
 
-  /* ---------- nīkau palm: ringed trunk + bulge + radiating fan of fronds ---------- */
-  function nikau(x,baseY,h,fill,seed,baseAng=-90,spread=130){
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    const tw=Math.max(3.5,h*0.022),topY=baseY-h;
-    g+=`<path d="M${(x-tw).toFixed(1)},${baseY} L${(x-tw*0.7).toFixed(1)},${(topY+h*0.12).toFixed(1)} L${(x+tw*0.7).toFixed(1)},${(topY+h*0.12).toFixed(1)} L${(x+tw).toFixed(1)},${baseY} Z"/>`;
-    g+=`<ellipse cx="${x.toFixed(1)}" cy="${(topY+h*0.1).toFixed(1)}" rx="${(tw*1.9).toFixed(1)}" ry="${(h*0.05).toFixed(1)}"/>`; // crownshaft bulge
-    const cy=topY+h*0.06,fr=7,fl=h*0.46;
-    for(let i=0;i<fr;i++){const a=baseAng+((i/(fr-1))-0.5)*spread+(r()-0.5)*8; const len=fl*(0.78+r()*0.34);
-      g+=`<g transform="translate(${x.toFixed(1)},${cy.toFixed(1)}) rotate(${a.toFixed(1)})"><path d="${frondPath({len,curl:len*0.5,leaves:Math.max(11,Math.round(len/8)),leafLen:len*0.14,leafAngle:0.5,rib:Math.max(1.4,len*0.018)})}"/></g>`;}
-    return g+`</g>`;
-  }
+  // ---- SHEET 5 · FRAMING TREES (margins only) -------------------------------
+  // bold trees hugging the left & right margins on connected ground lumps; centre
+  // kept open. nothing crosses the clearing, so these are whole natural shapes.
+  let margin=`<path fill="var(--margin)" d="M0,800 L0,690 Q70,660 150,684 Q210,664 250,690 L250,800 Z
+      M1200,800 L1200,690 Q1130,660 1050,684 Q990,664 950,690 L950,800 Z"/>`;
+  margin+=nikau(60,792,560,'var(--margin)',101,{baseAng:-102,spread:118});
+  margin+=treeFern(176,786,366,'var(--margin)',102,{baseAng:-60,spread:150});
+  margin+=canopyTree(110,792,300,'var(--margin)',103);
+  margin+=treeFern(1036,786,338,'var(--margin)',111,{baseAng:-118,spread:146});
+  margin+=nikau(1150,792,548,'var(--margin)',112,{baseAng:-76,spread:116});
+  margin+=cabbageTree(1088,792,320,'var(--margin)',113);
+  margin+=canopyTree(1110,792,250,'var(--margin)',114);
+  $('l-margin').innerHTML=margin;
 
-  /* ---------- grass / reed tuft ---------- */
-  function grass(x,baseY,w,h,n,fill,seed){
-    const r=rng(seed);let g=`<g fill="${fill}">`;
-    for(let i=0;i<n;i++){
-      const bx=x+(r()-0.5)*w,lean=(r()-0.5)*0.6,bh=h*(0.45+r()*0.75);
-      const tipx=bx+lean*bh,tipy=baseY-bh,bw=1.3+r()*1.5,mx=bx+lean*bh*0.5,my=baseY-bh*0.55;
-      g+=`<path d="M${(bx-bw).toFixed(1)},${baseY} Q${(mx-bw*0.5).toFixed(1)},${my.toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} Q${(mx+bw*0.5).toFixed(1)},${my.toFixed(1)} ${(bx+bw).toFixed(1)},${baseY} Z"/>`;
-    }
-    return g+`</g>`;
-  }
+  // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI -------------------------------
+  // the frontmost, darkest card: low banks in each corner diving to the open centre,
+  // with a fern fringe, grass tufts, the focal kiwi (left frame) and a fantail.
+  let fore=`<path fill="var(--fore)" d="M0,800 L0,752 Q120,724 250,748 Q330,762 372,800 Z
+      M1200,800 L1200,752 Q1080,724 950,748 Q870,762 828,800 Z"/>`;
+  fore+=grass(74,792,180,96,16,'var(--fore)',201)+grass(1128,792,180,92,16,'var(--fore)',202);
+  fore+=frond(36,760,118,'var(--fore)',211,-74)+frond(150,768,150,'var(--fore)',212,-98);
+  fore+=frond(1052,768,150,'var(--fore)',213,-106)+frond(1168,760,118,'var(--fore)',214,-112);
+  fore+=koru(112,792,150,'var(--fore)',215,1)+koru(1090,792,150,'var(--fore)',216,-1);
+  fore+=kiwi(238,770,0.82,'var(--fore)');   // focal kiwi in the left frame, clear of the clearing
+  fore+=fantail(178,706,1.05,'var(--fore)');
+  $('l-fore').innerHTML=fore;
 
-  /* ---------- koru / unfurling fern crozier: one tapered spiral cut ---------- */
-  function koru(x,baseY,h,fill,seed,dir=1){
-    const pts=[[x,baseY],[x+dir*h*0.03,baseY-h*0.3],[x,baseY-h*0.55]];
-    const ccx=x+dir*h*0.20, ccy=baseY-h*0.7, turns=1.5, n=44, thMax=turns*2*Math.PI, r0=h*0.27;
-    for(let i=0;i<=n;i++){const t=i/n,th=(dir>0?Math.PI:0)+dir*t*thMax,rad=r0*(1-0.6*t);
-      pts.push([ccx+Math.cos(th)*rad,ccy+Math.sin(th)*rad]);}
-    const N=pts.length,wid=k=>Math.max(0.8,h*0.05*(1-k*0.92)),L=[],R=[];
-    for(let i=0;i<N;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(N-1,i+1)];
-      let dx=b[0]-a[0],dy=b[1]-a[1];const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m;
-      const w=wid(i/(N-1));L.push([pts[i][0]-dy*w,pts[i][1]+dx*w]);R.push([pts[i][0]+dy*w,pts[i][1]-dx*w]);}
-    let d='M'+L.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' L'+R.reverse().map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z';
-    const tip=pts[N-1];
-    return `<g fill="${fill}"><path d="${d}"/><circle cx="${tip[0].toFixed(1)}" cy="${tip[1].toFixed(1)}" r="${(h*0.052).toFixed(1)}"/></g>`;
-  }
-
-  /* ---------- distant bird (little gull) ---------- */
-  function bird(x,y,s,fill){
-    return `<path d="M${(x-7*s).toFixed(1)},${y.toFixed(1)} Q${(x-3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${x.toFixed(1)},${(y-0.5*s).toFixed(1)} Q${(x+3*s).toFixed(1)},${(y-4.5*s).toFixed(1)} ${(x+7*s).toFixed(1)},${y.toFixed(1)}" fill="none" stroke="${fill}" stroke-width="${(1.5*s).toFixed(2)}" stroke-linecap="round"/>`;
-  }
-
-  /* ---------- kiwi focal silhouette ---------- */
-  function kiwi(cx,cy,s,fill){
-    const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
-    let g=`<g fill="${fill}">`;
-    // plump body, wider than tall, slight tail point at the back (left)
-    g+=`<path d="M${P(-54,-4)} C${P(-55,-26)} ${P(-32,-39)} ${P(-2,-39)} C${P(27,-39)} ${P(49,-27)} ${P(50,-7)} C${P(51,16)} ${P(28,28)} ${P(-6,28)} C${P(-36,28)} ${P(-54,17)} ${P(-54,-4)} Z"/>`;
-    // long down-curved beak from the front
-    g+=`<path d="M${P(40,-27)} C${P(62,-31)} ${P(82,-18)} ${P(100,28)} L${P(92,31)} C${P(76,-7)} ${P(58,-18)} ${P(38,-16)} Z"/>`;
-    // two stubby legs
-    g+=`<path d="M${P(-8,25)} L${P(-2,25)} L${P(-2,47)} L${P(-10,47)} Z"/>`;
-    g+=`<path d="M${P(13,25)} L${P(19,25)} L${P(19,47)} L${P(11,47)} Z"/>`;
-    return g+`</g>`;
-  }
-
-  /* ---------- fantail / pīwakawaka ---------- */
-  function fantail(cx,cy,s,fill){
-    const P=(x,y)=>`${(cx+x*s).toFixed(1)},${(cy+y*s).toFixed(1)}`;
-    let g=`<g fill="${fill}">`;
-    g+=`<path d="M${P(0,0)} C${P(-6,-9)} ${P(5,-15)} ${P(11,-10)} C${P(17,-5)} ${P(14,5)} ${P(5,6)} C${P(1,6)} ${P(-2,4)} ${P(0,0)} Z"/>`;
-    g+=`<path d="M${P(10,-12)} C${P(15,-19)} ${P(23,-16)} ${P(23,-10)} C${P(23,-6)} ${P(14,-6)} ${P(10,-8)} Z"/>`;
-    g+=`<path d="M${P(23,-12)} L${P(31,-11)} L${P(23,-9)} Z"/>`;
-    for(let i=0;i<6;i++){const a=Math.PI*0.72+i*0.13,ln=24,tx=Math.cos(a)*ln,ty=-Math.sin(a)*ln;
-      g+=`<path d="M${P(-3,-1)} L${P(-3+tx-2,-1+ty)} L${P(-3+tx+2,-1+ty+2)} Z"/>`;}
-    return g+`</g>`;
-  }
-
-  /* ====================== build the scene ====================== */
-  // warm low sun + a few birds (the bright open centre)
-  let sky=`<defs><radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#fff9ea"/><stop offset="52%" stop-color="#ffeac0" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#ffd98f" stop-opacity="0"/></radialGradient></defs>`;
-  sky+=`<circle cx="600" cy="432" r="140" fill="url(#sun)"/>`;          // glow halo
-  sky+=`<circle cx="600" cy="432" r="54" fill="#fff5d8"/>`;             // sun disc
-  const rb=rng(5);
-  for(const [bx,by,bs] of [[470,250,1.1],[520,232,0.9],[700,238,1.2],[760,262,0.85],[640,205,1.0],[840,290,0.8]])
-    sky+=bird(bx,by,bs,'var(--forest)');
-  $('sky').innerHTML=sky;
-
-  // ---- the river is NOT a painted shape: it is the lit floor of the box,
-  //      revealed through a winding channel cut out of every sheet in front of it ----
-  function ribbon(pts,hw){
-    let d='M'+(pts[0][0]-hw[0]).toFixed(1)+','+pts[0][1].toFixed(1);
-    for(let i=1;i<pts.length;i++) d+=' L'+(pts[i][0]-hw[i]).toFixed(1)+','+pts[i][1].toFixed(1);
-    for(let i=pts.length-1;i>=0;i--) d+=' L'+(pts[i][0]+hw[i]).toFixed(1)+','+pts[i][1].toFixed(1);
-    return d+' Z';
-  }
-  // gentle meander: |Δx| stays under the channel half-width so the banks never cross
-  const cpts=[[600,816],[585,756],[612,702],[600,652],[607,606],[601,576],[600,550]];
-  const chw =[ 92,        72,        57,        46,        36,        28,        19 ];
-  const CHANNEL=ribbon(cpts,chw);                         // banks: hole cut from foreground sheets
-  const WATER  =ribbon(cpts,chw.map(h=>Math.max(2,h-7))); // lit floor seen through the channel
-  // mask = "show the whole sheet except the river channel" (robust cut, any sheet height)
-  const cutMask=id=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800"><rect width="1200" height="800" fill="#fff"/><path d="${CHANNEL}" fill="#000"/></mask>`;
-
-  // lit floor: dim at the front, brightening toward the light at the back
-  $('river').innerHTML=`<defs><linearGradient id="rl" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#c2823c"/><stop offset="0.5" stop-color="#f3bd72"/><stop offset="1" stop-color="#fff0cf"/></linearGradient></defs>
-    <path fill="url(#rl)" d="${WATER}"/>`;
-
-  // distant hills sheet: silhouette card with the river channel masked out
-  $('hills').innerHTML=
-    `<defs><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffe9c0" stop-opacity="0"/>
-      <stop offset="0.55" stop-color="#ffe9c0" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#ffe9c0" stop-opacity="0"/></linearGradient>${cutMask('cut-h')}</defs>
-     <rect x="0" y="498" width="1200" height="130" fill="url(#mist)"/>
-     <rect x="0" y="430" width="1200" height="92" fill="url(#mist)" opacity="0.45"/>
-     <path fill="var(--hill)" mask="url(#cut-h)"
-       d="M0,650 Q150,590 300,635 Q450,585 600,640 Q780,590 940,640 Q1080,600 1200,645 L1200,800 L0,800 Z"/>`;
-
-  // kiwi: smaller crisp silhouette nestled on the near bank, beak toward the lit water
-  $('kiwi').innerHTML=kiwi(470,726,0.86,'#0a0c10');
-
-  // midground bush band (river channel cut out) + cabbage trees + a deeper tree fern
-  let mid=`<defs>${cutMask('cut-m')}</defs><path fill="var(--forest)" mask="url(#cut-m)" d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/>`;
-  mid+=cabbageTree(300,652,118,'var(--forest)',12)+cabbageTree(944,656,108,'var(--forest)',48);
-  mid+=conifer(250,656,156,'var(--forest)',62,{droop:22,density:0.9})+conifer(958,654,144,'var(--forest)',63,{droop:22,density:0.9});
-  // little distant firs flanking the river's vanishing point (low, by the water)
-  mid+=conifer(548,612,72,'var(--hill)',64,{droop:20})+conifer(672,612,64,'var(--hill)',65,{droop:20});
-  $('mid').innerHTML=mid;
-
-  // NZ native bush framing the MARGINS only — centre kept open for text
-  let ft='';
-  // connected ground bush so the margin reads as one continuous cut, not floating fronds
-  ft+=canopyTree(52,876,156,'var(--front)',120)+canopyTree(140,878,130,'var(--front)',121)+canopyTree(206,880,104,'var(--front)',122);
-  ft+=canopyTree(1148,876,156,'var(--front)',130)+canopyTree(1060,878,134,'var(--front)',131)+canopyTree(996,880,104,'var(--front)',132);
-  // left margin: nīkau height + arching ponga + canopy mass + cabbage tree
-  ft+=nikau(48,868,600,'var(--front)',101,-104,116);
-  ft+=treeFern(176,860,372,12,150,'var(--front)',102,-58,150);
-  ft+=canopyTree(98,868,300,'var(--front)',103);
-  ft+=cabbageTree(210,868,300,'var(--front)',104);
-  // right margin (varied, not a mirror)
-  ft+=treeFern(1036,860,392,12,150,'var(--front)',111,-122,150);
-  ft+=nikau(1162,868,560,'var(--front)',112,-76,116);
-  ft+=canopyTree(1108,868,320,'var(--front)',113);
-  ft+=cabbageTree(1000,868,266,'var(--front)',114);
-  $('frame-trees').innerHTML=ft;
-
-  // foreground: fern fringe + grass + a fantail perched
-  // foreground bank sheet, river channel cut out (even-odd)
-  let fg=`<defs>${cutMask('cut-f')}</defs><path fill="#010102" mask="url(#cut-f)" d="M0,800 L0,742 Q120,704 240,736 Q360,704 480,734 Q620,704 760,736 Q900,704 1040,734 Q1130,708 1200,736 L1200,800 Z"/>`;
-  const rg=rng(9);
-  // reed tufts + a couple of fern fronds in the bottom corners, clear of the water
-  fg+=grass(82,780,176,98,20,'var(--black)',201)+grass(1124,782,176,94,20,'var(--black)',202);
-  fg+=`<g fill="var(--black)">`;
-  for(const [x,a,len] of [[36,-72,120],[150,-96,150],[300,-90,108],[1052,-108,150],[1176,-114,120]])
-    fg+=`<g transform="translate(${x},752) rotate(${a})"><path d="${frondPath({len,curl:len*0.42,leaves:14,leafLen:len*0.22,leafAngle:0.7,rib:len*0.02})}"/></g>`;
-  fg+=`</g>`;
-  fg+=koru(232,792,128,'var(--black)',211,1)+koru(986,792,118,'var(--black)',212,-1);
-  fg+=fantail(168,700,1.1,'var(--black)');
-  $('fg').innerHTML=fg;
-
-  // narrow screens crop the margins, so add framing foliage at the mobile-visible edges,
-  // placed in the midground layer (behind the text) so readability holds
+  // narrow screens crop to the central clearing (only viewBox x~415-785 shows), so
+  // the desktop margin/foreground foliage is off-screen. Frame the mobile view from
+  // the BOTTOM instead: a low bush band well below the hero, with tree ferns arching
+  // outward from the lower corners. Placed in the bush sheet (behind text) so the
+  // halo keeps the projects copy legible.
   if(matchMedia('(max-width:760px)').matches){
-    $('mid').insertAdjacentHTML('beforeend',
-      nikau(430,866,372,'var(--forest)',301,-106,108)+
-      treeFern(470,860,250,10,112,'var(--forest)',302,-118,140)+
-      cabbageTree(452,866,206,'var(--forest)',303)+
-      nikau(774,866,352,'var(--forest)',304,-74,108)+
-      treeFern(736,860,250,10,112,'var(--forest)',305,-62,140)+
-      cabbageTree(752,866,196,'var(--forest)',306));
+    $('l-bush').insertAdjacentHTML('beforeend',
+      `<path fill="var(--bush)" d="M356,800 L356,752 Q480,720 600,738 Q720,756 844,746 L844,800 Z"/>`+
+      treeFern(432,760,214,'var(--bush)',302,{baseAng:-120,spread:128})+
+      treeFern(768,760,214,'var(--bush)',304,{baseAng:-60,spread:128})+
+      grass(440,768,120,72,12,'var(--bush)',305)+grass(760,768,120,72,12,'var(--bush)',306));
   }
 
-  /* ---------- parallax: vertical, on scroll only (eased) ---------- */
+  /* ---------- real projects ---------- */
+  fetch('../data/projects.json')
+    .then(r=>r.json())
+    .then(data=>{
+      const c=$('projects');
+      for(const p of data.projects){
+        const div=document.createElement('div');div.className='proj';
+        const date=new Date(p.date).toLocaleDateString('en-US',{year:'numeric',month:'long'});
+        let h=`<h3>${p.title}</h3><div class="meta">${date}${p.tags?' · '+p.tags.map(t=>'#'+t).join(' '):''}</div><p>${p.description}</p><p>`;
+        for(const [text,url] of Object.entries(p.links||{})){
+          const link=url.startsWith('http')?url:`https://${url}`;
+          h+=`<a href="${link}" target="_blank" rel="noopener">${text}</a> `;
+        }
+        div.innerHTML=h+'</p>';c.appendChild(div);
+      }
+    })
+    .catch(()=>{$('projects').innerHTML='<p>Failed to load projects.</p>';});
+
+  /* ---------- parallax: vertical scroll, separation MAX at top -> settled at bottom ----------
+     progress p = scroll position normalised over the (dynamic) page height.
+     amplitude = (1 - p): full depth-spread in the hero, layers register by the end. */
   const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let sT=0,sC=0;
-  addEventListener('scroll',()=>{sT=window.scrollY;},{passive:true});
+  const AMP=150;                                   // px of spread at the very top
+  let target=0, cur=0;
+  function readProgress(){
+    const max=document.documentElement.scrollHeight-window.innerHeight;
+    target=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+  }
+  addEventListener('scroll',readProgress,{passive:true});
+  addEventListener('resize',readProgress);
+  readProgress();
   function frame(){
-    sC+=(sT-sC)*0.12;                                  // ease toward scroll position
-    for(const L of layers){ L.el.style.transform=`translate3d(0, ${(-sC*L.depth*0.08).toFixed(2)}px, 0)`; } // nearer sheets drift more
+    cur+=(target-cur)*0.12;                         // ease for buttery motion
+    const amp=(1-cur)*AMP;
+    for(const L of layers) L.el.style.transform=`translate3d(0,${(L.depth*amp).toFixed(2)}px,0)`;
     requestAnimationFrame(frame);
   }
-  if(!reduce) requestAnimationFrame(frame);
+  if(reduce){ for(const L of layers) L.el.style.transform='none'; }
+  else requestAnimationFrame(frame);
 </script>
 </body>
 </html>
