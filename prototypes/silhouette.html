@@ -35,10 +35,15 @@
     background:radial-gradient(96% 86% at 50% 42%,
       transparent 40%, rgba(0,0,0,.34) 64%, rgba(0,0,0,.72) 84%, rgba(0,0,0,.95) 100%);}
 
+  /* rounded mat aperture: fill outside a rounded rect with frame colour + bevel */
+  .mat{position:fixed;inset:24px;z-index:38;pointer-events:none;border-radius:26px;
+    box-shadow:0 0 0 100vmax #0c0c0c,
+      inset 0 0 0 2px rgba(255,221,160,.10),
+      inset 0 0 0 10px rgba(0,0,0,.35),
+      inset 0 0 46px 14px rgba(0,0,0,.55);}
   .frame{position:fixed;inset:0;z-index:40;pointer-events:none;
-    border:20px solid #0b0b0b;
-    box-shadow:inset 0 0 0 2px #1c1c1c, inset 0 0 0 12px #060606,
-      inset 0 0 0 13px #222, inset 0 0 70px 26px rgba(0,0,0,.7);}
+    border:18px solid #0b0b0b;
+    box-shadow:inset 0 0 0 2px #1f1c18, inset 0 0 0 10px #060606, inset 0 0 0 11px #211d17;}
 
   /* content: black paper-cut text floating in the lit centre */
   /* soft backlight halo so the dark paper-cut text stays legible over any layer */
@@ -103,6 +108,7 @@
 </div>
 
 <div class="vignette"></div>
+<div class="mat"></div>
 <div class="frame"></div>
 
 <script>
@@ -301,8 +307,8 @@
      <path fill="var(--hill)" mask="url(#cut-h)"
        d="M0,650 Q150,590 300,635 Q450,585 600,640 Q780,590 940,640 Q1080,600 1200,645 L1200,800 L0,800 Z"/>`;
 
-  // kiwi as a crisp focal silhouette on the left bank, beak toward the lit water
-  $('kiwi').innerHTML=kiwi(505,690,1.0,'#0c0e12');
+  // kiwi: smaller crisp silhouette nestled on the near bank, beak toward the lit water
+  $('kiwi').innerHTML=kiwi(470,726,0.86,'#0a0c10');
 
   // midground bush band (river channel cut out) + cabbage trees + a deeper tree fern
   let mid=`<defs>${cutMask('cut-m')}</defs><path fill="var(--forest)" mask="url(#cut-m)" d="M0,660 Q140,615 280,650 Q430,610 580,650 Q740,612 900,650 Q1060,615 1200,652 L1200,800 L0,800 Z"/>`;
@@ -341,6 +347,18 @@
   fg+=`</g>`;
   fg+=fantail(168,700,1.1,'var(--black)');
   $('fg').innerHTML=fg;
+
+  // narrow screens crop the margins, so add framing foliage at the mobile-visible edges,
+  // placed in the midground layer (behind the text) so readability holds
+  if(matchMedia('(max-width:760px)').matches){
+    $('mid').insertAdjacentHTML('beforeend',
+      nikau(430,866,372,'var(--forest)',301,-106,108)+
+      treeFern(470,860,250,10,112,'var(--forest)',302,-118,140)+
+      cabbageTree(452,866,206,'var(--forest)',303)+
+      nikau(774,866,352,'var(--forest)',304,-74,108)+
+      treeFern(736,860,250,10,112,'var(--forest)',305,-62,140)+
+      cabbageTree(752,866,196,'var(--forest)',306));
+  }
 
   /* ---------- parallax: vertical, on scroll only (eased) ---------- */
   const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
