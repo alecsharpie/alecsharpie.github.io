@@ -134,6 +134,92 @@
 
   const SUN={cx:236,cy:214,r:58};   // sun hole, in the left sky, clear of the clearing
 
+  // ---- PROCEDURAL SCATTER ---------------------------------------------------
+  // ONE master seed per page load → a slightly different but always-tidy scene.
+  // Tidiness is structural, not luck: plants only ever sit in the side BAYS
+  // (never the central clearing), and a plant's height grows toward the frame
+  // edge (edge-tall), so every draw rises in the margins and dives to the open
+  // centre. Bigger plants live on the back sheets, smaller on the front sheets.
+  // one master seed per load (override with ?seed=N to reproduce a composition).
+  const SEED=(+new URLSearchParams(location.search).get('seed'))||(Math.random()*1e9)|0;
+  const sub=n=>(SEED*2654435761 + n*40503)|0;        // independent per-bay seeds
+
+  // adapt the stamp library to a common (x,baseY,h,fill,seed,out) call. ONLY the
+  // ten authoritative catalogue stamps (catalogue.html) are used here. Crowns are
+  // drawn UPRIGHT (exactly like their catalogue stamps — no tilt, or a tall palm
+  // ends up looking bent); `out` = +1/-1 only faces the ground fronds back toward
+  // the clearing.
+  const KIND={
+    ponga:     (x,b,h,f,s)=>ponga(x,b,h,f,s),
+    nikau:     (x,b,h,f,s)=>nikau(x,b,h,f,s),
+    pohutukawa:(x,b,h,f,s)=>pohutukawa(x,b,h,f,s),
+    cabbage:   (x,b,h,f,s)=>cabbageTree(x,b,h,f,s),
+    flax:      (x,b,h,f,s)=>flax(x,b,h,f,s),
+    toetoe:    (x,b,h,f,s)=>toetoe(x,b,h,f,s),
+    grass:     (x,b,h,f,s)=>grass(x,b,h*1.5,h,Math.max(9,Math.round(h/8)),f,s),
+    frond:     (x,b,h,f,s,o)=>frond(x,b,h,f,s,-90+o*18),
+  };
+
+  // smoothstep
+  const ss=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+
+  // THE TEXT COLUMN (viewBox x). Nothing in any card — not even a wide crown — may sit
+  // behind it, so the page text always reads on the plain sky/far backdrop. Every
+  // plant is pulled back toward its frame edge until its whole crown clears this band.
+  const CLEAR_L=378, CLEAR_R=822;
+  const CW={ponga:0.5,nikau:0.42,pohutukawa:0.56,cabbage:0.30,flax:0.52,toetoe:0.34,grass:0.78,frond:0.6};
+  const clampX=(x,h,kn,out)=>{const w=(CW[kn]||0.5)*h;
+    return out<0 ? Math.min(x,CLEAR_L-w) : Math.max(x,CLEAR_R+w);};
+
+  // a NATURAL, irregular ground crest. The overall line rises (low y) at the frame
+  // edge and dives to the bottom near the clearing (smoothstep); several random
+  // harmonics — led by a big low-frequency mound — ride on top so the ground reads as
+  // lumpy land, NOT a smooth arc. The SAME crest draws the bank AND roots every plant,
+  // so a trunk can never float above the ground.
+  function noise(r,scale){const oct=[[0.7,r()*6.28,1.1],[1.6,r()*6.28,0.65],[3.3,r()*6.28,0.36],[6.5,r()*6.28,0.18]];
+    return t=>{let n=0; for(const [f,p,a] of oct) n+=Math.sin(t*Math.PI*f+p)*a; return n*scale;};}
+  // `divePow` shapes how the crest falls from edge to clearing: 1 = a steady dive
+  // (front banks); >1 = a wide PLATEAU at the edge height that only drops near the
+  // clearing, so the distant ranges read as broad receding hill-bands, not slivers.
+  function makeCrest(edgeX,innerX,edgeY,diveY,r,roll,divePow=1){
+    const span=innerX-edgeX, nz=noise(r,roll);
+    return x=>{const t=Math.max(0,Math.min(1,(x-edgeX)/span)), d=Math.pow(ss(t),divePow);
+      return edgeY+(diveY-edgeY)*d + nz(t)*(1-0.45*d);};
+  }
+  // the bank: a filled card whose top edge IS the crest, closed down to the frame.
+  function bankPath(edgeX,innerX,crest,fill){
+    const span=innerX-edgeX,N=56; let d=`M${edgeX},806 L${edgeX.toFixed(1)},${crest(edgeX).toFixed(1)}`;
+    for(let i=1;i<=N;i++){const x=edgeX+span*(i/N);d+=` L${x.toFixed(1)},${crest(x).toFixed(1)}`;}
+    return `<path fill="${fill}" d="${d} L${innerX.toFixed(1)},806 Z"/>`;
+  }
+  // one bay: natural bank + plants rooted ON its crest, each clamped clear of the text.
+  // `bury` = how far the foot dips below the crest. Returns the crest fn too.
+  function bay(edgeX,innerX,edgeY,diveY,roll,kinds,n,fill,seed,out,bury=9,divePow=1){
+    const r=rng(seed), crest=makeCrest(edgeX,innerX,edgeY,diveY,r,roll,divePow);
+    const span=innerX-edgeX, slotW=Math.abs(span)/n, items=[];
+    for(let i=0;i<n;i++){
+      const slot=(i+0.5)/n, edgeK=1-slot;               // 1 at edge → 0 at clearing
+      const [kn,hMin,hMax]=kinds[(r()*kinds.length)|0];
+      const h=(hMin+(hMax-hMin)*(0.4+0.6*edgeK))*(0.9+0.16*r());
+      const x=clampX(edgeX+span*slot+(r()-0.5)*slotW*0.45, h, kn, out);
+      items.push({x,by:crest(x)+bury,h,kn,sd:(seed*131+i*61+7)|0});
+    }
+    items.sort((a,b)=>b.h-a.h);                         // tallest → back
+    return {crest, html:bankPath(edgeX,innerX,crest,fill)
+      +items.map(it=>KIND[it.kn](it.x,it.by,it.h,fill,it.sd,out)).join('')};
+  }
+
+  // the central FOREGROUND mound: a low, lumpy bush hill that caps the base of the
+  // central sky column (the "footer" middle the page text ends on). It stays low, so
+  // the reading column above it is open sky; only the footer copy sits over it (on its
+  // halo). Returns its crest so a couple of low tufts can root on it.
+  function centreMound(seed){
+    const r=rng(seed), nz=noise(r,9);
+    const cY=x=>800-42*Math.exp(-Math.pow((x-600)/300,2)*1.1)+nz((x-300)/600)*0.7;
+    let d='M300,806'; for(let i=0;i<=44;i++){const x=300+600*i/44; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
+    return {cY, html:`<path fill="var(--fore)" d="${d} L900,806 Z"/>`};
+  }
+
   // ---- SHEET 1 · SKY CARD ---------------------------------------------------
   // a flat sky-toned card filling the whole frame. the sun is the only hole cut in
   // this sheet, revealing the light panel behind (every bright thing is that one light).
@@ -144,56 +230,73 @@
      </mask></defs>
      <rect width="1200" height="800" fill="var(--sky)" mask="url(#cut-sky)"/>`;
 
+  // distant treelines carry ALL the catalogue plant stamps (small, since they're far),
+  // so the back ranges read as full mixed bush. The big trees only ever get filtered
+  // OUT of the front layers — never the back.
+  const farKinds=[['ponga',60,98],['nikau',66,104],['pohutukawa',54,94],['cabbage',58,96],
+                  ['flax',48,80],['toetoe',50,82],['grass',40,64],['frond',46,76]];
+  const midKinds=[['ponga',96,150],['nikau',104,160],['pohutukawa',86,140],['cabbage',92,148],
+                  ['flax',78,120],['toetoe',80,124],['grass',60,92],['frond',70,112]];
+
   // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
-  // one flat card; soft rolling ridge across the whole frame. NO opening — together
-  // with the sky it is the plain backdrop the page text reads on.
+  // the far range now ALSO opens a central clearing: two shoulder banks that dive to
+  // the base, so behind the whole text column there is ONLY sky. A distant mixed
+  // treeline rides each shoulder. Raised high up the frame → little bare sky, lots of
+  // bush. (innerX = the text-column edge, so the far card stops exactly at the sky.)
   $('l-far').innerHTML=
-    `<path fill="var(--far)" d="M0,800 L0,470 Q120,436 240,452 Q380,478 520,452
-       Q660,428 800,452 Q940,478 1060,448 Q1140,432 1200,456 L1200,800 Z"/>`;
+      bay(0,   CLEAR_L,338,804,14,farKinds,9,'var(--far)',sub(8),-1,8,3.0).html
+    + bay(1200,CLEAR_R,338,804,14,farKinds,9,'var(--far)',sub(9),+1,8,3.0).html;
 
   // ---- SHEET 3 · MID RANGE CARD --------------------------------------------
-  // two mountain shoulders that dive on smooth curves into a central valley, opening
-  // the clearing the text reads through (revealing the far range + sky behind).
+  // two natural mountain shoulders that dive into the same central clearing. A nearer,
+  // larger mixed treeline rises from each shoulder, receding between far and bush.
   $('l-mid').innerHTML=
-    `<path fill="var(--mid)" d="M0,800 L0,556 Q120,520 240,544 Q330,562 360,640
-       Q372,712 352,800 Z M1200,800 L1200,556 Q1080,520 960,544 Q870,562 840,640
-       Q828,712 848,800 Z"/>`;
+      bay(0,   374,430,803,16,midKinds,7,'var(--mid)',sub(10),-1,8,2.6).html
+    + bay(1200,826,430,803,16,midKinds,7,'var(--mid)',sub(11),+1,8,2.6).html;
 
-  // ---- SHEET 4 · BUSH BAND -------------------------------------------------
-  // a bush band massed in the margins, diving away from the centre. bold trees rise
-  // from each side mass; the centre stays open. (full natural shapes, no cut.)
-  let bush=`<path fill="var(--bush)" d="M0,800 L0,664 Q110,632 230,656 Q320,672 360,748
-      Q374,772 366,800 Z M1200,800 L1200,664 Q1090,632 970,656 Q880,672 840,748
-      Q826,772 834,800 Z"/>`;
-  bush+=cabbageTree(300,660,158,'var(--bush)',12)+treeFern(216,662,182,'var(--bush)',13,{baseAng:-70,spread:150});
-  bush+=cabbageTree(902,662,150,'var(--bush)',48)+ponga(948,662,176,'var(--bush)',49,{spread:150,baseAng:-110});
-  $('l-bush').innerHTML=bush;
+  // ---- SHEET 4 · BUSH BAND (backmost plant band → the TALL canopy) ----------
+  // a natural bush bank massed in the margins, rolling high at the frame edge and
+  // diving away to the open centre. As the BACK plant band it carries the TALLEST
+  // trees, all rooted ON the bank crest so no trunk floats. (Rolls the most — it is
+  // the furthest, softest ground.)
+  const bushKinds=[['ponga',210,300],['nikau',240,330],['pohutukawa',185,255],['cabbage',180,245]];
+  $('l-bush').innerHTML=
+      bay(0,   366,540,800,22,bushKinds,3,'var(--bush)',sub(1),-1).html
+    + bay(1200,834,540,800,22,bushKinds,3,'var(--bush)',sub(2),+1).html;
 
-  // ---- SHEET 5 · FRAMING TREES (margins only) -------------------------------
-  // bold trees hugging the left & right margins on connected ground lumps; centre
-  // kept open. nothing crosses the clearing, so these are whole natural shapes.
-  let margin=`<path fill="var(--margin)" d="M0,800 L0,690 Q70,660 150,684 Q210,664 250,690 L250,800 Z
-      M1200,800 L1200,690 Q1130,660 1050,684 Q990,664 950,690 L950,800 Z"/>`;
-  margin+=nikau(60,792,560,'var(--margin)',101,{baseAng:-102,spread:118});
-  margin+=treeFern(176,786,366,'var(--margin)',102,{baseAng:-60,spread:150});
-  margin+=canopyTree(110,792,300,'var(--margin)',103);
-  margin+=treeFern(1036,786,338,'var(--margin)',111,{baseAng:-118,spread:146});
-  margin+=nikau(1150,792,548,'var(--margin)',112,{baseAng:-76,spread:116});
-  margin+=cabbageTree(1088,792,320,'var(--margin)',113);
-  margin+=canopyTree(1110,792,250,'var(--margin)',114);
-  $('l-margin').innerHTML=margin;
+  // ---- SHEET 5 · FRAMING TREES (mid plant band, in front of the text) -------
+  // medium shrubs & smaller trees on a natural bank hugging the margins; centre kept
+  // open (they never cross the clearing). Smaller than the bush band behind → the
+  // scene reads small-in-front, large-behind.
+  const marginKinds=[['ponga',150,205],['cabbage',150,205],['flax',120,170],['toetoe',120,165]];
+  $('l-margin').innerHTML=
+      bay(0,   262,606,800,20,marginKinds,3,'var(--margin)',sub(3),-1).html
+    + bay(1200,938,606,800,20,marginKinds,3,'var(--margin)',sub(4),+1).html;
 
-  // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI -------------------------------
-  // the frontmost, darkest card: low banks in each corner diving to the open centre,
-  // with a fern fringe, grass tufts, the focal kiwi (left frame) and a fantail.
-  let fore=`<path fill="var(--fore)" d="M0,800 L0,752 Q120,724 250,748 Q330,762 372,800 Z
-      M1200,800 L1200,752 Q1080,724 950,748 Q870,762 828,800 Z"/>`;
-  fore+=grass(74,792,180,96,16,'var(--fore)',201)+grass(1128,792,180,92,16,'var(--fore)',202);
-  fore+=frond(36,760,118,'var(--fore)',211,-74)+frond(150,768,150,'var(--fore)',212,-98);
-  fore+=frond(1052,768,150,'var(--fore)',213,-106)+frond(1168,760,118,'var(--fore)',214,-112);
-  fore+=koru(112,792,150,'var(--fore)',215,1)+koru(1090,792,150,'var(--fore)',216,-1);
-  fore+=kiwi(238,770,0.82,'var(--fore)');   // focal kiwi in the left frame, clear of the clearing
-  fore+=fantail(178,706,1.05,'var(--fore)');
+  // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI (frontmost, smallest) ---------
+  // the darkest card: a low natural bank in each corner. Its plants stand PROUD of
+  // the bank (small bury) so the dark silhouettes read clearly against the lighter
+  // bands behind — grass, single fronds, flax/toetoe tufts — plus the focal kiwi
+  // (standing on the same crest) and a perched fantail.
+  // few, BOLD, taller plants (well separated) so the dark front silhouettes read
+  // clearly against the lighter bands behind instead of merging into one blob.
+  const foreKinds=[['grass',92,138],['frond',130,188],['flax',116,162],['toetoe',116,156]];
+  const foreL=bay(0,   342,678,800,16,foreKinds,2,'var(--fore)',sub(5),-1,4);
+  const foreR=bay(1200,858,678,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
+  const mound=centreMound(sub(13));                                 // footer-middle bush, capping the base
+  let fore=foreL.html+foreR.html+mound.html;
+  // a visible little bush thicket in the footer middle (front-layer plants only — no big
+  // trees — so the centre of the footer reads as a clump of harakeke, toetoe & ferns).
+  const fc=rng(sub(14));
+  const footKinds=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',72,104]];
+  for(const fx of [486,534,584,620,668,714]){ if(fc()<0.8){
+    const [kn,a,b]=footKinds[(fc()*footKinds.length)|0], h=a+(b-a)*fc();
+    fore+=KIND[kn](fx+(fc()-0.5)*24, mound.cY(fx)+5, h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1);
+  }}
+  const kr=rng(sub(12));
+  const kS=0.84+kr()*0.06, kx=244+(kr()-0.5)*44;
+  fore+=kiwi(kx, foreL.crest(kx)-47*kS, kS, 'var(--fore)');         // feet planted on the bank crest
+  fore+=fantail(176+(kr()-0.5)*30,636,1.02+kr()*0.08,'var(--fore)');
   $('l-fore').innerHTML=fore;
 
   // narrow screens crop to the central clearing (only viewBox x~415-785 shows), so
