@@ -135,16 +135,12 @@
   const SUN={cx:236,cy:214,r:58};   // sun hole, in the left sky, clear of the clearing
 
   // ---- SHEET 1 · SKY CARD ---------------------------------------------------
-  // a flat sky-toned card filling the whole frame. the sun AND the birds are holes
-  // cut in this one sheet, so every bright thing is the same light. (a free-floating
-  // dark bird can't exist on a single sheet — it would fall out — so the birds are
-  // little bright cuts, not painted shapes.) both sit in the side sky.
-  const BIRDS=[[930,228,1.0],[1006,202,1.1],[1066,246,0.8],[978,270,0.85]];
+  // a flat sky-toned card filling the whole frame. the sun is the only hole cut in
+  // this sheet, revealing the light panel behind (every bright thing is that one light).
   $('l-sky').innerHTML=
     `<defs><mask id="cut-sky" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">
        <rect width="1200" height="800" fill="#fff"/>
        <circle cx="${SUN.cx}" cy="${SUN.cy}" r="${SUN.r}" fill="#000"/>
-       ${BIRDS.map(([x,y,s])=>bird(x,y,s,'#000')).join('')}
      </mask></defs>
      <rect width="1200" height="800" fill="var(--sky)" mask="url(#cut-sky)"/>`;
 
@@ -170,7 +166,7 @@
       Q374,772 366,800 Z M1200,800 L1200,664 Q1090,632 970,656 Q880,672 840,748
       Q826,772 834,800 Z"/>`;
   bush+=cabbageTree(300,660,158,'var(--bush)',12)+treeFern(216,662,182,'var(--bush)',13,{baseAng:-70,spread:150});
-  bush+=cabbageTree(902,662,150,'var(--bush)',48)+conifer(948,660,184,'var(--bush)',49,{droop:22,density:0.9});
+  bush+=cabbageTree(902,662,150,'var(--bush)',48)+ponga(948,662,176,'var(--bush)',49,{spread:150,baseAng:-110});
   $('l-bush').innerHTML=bush;
 
   // ---- SHEET 5 · FRAMING TREES (margins only) -------------------------------

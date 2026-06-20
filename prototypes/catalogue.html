@@ -29,20 +29,16 @@
   // each entry: [label, te-reo/latin, builder(returns svg inner), baseY, vbH]
   const W=220, H=260, B=232;   // cell width, height, baseline
   const items=[
-    ['Tree fern','ponga',      ()=>treeFern(110,B,210,CARD,13)],
     ['Cabbage tree','tī kōuka',()=>cabbageTree(110,B,200,CARD,12)],
-    ['Nīkau palm','nīkau',     ()=>nikau(110,B,220,CARD,101)],
-    ['Conifer','kahikatea',    ()=>conifer(110,B,224,CARD,49,{droop:22,density:0.9})],
-    ['Canopy tree','rātā',     ()=>canopyTree(110,B,200,CARD,103)],
-    ['Flax','harakeke',        ()=>flax(110,B,170,CARD,7)],
+    ['Nīkau palm','nīkau',     ()=>nikau(110,B,168,CARD,101)],
+    ['Pōhutukawa','rātā',      ()=>pohutukawa(110,B,200,CARD,103)],
+    ['Flax','harakeke',        ()=>flax(110,B,150,CARD,7)],
     ['Toetoe','plume grass',   ()=>toetoe(110,B,200,CARD,5)],
     ['Grass tuft','',          ()=>grass(110,B,120,80,16,CARD,201)],
     ['Fern frond','',          ()=>frond(110,B,150,CARD,9,-92)],
-    ['Koru','fiddlehead',      ()=>koru(110,B,180,CARD,4,1)],
+    ['Ponga','silver fern',    ()=>ponga(110,B,232,CARD,4)],
     ['Kiwi','',                ()=>kiwi(110,150,1.0,CARD)],
     ['Fantail','pīwakawaka',   ()=>fantail(110,130,2.4,CARD)],
-    ['Tui','',                 ()=>tui(110,130,2.6,CARD)],
-    ['Birds (hole)','',        ()=>bird(70,120,2.2,CARD)+bird(140,140,2.6,CARD)],
   ];
   const grid=document.getElementById('grid');
   for(const [label,sub,build] of items){

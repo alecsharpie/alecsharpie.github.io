@@ -21,30 +21,38 @@ stamp(x, baseY, h, fill, seed [, opts])  ->  "<g fill=…>…</g>"
 - **h** — overall height in viewBox units; the stamp scales to it.
 - **fill** — the card colour for the sheet it sits on (e.g. `var(--bush)`).
 - **seed** — integer; the PRNG is deterministic, so a seed always draws the same plant.
-- **opts** — per-stamp extras (frond `spread`, `baseAng`, conifer `droop`/`density`…).
+- **opts** — per-stamp extras (`fronds`, `spread`, `baseAng` for the crown stamps…).
 
-Birds/kiwi/fantail/tui take `(cx, cy, s, fill)` — centre + a size scalar.
+The creatures (`kiwi`, `fantail`) take `(cx, cy, s, fill)` — centre + a size scalar.
 
 ## The catalogue
 
+In grid order (see `catalogue.html`):
+
 | Stamp | te reo / type | Notes |
 |---|---|---|
-| `treeFern` | ponga | stout trunk + crown of bold arching fronds; `opts:{fronds,spread,baseAng}` |
-| `cabbageTree` | tī kōuka | trunk + spiky sword-leaf heads |
-| `nikau` | nīkau palm | ringed trunk + crownshaft bulge + radiating fan; `opts:{spread,baseAng}` |
-| `conifer` | kahikatea / rimu | slender trunk + feathered tiers; `opts:{droop,density,taper}` |
-| `canopyTree` | rātā / broadleaf | trunk + solid lumpy crown (scalloped blobs) |
-| `flax` | harakeke | fan of stiff upright sword leaves |
-| `toetoe` | plume grass | arching stems topped by feathery plumes |
+| `cabbageTree` | tī kōuka | forked trunk + three dense spiky sword-leaf mop-heads |
+| `nikau` | nīkau palm | ringed trunk + bulging crownshaft + a clean upright **cone** of feather fronds (the outermost frond on each side dropped for a tidy edge); `opts:{fronds,spread,baseAng}` |
+| `pohutukawa` | pōhutukawa / rātā | short trunk forking into a candelabra of boughs that **split into twigs**, each carrying a lobed foliage clump, leaving airy sky-gaps near the branches (alias `canopyTree`) |
+| `flax` | harakeke | upright fan of stiff sword leaves (outer two nodding to ~half height) + drooping old "grandad" leaves + tall kōrari flower stalks |
+| `toetoe` | plume grass | short, wide, droopy cascading tussock + tall stems topped by slim **one-sided, upward-fluffed curving** plumes |
 | `grass` | reed tuft | `grass(x,baseY,w,h,n,fill,seed)` — `n` blades over width `w` |
 | `frond` | single fern frond | `frond(x,baseY,len,fill,seed,dir)` — ground frond at angle `dir`° |
-| `koru` | fiddlehead | unfurling fern crozier (a fat stroked spiral); `dir` ±1 |
-| `kiwi` | — | focal silhouette; `kiwi(cx,cy,s,fill)` |
-| `fantail` | pīwakawaka | body + cocked wide fanned tail; `fantail(cx,cy,s,fill)` |
-| `tui` | — | plump perching bird, cocked tail; `tui(cx,cy,s,fill)` |
-| `bird` | distant gull | thin **stroke** — used as a light-HOLE in the sky, not a solid |
+| `ponga` | silver fern | thick squarish trunk + broad weeping vase crown + 3 koru fiddleheads rising from the hub + two fronds draping over the front |
+| `kiwi` | — | focal silhouette: pear body, rounded head, long thin down-curved bill, three-toed feet; `kiwi(cx,cy,s,fill)` |
+| `fantail` | pīwakawaka | small round body + small head + broad cocked fan tail (steep on the right, shallow on the left); `fantail(cx,cy,s,fill)` |
+
+Scene-only (not shown in the catalogue grid): `mamaku` (tall slender bendy tree fern with
+a wide weeping crown, alias `treeFern`; `opts:{fronds,spread,baseAng}`) and `koru`
+(unfurling fiddlehead spiral, `dir` ±1).
 
 ### Internal helpers
-`rng(seed)` deterministic PRNG · `frondPath(opts)` the pinnate-frond path generator
-(shared by ferns, palms, conifers, toetoe plumes) · `rachis(...)` the frond rib curve ·
-`blob(...)` one scalloped foliage lobe (builds `canopyTree` crowns).
+`rng(seed)` deterministic PRNG · `rachis(...)` + `frondPath(...)` the pinnate-frond path
+generator (used by `frond`) · `ribFrond(...)` a pinnate frond along an arbitrary quadratic
+rib, with optional one-sided leaflets (`trimSide`) · `frondCrown(...)` fans fronds up-then-out
+from one hub, sized/leaned per `opts` (`maxLean`, `droopK`, `leanPow`, `coneTrim` one-sided
+outer edges, `centerGap`, `coreShort`, `dropOuter`…); shared by `nikau`, `ponga`, `mamaku` ·
+`koruPath(...)` bare fiddlehead spiral (used by `koru`) · `fiddleheadPath(...)` stalk-into-tight-coil
+crozier (used by `ponga`) · `plumePath(...)` one-sided curved foxtail plume (used by `toetoe`) ·
+`cabbageHead(...)` spiky mop-head (used by `cabbageTree`) · `blob(...)` one scalloped foliage
+lobe (builds `pohutukawa` clumps).

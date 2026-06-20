@@ -60,8 +60,8 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
 `l-bush` · `--bush` `#562e14` · depth 0.22
 - A bush band **massed in the margins**, diving away from the centre on organic
   curves. Bold trees rise from each side mass; the centre stays open:
-  - left: a **cabbage tree (tī kōuka)** + an arching **tree fern (ponga)**
-  - right: a **cabbage tree** + a tall **conifer (kahikatea/rimu)**
+  - left: a **cabbage tree (tī kōuka)** + an arching **tree fern (mamaku)**
+  - right: a **cabbage tree** + an arching **ponga (silver fern)**
 - *(On mobile only — where just the clearing shows — a low bush band + outward-arching
   tree ferns + grass are added to frame the view from the bottom.)*
 

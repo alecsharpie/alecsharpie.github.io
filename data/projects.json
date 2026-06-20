@@ -1,6 +1,20 @@
 {
     "projects": [
         {
+            "title": "Screenshot Backpressure: giving a coding agent eyes",
+            "date": "2026-06-01",
+            "description": "A little agentic-engineering workflow for getting a coding agent to write good *visual* code. When an LLM generates SVG/canvas/CSS it's basically working blindfolded, so I close the loop: every edit gets rendered, screenshotted with Playwright, and the image handed straight back to the agent's vision next to a target reference photo. The picture exerts 'backpressure' on the next edit, the way a downstream consumer pushes back on an over-eager producer in a streaming system. I built it while turning photos of NZ-bush plants into deterministic paper-cut SVG silhouettes; the writeup walks a ponga (silver fern) from a stick-with-spikes all the way to a clean paper-cut.",
+            "links": {
+                "Writeup": "https://github.com/alecsharpie/alecsharpie.github.io/blob/master/projects/screenshot-backpressure/README.md"
+            },
+            "image_path": "screenshot_backpressure.png",
+            "image_alt": "a circle image, a paper-cut silhouette of a ponga (silver tree fern) generated from code",
+            "tags": [
+                "Code",
+                "Experiment"
+            ]
+        },
+        {
             "title": "Dancing Creatures",
             "date": "2025-03-01",
             "description": "Real-time multi-pose detection using ML, rendered to a 2D canvas animation. I was inspired by ACMI's Beings exhibit: 'Move, dance, and play to interact with a vibrant array of larger-than-life digital creatures'. This is a revamp of a project I did a while ago, I wanted to update my personal web dev tech stack (as a Data Engineer I was stuck using create-react-app). I went for React, Vite, Typescript (and Tensorflow.js in this case)",

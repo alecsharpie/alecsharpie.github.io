@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Single stamp — focus harness</title>
+<style>
+  :root{--light:#ffe7b4;--card:#1c1006}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0a09;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#e7d6b8}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px}
+  .panel{background:var(--light);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.6);
+    width:560px;height:560px;display:block}
+  .panel svg{width:100%;height:100%;display:block}
+  .cap{font-size:1rem;color:#cdbfa0}
+  .cap b{color:#fff}
+  /* a faint baseline + centre guide so proportions are easy to judge */
+  .guide{stroke:#caa86e;stroke-width:1;stroke-dasharray:4 6;opacity:.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel"><svg id="svg" viewBox="0 0 220 260" preserveAspectRatio="xMidYMid meet"></svg></div>
+  <div class="cap"><b id="lbl"></b> <span id="sub"></span></div>
+</div>
+<script src="stamps.js"></script>
+<script>
+  const CARD='#1c1006';
+  const W=220,H=260,B=232;            // matches catalogue cell geometry
+  // registry: name -> [label, sub, builder]
+  const R={
+    cabbageTree: ['Cabbage tree','tī kōuka',()=>cabbageTree(110,B,200,CARD,12)],
+    nikau:       ['Nīkau palm','nīkau',    ()=>nikau(110,B,168,CARD,101)],
+    pohutukawa:  ['Pōhutukawa','rātā',     ()=>pohutukawa(110,B,200,CARD,103)],
+    canopyTree:  ['Pōhutukawa','rātā',     ()=>pohutukawa(110,B,200,CARD,103)],
+    flax:        ['Flax','harakeke',       ()=>flax(110,B,150,CARD,7)],
+    toetoe:      ['Toetoe','plume grass',  ()=>toetoe(110,B,200,CARD,5)],
+    grass:       ['Grass tuft','',         ()=>grass(110,B,120,80,16,CARD,201)],
+    frond:       ['Fern frond','',         ()=>frond(110,B,150,CARD,9,-92)],
+    ponga:       ['Ponga','silver fern',   ()=>ponga(110,B,232,CARD,4)],
+    koru:        ['Koru','fiddlehead',     ()=>koru(110,B,180,CARD,4,1)],
+    kiwi:        ['Kiwi','',               ()=>kiwi(110,150,1.0,CARD)],
+    fantail:     ['Fantail','pīwakawaka',  ()=>fantail(110,130,2.4,CARD)],
+  };
+  const name=new URLSearchParams(location.search).get('name')||'koru';
+  const [label,sub,build]=R[name]||R.koru;
+  const guides=new URLSearchParams(location.search).get('guides')==='1';
+  let inner=build();
+  if(guides) inner=`<line class="guide" x1="0" y1="${B}" x2="${W}" y2="${B}"/>`+
+                   `<line class="guide" x1="${W/2}" y1="0" x2="${W/2}" y2="${H}"/>`+inner;
+  document.getElementById('svg').innerHTML=inner;
+  document.getElementById('lbl').textContent=label;
+  document.getElementById('sub').textContent=sub;
+</script>
+</body>
+</html>
