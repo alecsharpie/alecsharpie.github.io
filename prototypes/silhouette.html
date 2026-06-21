@@ -149,7 +149,7 @@
        6  l-fore    FOREGROUND bank · side banks + kiwi       depth 0.70
      ===================================================================== */
 
-  const SUN={cx:236,cy:214,r:58};   // sun hole, in the left sky, clear of the clearing
+  const SUN={cx:232,cy:82,r:31};    // small moon, in the thin sky strip above the deep forest band
 
   // ---- PROCEDURAL SCATTER ---------------------------------------------------
   // ONE master seed per page load → a slightly different but always-tidy scene.
@@ -268,6 +268,27 @@
     return g;
   }
 
+  // a FULL-WIDTH range band high on the frame: a flat card with an undulating ridge and
+  // a distant treeline across the WHOLE width. The page text reads on the flat card
+  // BELOW the ridge (a hazy forested hillside), with sky only in the thin strip above —
+  // so the screen is mostly bush. Trees root on the ridge and grow up, so their crowns
+  // sit in the sky strip above the text and their trunks merge into the card.
+  function band(baseY,roll,kinds,n,fill,seed){
+    const r=rng(seed), nz=noise(r,roll), crest=x=>baseY+nz(x/1200);
+    let d='M0,806 L0,'+crest(0).toFixed(1); const N=80;
+    for(let i=1;i<=N;i++){const x=1200*i/N; d+=' L'+x.toFixed(1)+','+crest(x).toFixed(1);}
+    let html=`<path fill="${fill}" d="${d} L1200,806 Z"/>`;
+    const slotW=1200/n, items=[];
+    for(let i=0;i<n;i++){
+      const x=slotW*(i+0.5)+(r()-0.5)*slotW*0.6;
+      const [kn,a,b]=kinds[(r()*kinds.length)|0], h=a+(b-a)*r();
+      items.push({x,by:crest(x)+6,h,kn,sd:(seed^(i*97+3))|0});
+    }
+    items.sort((p,q)=>q.h-p.h);
+    html+=items.map(it=>KIND[it.kn](it.x,it.by,it.h,fill,it.sd,it.x<600?-1:1)).join('');
+    return {crest,html};
+  }
+
   // ---- SHEET 1 · SKY CARD ---------------------------------------------------
   // a flat sky-toned card filling the whole frame. the sun is the only hole cut in
   // this sheet, revealing the light panel behind (every bright thing is that one light).
@@ -285,19 +306,18 @@
   // behind it (innerX steps outward, deep→fore), so the ranges funnel inward to the
   // narrow deep gap high in the centre — the eye is drawn down into a valley. Every gap
   // still contains the text column [CLEAR_L,CLEAR_R], so the copy stays on pure sky.
-  const deepKinds=[['pohutukawa',34,58],['cabbage',36,60],['ponga',38,62],['nikau',40,64],
-                   ['flax',28,48],['toetoe',30,50],['grass',24,40]];
+  const deepKinds=[['pohutukawa',38,62],['cabbage',40,64],['ponga',42,66],['nikau',44,68],
+                   ['flax',30,50],['toetoe',32,52]];
   const farKinds=[['ponga',60,98],['nikau',66,104],['pohutukawa',54,94],['cabbage',58,96],
                   ['flax',48,80],['toetoe',50,82],['grass',40,64],['frond',46,76]];
   const midKinds=[['ponga',96,150],['nikau',104,160],['pohutukawa',86,140],['cabbage',92,148],
                   ['flax',78,120],['toetoe',80,124],['grass',60,92],['frond',70,112]];
 
-  // ---- SHEET 1.5 · DEEPEST RANGE CARD --------------------------------------
-  // the furthest, palest range — the narrow gap it leaves high in the centre is the
-  // valley's vanishing point. Tiny mixed treeline on a wide plateau.
-  $('l-deep').innerHTML=
-      bay(0,   378,288,805,12,deepKinds,8,'var(--deep)',sub(19),-1,8,3.3).html
-    + bay(1200,822,288,805,12,deepKinds,8,'var(--deep)',sub(20),+1,8,3.3).html;
+  // ---- SHEET 1.5 · DEEPEST RANGE — FULL-WIDTH FOREST BAND ------------------
+  // the furthest, palest range now spans the WHOLE width, high up: the page text reads
+  // on this flat forested hillside (not bare sky), and a distant treeline runs right
+  // across the top. Only a thin strip of sky + the small moon sit above it.
+  $('l-deep').innerHTML=band(200,16,deepKinds,20,'var(--deep)',sub(19)).html;
 
   // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
   // two shoulder banks opening a slightly WIDER gap than the deep range → the valley

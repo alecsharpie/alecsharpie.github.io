@@ -14,12 +14,14 @@ light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore
 The **sun** and the **birds** are holes in the sky card (sheet 1) — the only bright
 holes, both the same `--light` brightness, both kept clear of the text.
 
-There is **no reading-window cut**. The page text reads in a **central sky column**:
-**every** card in front of the sky — deep, far, mid, bush, margin, fore — is massed in
-the margins and **dives away from the centre on organic curves**, so the text always
-floats over **pure sky** (not even the far range sits behind it). Every shape stays a
-full, natural paper-cut — no flat margin cut-offs (see RULES.md §7b). The whole forest
-is raised high up the frame (little bare sky, lots of bush).
+There is **no reading-window cut**. The **deepest range is now a FULL-WIDTH forest band**
+high on the frame, and the page text reads on **that flat forested hillside** (`--deep`),
+not bare sky — only a thin strip of sky + the small **moon** sit above its distant
+treeline. The nearer cards — far, mid, bush, margin, fore — are still massed in the
+margins and **dive away from the centre on organic curves**, opening a central column
+that now reveals the **deep band** (a plain flat card, so the copy stays legible on its
+halo). Every shape stays a full, natural paper-cut — no flat margin cut-offs (see
+RULES.md §7b). The whole forest is raised high (very little bare sky, mostly bush).
 
 **CONVERGING valley:** each successive range opens a *wider* central gap than the one
 behind it (the inner edge steps outward deep→fore), so the ranges funnel inward to the
@@ -89,17 +91,17 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
 
 ### SHEET 1 · SKY CARD
 `l-sky` · `--sky` `#e0a455` · depth 0.03
-- A flat sky-toned card filling the whole frame.
-- **Holes:** the **sun** (circle at cx 250, cy 222, r 58) and **4 birds** (thin
-  stroke cuts) — both reveal `--light`, so every bright thing is the same light,
-  and both sit in the side sky **clear of the text**. (A free-floating dark bird
-  can't exist on a single sheet — it would fall out — so the birds are bright cuts,
-  not painted shapes.)
+- A flat sky-toned card filling the whole frame (mostly hidden now — only the thin
+  strip above the deep forest band shows).
+- **Hole:** the small **moon** (circle at cx 232, cy 82, r 31), high in the sky strip
+  above the deep treeline, revealing `--light` — the one bright hole.
 
-### SHEET 1.5 · DEEPEST RANGE CARD
+### SHEET 1.5 · DEEPEST RANGE — FULL-WIDTH FOREST BAND
 `l-deep` · `--deep` `#ce9148` · depth 0.04
-- The furthest, palest range, raised highest. The **narrow central gap** it leaves is
-  the valley's **vanishing point**. A tiny mixed treeline rides its wide plateau.
+- The furthest, palest range, now spanning the **whole width** high on the frame
+  (`band()`), with a **distant treeline across the top**. The page text reads on its
+  flat card below the ridge; only a thin sky strip + the small moon sit above it. This
+  is the back wall the nearer ranges funnel down into.
 
 ### SHEET 2 · FAR RANGE CARD
 `l-far` · `--far` `#bd7e3c` · depth 0.07
