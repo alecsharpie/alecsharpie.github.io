@@ -21,6 +21,7 @@
     --margin:#2a1809;  /* 5 — framing trees (margins)                             */
     --fore:#120a04;    /* 6 — foreground bank (nearly black)                      */
     --ink:#231506; --ink-soft:#5b3a1c;
+    --halo:rgba(255,244,222,.94);  /* the text glow; each palette tints it to its clearing */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:#000}
@@ -49,17 +50,33 @@
     border:14px solid #0a0a09;
     box-shadow:inset 0 0 0 1px #2b2620, inset 0 0 0 8px #050504, inset 0 0 0 9px #221e17;}
 
-  /* colour-scheme switcher — small swatches in the top-right corner */
-  .palettes{position:fixed;top:24px;right:26px;z-index:70;display:flex;gap:8px}
-  .palettes button{width:19px;height:19px;border-radius:50%;padding:0;cursor:pointer;
-    border:1.5px solid rgba(255,255,255,.55);box-shadow:0 1px 5px rgba(0,0,0,.55);
-    transition:transform .12s ease}
-  .palettes button:hover{transform:scale(1.18)}
-  .palettes button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+  /* light / dark switch — dead-simple 2D paper cut-out: two flat shapes, no borders, no
+     gloss. A dark pill (cut from the same paper as the foreground silhouette) with a light
+     disc — the sun/moon hole the backlight shines through. Disc slides 32px (64−26−2×3). */
+  .theme-toggle{position:fixed;top:22px;right:24px;z-index:70;
+    width:64px;height:32px;padding:0;border:0;border-radius:999px;cursor:pointer;
+    background:#18391a;transition:background .5s ease}
+  .theme-toggle:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  /* the destination icon, cut into the dark paper, showing where the disc isn't */
+  .theme-toggle svg{position:absolute;top:50%;transform:translateY(-50%);
+    width:13px;height:13px;pointer-events:none;color:#f7f1df;transition:opacity .4s ease}
+  .tt-sun{left:8px}
+  .tt-moon{right:8px}
+  .theme-toggle[aria-pressed="false"] .tt-sun{opacity:0}    /* hidden under the disc */
+  .theme-toggle[aria-pressed="false"] .tt-moon{opacity:.55}
+  .theme-toggle[aria-pressed="true"]  .tt-sun{opacity:.55}
+  .theme-toggle[aria-pressed="true"]  .tt-moon{opacity:0}
+  /* the sliding disc — one flat fill, nothing else */
+  .tt-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;
+    background:#f7f1df;transition:transform .45s cubic-bezier(.34,1.56,.5,1),background .45s ease}
+  .theme-toggle[aria-pressed="true"] .tt-knob{transform:translateX(32px);background:#eef1fb}
+  /* dark scene: the paper goes to night sky, the disc to a pale moon */
+  body.pal-aurora .theme-toggle{background:#14112b}
+  body.pal-aurora .theme-toggle svg{color:#eef1fb}
 
   /* content: black paper-cut text floating in the lit central clearing */
   .intro h1,.intro p,.content h2,.content h3,.proj p,.proj .meta,.cool a,.intro .links a{
-    text-shadow:0 0 13px rgba(255,244,222,.92),0 0 5px rgba(255,244,222,.95)}
+    text-shadow:0 0 13px var(--halo),0 0 5px var(--halo)}
   .intro{position:relative;z-index:10;text-align:center;padding:23vh 24px 26vh}
   .intro h1{font-size:clamp(2.6rem,8vw,4.8rem);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
   .intro p{margin-top:.55rem;font-size:clamp(1rem,2.3vw,1.18rem);color:var(--ink-soft)}
@@ -74,6 +91,44 @@
   .proj a,.cool a{color:#1a1810;border-bottom:1px solid rgba(20,18,10,.3);text-decoration:none}
   .cool ul{list-style:none}.cool li{padding:8px 0;border-top:1px solid rgba(20,18,10,.12)}
   footer{position:relative;z-index:10;text-align:center;color:#6b6655;font-size:.8rem;padding:0 24px 34px}
+
+  /* AURORA: plain white copy, no halo (the base text-shadow resolves to transparent). The
+     project/link/footer colours are hardcoded dark for the light palettes, so re-light them. */
+  body.pal-aurora .proj h3{color:#ffffff}
+  body.pal-aurora .proj .meta{color:#c8dcef}
+  body.pal-aurora .proj p{color:#eef4fb}
+  body.pal-aurora .proj a,body.pal-aurora .cool a{color:#dbeeff;border-bottom-color:rgba(219,238,255,.4)}
+  body.pal-aurora .intro .links a{color:#eaf4ff;border-bottom-color:rgba(234,244,255,.45)}
+  body.pal-aurora footer{color:#b6c8de}
+  /* AURORA: no air-gap shadows. Separation comes purely from the depth ramp, which runs the
+     full spectrum (bright back → BLACK foreground), so neighbouring sheets differ enough in
+     tone to read on their own. */
+  body.pal-aurora #l-deep,body.pal-aurora #l-far,body.pal-aurora #l-mid,
+  body.pal-aurora #l-bush,body.pal-aurora #l-margin,body.pal-aurora #l-fore{filter:none}
+
+  /* DARK palettes (white copy on a deep, dim scene): re-light the hardcoded dark text
+     colours, and — like aurora — give every range a crisp air-gap shadow so the dim
+     green layers cleanly overlap instead of merging into one black mass. The white text
+     reads on the back sky/range tones with a soft dark halo (set per-palette via --halo). */
+  body.pal-dark .proj h3{color:#ffffff}
+  body.pal-dark .proj .meta{color:#cfe2d6}
+  body.pal-dark .proj p{color:#eef6f1}
+  body.pal-dark .proj a,body.pal-dark .cool a{color:#dbf0e2;border-bottom-color:rgba(219,240,226,.4)}
+  body.pal-dark .intro .links a{color:#eafff2;border-bottom-color:rgba(234,255,242,.45)}
+  body.pal-dark footer{color:#9fc2ac}
+  body.pal-dark #l-deep  {filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+  body.pal-dark #l-far   {filter:drop-shadow(0 4px 5px rgba(0,0,0,.55))}
+  body.pal-dark #l-mid   {filter:drop-shadow(0 6px 7px rgba(0,0,0,.6))}
+  body.pal-dark #l-bush  {filter:drop-shadow(0 9px 10px rgba(0,0,0,.64))}
+  body.pal-dark #l-margin{filter:drop-shadow(0 13px 14px rgba(0,0,0,.68))}
+  body.pal-dark #l-fore  {filter:drop-shadow(0 17px 17px rgba(0,0,0,.72))}
+
+  /* FLAT palettes: a clean cut-paper look with NO shadows of any kind — no air-gap drop
+     shadows between sheets, no frame bevel, no text glow (--halo is transparent). Depth
+     reads purely from the flat tonal ramp. */
+  body.pal-flat #l-mid,body.pal-flat #l-bush,body.pal-flat #l-margin,body.pal-flat #l-fore{filter:none}
+  /* drop the inner bevel line (the "2nd" border) → a single clean frame. Aurora opts in too. */
+  body.pal-flat .frame,body.pal-aurora .frame{box-shadow:none}
 </style>
 </head>
 <body>
@@ -115,13 +170,22 @@
 
 <div class="frame"></div>
 
-<div class="palettes" id="palettes" aria-label="Colour scheme">
-  <button data-pal="sepia"  title="Sepia"></button>
-  <button data-pal="dusk"   title="Dusk"></button>
-  <button data-pal="forest" title="Forest"></button>
-  <button data-pal="ember"  title="Ember"></button>
-  <button data-pal="aurora" title="Aurora"></button>
-</div>
+<button class="theme-toggle" id="themeToggle" type="button"
+        role="switch" aria-pressed="false"
+        aria-label="Switch between light and dark mode" title="Light / dark mode">
+  <svg class="tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="2" stroke-linecap="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.1" fill="currentColor" stroke="none"/>
+    <line x1="12" y1="1.8" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.2"/>
+    <line x1="1.8" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.2" y2="12"/>
+    <line x1="4.6" y1="4.6" x2="6.2" y2="6.2"/><line x1="17.8" y1="17.8" x2="19.4" y2="19.4"/>
+    <line x1="4.6" y1="19.4" x2="6.2" y2="17.8"/><line x1="17.8" y1="6.2" x2="19.4" y2="4.6"/>
+  </svg>
+  <svg class="tt-moon" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M21 12.9A8.6 8.6 0 1 1 11.1 3a6.7 6.7 0 0 0 9.9 9.9z"/>
+  </svg>
+  <span class="tt-knob" aria-hidden="true"></span>
+</button>
 
 <script src="stamps.js"></script>
 <script>
@@ -152,7 +216,7 @@
        6  l-fore    FOREGROUND bank · side banks + kiwi       depth 0.70
      ===================================================================== */
 
-  const SUN={cx:232,cy:82,r:31};    // small moon, in the thin sky strip above the deep forest band
+  const SUN={cx:232,cy:72,r:22};    // small moon, clear in the open sky strip above the bunched far treelines
 
   // ---- PROCEDURAL SCATTER ---------------------------------------------------
   // ONE master seed per page load → a slightly different but always-tidy scene.
@@ -168,29 +232,199 @@
   // persists. Each keeps the strict monotonic depth ramp light > sky > deep > far > mid
   // > bush > margin > fore; the warm sun/glow (--light) stays the one light.
   const PALETTES={
-    sepia:  {light:'#ffe7b4',sky:'#e0a455',haze:'#d79b4e',deep:'#ce9148',far:'#bd7e3c',mid:'#8a5729',bush:'#562e14',margin:'#2a1809',fore:'#120a04',ink:'#231506',inkSoft:'#5b3a1c'},
-    dusk:   {light:'#ffe1ad',sky:'#8693bb',haze:'#7e89b3',deep:'#767fac',far:'#67729e',mid:'#4e587f',bush:'#384164',margin:'#232a48',fore:'#10142b',ink:'#10131f',inkSoft:'#313a58'},
-    forest: {light:'#fcf3bf',sky:'#b7cc78',haze:'#acc671',deep:'#a1bf6a',far:'#8bb15c',mid:'#688f46',bush:'#476a33',margin:'#2c4720',fore:'#132410',ink:'#16240f',inkSoft:'#3a5a2a'},
-    ember:  {light:'#ffdfa4',sky:'#d6824f',haze:'#cb784c',deep:'#c16e49',far:'#ad5942',mid:'#7f3f44',bush:'#562d3a',margin:'#331c2a',fore:'#160c17',ink:'#200c12',inkSoft:'#542c38'},
-    // AURORA — the light panel is the green aurora glow (so the moon + birds glow green,
-    // like curtains of light), under a magenta-rose night sky that ramps back through
-    // violet → indigo → near-black forest. The greatest luminance jump is light→sky, so
-    // the holes blaze against a dark sky — the most dramatic palette.
-    aurora: {light:'#b6ffcb',sky:'#c95d97',haze:'#b9558f',deep:'#a44d88',far:'#8a4684',mid:'#6a3d77',bush:'#4a3163',margin:'#2c2147',fore:'#14112b',ink:'#1a0c22',inkSoft:'#5a3560'},
+    // LIGHT MODE — MAX-CONTRAST tinted: clearing pinned to pure WHITE + near-black ink
+    // (paper-level text contrast), with deep colour carried ONLY by the foliage ramp.
+    // FLAT (flat:true → .pal-flat: no shadows, no halo); depth reads from the tonal ramp alone.
+    totara:   {light:'#ffffff',sky:'#eef4ee',haze:'#dde9dd',deep:'#c6dac6',far:'#9cc09c',mid:'#5b8a5b',bush:'#356035',margin:'#1a3c1a',fore:'#08180a',ink:'#101410',inkSoft:'#3a4a3a',halo:'transparent',flat:true},  // deep forest green
+
+    // DARK MODE — AURORA — THE ONE RULE-BREAKER (see buildAuroraDefs below). Instead of flat cards on a
+    // monotonic ramp, every sheet is filled with the SAME aurora gradient — a dark blue/black
+    // night sky up top, magenta-rose curtains through the middle, green glow toward the
+    // horizon — just multiplied DARKER the nearer the sheet sits (so depth still reads). A
+    // 2D "lava-lamp" of light cast across the whole scene. The hex values below are only the
+    // fallback / corner-swatch tints; the live look comes from the injected SVG gradients.
+    // Text is plain WHITE with NO halo, reading on the darker night-sky marble.
+    aurora: {light:'#b6ffcb',sky:'#c95d97',haze:'#b9558f',deep:'#a44d88',far:'#8a4684',mid:'#6a3d77',bush:'#4a3163',margin:'#2c2147',fore:'#14112b',ink:'#ffffff',inkSoft:'#d6e4f2',halo:'transparent'},
   };
   const RAMP=['light','sky','haze','deep','far','mid','bush','margin','fore'];
-  function applyPalette(name){
-    const p=PALETTES[name]||PALETTES.sepia, s=document.documentElement.style;
-    for(const k of RAMP) s.setProperty('--'+k,p[k]);
-    s.setProperty('--ink',p.ink); s.setProperty('--ink-soft',p.inkSoft);
-    try{localStorage.setItem('palette',name)}catch(e){}
-    for(const b of document.querySelectorAll('.palettes button')) b.setAttribute('aria-pressed', b.dataset.pal===name);
+
+  // ===== AURORA — the sanctioned rule-break: a fuzzy marble of light =========
+  // Not flat cards but ONE speckled aurora field cast across the WHOLE 1200x800
+  // scene (patternUnits=userSpaceOnUse, so every sheet AND every stamp samples the
+  // same marble by position). Vertical zones trace the reference photos: deep blue
+  // night at the top, magenta-rose through the middle, aurora green toward the
+  // horizon. The soft mottled quality is one shared grayscale value-noise field
+  // (buildAuroraNoise) baked onto a canvas with the hue column — fuzzy curtains of
+  // light marbled into the night. Each depth level is that same marble, darkened the
+  // nearer it sits, so the foreground reads dark but stays TINTED & speckled rather
+  // than a flat black band.
+  // Stops are kept close in LUMINANCE and evenly spaced, so (a) a tall stamp spanning
+  // two zones shifts gently — the cool crown is fine, it just must not be a stark step —
+  // and (b) the cool/upper zone is no darker than the warm/lower zone, so the soft-light
+  // speckle registers EQUALLY across the whole stamp (a dark crown shows no speckle).
+  const AURORA_STOPS=[        // [offset, r,g,b] — cool blue-black, but luminous enough to read
+    [0.00, 56, 80,144],       // night blue (top)
+    [0.20, 82, 84,156],       // indigo
+    [0.40,156, 98,148],       // mauve-magenta curtains (mid)
+    [0.60,114, 96,156],       // violet
+    [0.80, 88,168,128],       // aurora green
+    [1.00, 66,134,106],       // deep green (base)
+  ];
+  // brightness factor per sheet — the SAME strict monotonic fade-to-darkness as every
+  // other palette (light brightest at the back → fore near-black at the front). Aurora
+  // only changes the HUE of each step; the depth ramp itself is unchanged, so the
+  // foreground still reads as a dark silhouette and the marble speckle keeps that
+  // darkness natural rather than a hard black band.
+  // the ramp uses the FULL spectrum: bright marble at the back → pure BLACK foreground. That
+  // maximal range lets each sheet sit at a distinctly different tone, so the forest layers
+  // separate by brightness alone (no shadows needed) and the nearest foliage reads as a
+  // clean black silhouette against the lit ranges behind.
+  const AURORA_DEPTH={light:1.22,sky:1.0,haze:0.85,deep:0.71,far:0.57,mid:0.43,bush:0.29,margin:0.15,fore:0.0};
+  const AURORA_SHEETS=['sky','haze','deep','far','mid','bush','margin','fore'];
+  const clamp255=v=>Math.max(0,Math.min(255,Math.round(v)));
+
+  // TWO shared grayscale value-noise fields (0..1), generated once. AURORA_NOISE is the
+  // brightness mottle; AURORA_WARP is a low-frequency field that displaces the hue column
+  // vertically per-x, so the colour bands WAVE up and down like real aurora curtains
+  // instead of reading as one flat horizontal line.
+  const AURORA_NW=320, AURORA_NH=216;
+  function genNoise(octs,seedBase){
+    const w=AURORA_NW,h=AURORA_NH,out=new Float32Array(w*h);
+    // octs: [gridW, gridH, amplitude] — random grid bilinearly upsampled, summed.
+    for(const [gw,gh,amp] of octs){
+      const r=rng((gw*131+gh*17+seedBase)|0), grid=new Float32Array((gw+1)*(gh+1));
+      for(let i=0;i<grid.length;i++) grid[i]=r();
+      const g=(xx,yy)=>grid[yy*(gw+1)+xx];
+      for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+        const fx=x/w*gw,fy=y/h*gh,x0=fx|0,y0=fy|0,tx=fx-x0,ty=fy-y0;
+        const top=g(x0,y0)*(1-tx)+g(x0+1,y0)*tx, bot=g(x0,y0+1)*(1-tx)+g(x0+1,y0+1)*tx;
+        out[y*w+x]+=(top*(1-ty)+bot*ty)*amp;
+      }
+    }
+    let mn=Infinity,mx=-Infinity;
+    for(const v of out){ if(v<mn)mn=v; if(v>mx)mx=v; }
+    const sp=mx-mn||1; for(let i=0;i<out.length;i++) out[i]=(out[i]-mn)/sp;
+    return out;
   }
+  let AURORA_NOISE=null, AURORA_WARP=null;
+  function buildAuroraNoise(){
+    if(!AURORA_NOISE){
+      // speckled marble: mid + fine octaves give the lively grain the user liked.
+      AURORA_NOISE=genNoise([[9,6,0.6],[20,14,0.28],[44,30,0.16]], 7);
+      // STRONG multi-octave displacement → the hue bands swirl & wave right across the
+      // frame, so it reads as marble, not three flat stripes of blue/pink/green.
+      AURORA_WARP =genNoise([[3,2,0.62],[6,4,0.32],[13,9,0.16]], 91);
+    }
+    return AURORA_NOISE;
+  }
+
+  // the aurora hue COLUMN: interpolate AURORA_STOPS at vertical fraction t (0..1).
+  function auroraHue(t){
+    const S=AURORA_STOPS;
+    for(let i=1;i<S.length;i++){
+      if(t<=S[i][0]||i===S.length-1){
+        const a=S[i-1],b=S[i],k=Math.max(0,Math.min(1,(t-a[0])/((b[0]-a[0])||1)));
+        return [a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k, a[3]+(b[3]-a[3])*k];
+      }
+    }
+  }
+  // one sheet's marble baked to a data URL: vertical hue column × this sheet's depth
+  // darkening × the shared noise (mottle). One raster per depth, reused by ONE rect.
+  function auroraSheetURL(f){
+    const w=AURORA_NW,h=AURORA_NH; buildAuroraNoise();
+    const noise=AURORA_NOISE, warp=AURORA_WARP, warpAmp=0.42*h;   // big waves → marbled, not striped
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    const ctx=cv.getContext('2d'),img=ctx.createImageData(w,h),d=img.data;
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const idx=y*w+x;
+        // waver the hue band up/down so the curtains undulate (not a flat horizontal line)
+        const t=Math.max(0,Math.min(1,(y+(warp[idx]-0.5)*warpAmp)/(h-1)));
+        const [r,g,b]=auroraHue(t);
+        const m=f*(0.68+0.58*noise[idx]), i=idx*4;          // speckle, but gentle enough that depth-ordering still reads between sheets
+        d[i]=clamp255(r*m); d[i+1]=clamp255(g*m); d[i+2]=clamp255(b*m); d[i+3]=255;
+      }
+    }
+    ctx.putImageData(img,0,0);
+    return cv.toDataURL();
+  }
+  function auroraCSS(f){               // the .glow panel behind the holes: the marble as a CSS bg
+    return `url(${auroraSheetURL(f)}) center/cover`;
+  }
+
+  // Build ONE marble <pattern> per depth (each = a single <image>). A sheet is then drawn
+  // as that sheet's shapes MASKING one full-viewBox marble rect — so the colour & speckle
+  // come from the untransformed rect (immune to the per-stamp translate/rotate that shifts
+  // a userSpaceOnUse gradient and flat-lined the fronds), while the shapes only cut it out.
+  let AURORA_DEFS_DONE=false;
+  function buildAuroraDefs(){
+    if(AURORA_DEFS_DONE) return;
+    AURORA_DEFS_DONE=true;
+    const NS='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(NS,'svg'); svg.id='aurora-defs';
+    svg.setAttribute('aria-hidden','true');
+    svg.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
+    svg.innerHTML='<defs>'+AURORA_SHEETS.map(k=>
+      `<pattern id="aurora-${k}" patternUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">
+         <image href="${auroraSheetURL(AURORA_DEPTH[k])}" x="0" y="0" width="1200" height="800" preserveAspectRatio="none"/>
+       </pattern>`).join('')+'</defs>';
+    document.body.appendChild(svg);
+  }
+
+  // swap each sheet's markup between the normal var-filled form (for every other palette,
+  // recoloured live via CSS vars) and the aurora masked-marble form. Originals are cached
+  // so switching back is instant.
+  const AURORA_ORIG={};
+  let AURORA_MASKED=false, SCENE_BUILT=false;
+  function auroraMaskify(on){
+    if(!SCENE_BUILT || on===AURORA_MASKED) return;
+    if(on){
+      buildAuroraDefs();
+      for(const k of AURORA_SHEETS){
+        const svg=$('l-'+k); if(!svg) continue;
+        if(AURORA_ORIG[k]==null) AURORA_ORIG[k]=svg.innerHTML;
+        // shapes render white (vars are #fff under aurora) → they mask in the marble rect.
+        svg.innerHTML=`<defs><mask id="amask-${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">`
+          +`<g fill="#fff">${AURORA_ORIG[k]}</g></mask></defs>`
+          +`<rect width="1200" height="800" fill="url(#aurora-${k})" mask="url(#amask-${k})"/>`;
+      }
+    } else {
+      for(const k of AURORA_SHEETS){
+        const svg=$('l-'+k); if(svg && AURORA_ORIG[k]!=null) svg.innerHTML=AURORA_ORIG[k];
+      }
+    }
+    AURORA_MASKED=on;
+  }
+
+  function applyPalette(name){
+    const p=PALETTES[name]||PALETTES.totara, s=document.documentElement.style;
+    if(name==='aurora'){
+      buildAuroraDefs();
+      // every shape fills white so it works as a mask; the colour comes from the marble.
+      for(const k of RAMP) s.setProperty('--'+k, k==='light' ? auroraCSS(AURORA_DEPTH.light) : '#fff');
+    } else {
+      for(const k of RAMP) s.setProperty('--'+k,p[k]);
+    }
+    s.setProperty('--ink',p.ink); s.setProperty('--ink-soft',p.inkSoft);
+    s.setProperty('--halo',p.halo||'rgba(255,244,222,.94)');
+    document.body.classList.toggle('pal-aurora', name==='aurora');
+    document.body.classList.toggle('pal-dark', !!p.dark);   // white-copy palettes (deep, dim scene)
+    document.body.classList.toggle('pal-flat', !!p.flat);   // shadowless flat cut-paper palettes
+    auroraMaskify(name==='aurora');     // no-op until SCENE_BUILT; re-applied once after build
+    try{localStorage.setItem('palette',name)}catch(e){}
+    const tt=document.getElementById('themeToggle');
+    if(tt) tt.setAttribute('aria-pressed', name==='aurora');   // pressed = dark mode
+  }
+  // precedence: explicit ?palette= → saved choice → OS dark/light preference → tōtara (light).
+  const osDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
   let curPal=new URLSearchParams(location.search).get('palette')
-    || (()=>{try{return localStorage.getItem('palette')}catch(e){return null}})() || 'sepia';
-  if(!PALETTES[curPal]) curPal='sepia';
-  for(const b of document.querySelectorAll('.palettes button')) b.style.background=PALETTES[b.dataset.pal].sky;
-  document.getElementById('palettes').addEventListener('click',e=>{const b=e.target.closest('button'); if(b) applyPalette(b.dataset.pal);});
+    || (()=>{try{return localStorage.getItem('palette')}catch(e){return null}})()
+    || (osDark ? 'aurora' : 'totara');
+  if(!PALETTES[curPal]) curPal='totara';
+  // the sun↔moon switch flips between the two modes: tōtara (light) and aurora (dark).
+  document.getElementById('themeToggle').addEventListener('click',()=>{
+    applyPalette(document.body.classList.contains('pal-aurora') ? 'totara' : 'aurora');
+  });
   applyPalette(curPal);
 
   // adapt the stamp library to a common (x,baseY,h,fill,seed,out) call. ONLY the
@@ -205,7 +439,7 @@
     cabbage:   (x,b,h,f,s)=>cabbageTree(x,b,h,f,s),
     flax:      (x,b,h,f,s)=>flax(x,b,h,f,s),
     toetoe:    (x,b,h,f,s)=>toetoe(x,b,h,f,s),
-    grass:     (x,b,h,f,s)=>grass(x,b,h*1.5,h,Math.max(9,Math.round(h/8)),f,s),
+    grass:     (x,b,h,f,s)=>grass(x,b,h*1.05,h,Math.round(h*1.05/2.2),f,s),
     frond:     (x,b,h,f,s,o)=>frond(x,b,h,f,s,-90+o*18),
   };
 
@@ -219,6 +453,36 @@
   const CW={ponga:0.5,nikau:0.42,pohutukawa:0.56,cabbage:0.30,flax:0.52,toetoe:0.34,grass:0.78,frond:0.6};
   const clampX=(x,h,kn,out)=>{const w=(CW[kn]||0.5)*h;
     return out<0 ? Math.min(x,CLEAR_L-w) : Math.max(x,CLEAR_R+w);};
+
+  // CROWN: how far a stamp's drawn TOP reaches above its base, as a multiple of h. Several
+  // stamps draw well above their nominal top (baseY-h): the nīkau shoots a tall upright
+  // shuttlecock crown, flax sends kōrari flower-stalks up ~1.5h, cabbage's mop sits at the
+  // tip. So a tall plant rooted on a high crest would punch through the viewBox top (y<0)
+  // and get sliced off. Clamp h on placement so the whole crown stays inside the frame.
+  const CROWN={nikau:1.46,flax:1.55,cabbage:1.30,toetoe:1.26,pohutukawa:1.08,ponga:1.02,grass:1.12,frond:1.12};
+  // The layers cover the viewport with preserveAspectRatio="…slice": on a WIDE screen the
+  // viewBox is scaled to fill the width, so its top (and bottom) strip is cropped off-frame —
+  // e.g. at 1.9:1 the top ~85 viewBox units are hidden. So "the top of the frame" is NOT y=0;
+  // it moves down as the window widens. Work out how many viewBox units are hidden above the
+  // fold for THIS viewport, so a capped crown lands just below the visible edge (+ the frame
+  // border + a small gap) rather than inside the cropped band.
+  function fitTop(){
+    const sc=Math.max(innerWidth/1200, innerHeight/800);     // slice scale (cover)
+    const hiddenTop=Math.max(0, 400 - innerHeight/(2*sc));   // viewBox units cropped at the top
+    return hiddenTop + 14/sc + 10;                           // + frame border + a small gap
+  }
+  let TOP_PAD=fitTop();                               // keep crowns this far below the VISIBLE top
+  // …and the mirror of fitTop for the BOTTOM: slice crops an equal strip off the bottom on a
+  // wide window, so the lowest always-visible viewBox-y moves UP as the window widens. Use it
+  // to keep a focal element (the kiwi) whole — its feet must not drop past this line.
+  function fitBottom(){
+    const sc=Math.max(innerWidth/1200, innerHeight/800);
+    const hiddenBot=Math.max(0, 400 - innerHeight/(2*sc));   // viewBox units cropped at the bottom
+    return 800 - hiddenBot - 14/sc - 10;                     // − frame border − a small gap
+  }
+  let BOTTOM_PAD=fitBottom();
+  // tallest h whose crown still clears the visible top edge, given a base at viewBox-y `by`.
+  const fitH=(h,by,kn)=>Math.min(h,(by-TOP_PAD)/(CROWN[kn]||1.1));
 
   // a NATURAL, irregular ground crest. The overall line rises (low y) at the frame
   // edge and dives to the bottom near the clearing (smoothstep); several random
@@ -242,20 +506,61 @@
     return `<path fill="${fill}" d="${d} L${innerX.toFixed(1)},806 Z"/>`;
   }
   // one bay: natural bank + plants rooted ON its crest, each clamped clear of the text.
+  // pick from `kinds` for a left-to-right run of slots, while discouraging the
+  // SAME stamp landing in adjacent slots — identical stamps planted close
+  // together overlap into a featureless blob. Remembers the last pick and
+  // re-rolls a match a few times; with only one kind available it just yields it.
+  function kindPicker(r,kinds){
+    let last=-1;
+    return ()=>{
+      let i=(r()*kinds.length)|0;
+      for(let t=0;t<3 && kinds.length>1 && i===last;t++) i=(r()*kinds.length)|0;
+      // pōhutukawa reads heavier than the others (big crimson crown); ease its
+      // frequency by re-rolling a third of its hits onto another stamp.
+      if(kinds[i][0]==='pohutukawa' && kinds.length>1 && r()<0.33) i=(r()*kinds.length)|0;
+      last=i; return kinds[i];
+    };
+  }
+
   // `bury` = how far the foot dips below the crest. Returns the crest fn too.
-  function bay(edgeX,innerX,edgeY,diveY,roll,kinds,n,fill,seed,out,bury=9,divePow=1){
+  // `xbias` skews where the slots sit along the bay: 1 = even; <1 packs them toward the
+  // INNER (clearing/text) end, so a layer's stamps climb up the slope toward the centre
+  // instead of spreading down the outer edge.
+  function bay(edgeX,innerX,edgeY,diveY,roll,kinds,n,fill,seed,out,bury=9,divePow=1,xbias=1){
     const r=rng(seed), crest=makeCrest(edgeX,innerX,edgeY,diveY,r,roll,divePow);
-    const span=innerX-edgeX, slotW=Math.abs(span)/n, items=[];
+    const span=innerX-edgeX, slotW=Math.abs(span)/n, items=[], pick=kindPicker(r,kinds);
     for(let i=0;i<n;i++){
-      const slot=(i+0.5)/n, edgeK=1-slot;               // 1 at edge → 0 at clearing
-      const [kn,hMin,hMax]=kinds[(r()*kinds.length)|0];
-      const h=(hMin+(hMax-hMin)*(0.4+0.6*edgeK))*(0.9+0.16*r());
+      const slot=Math.pow((i+0.5)/n, xbias), edgeK=1-slot;   // 1 at edge → 0 at clearing
+      const [kn,hMin,hMax]=pick();
+      // height still grows toward the frame edge, but the near-clearing floor is high
+      // (0.62) so the plants flanking the central column stay tall and claim the band
+      // of sky that used to show beside the hero text.
+      let h=(hMin+(hMax-hMin)*(0.62+0.38*edgeK))*(0.9+0.16*r());
       const x=clampX(edgeX+span*slot+(r()-0.5)*slotW*0.45, h, kn, out);
-      items.push({x,by:crest(x)+bury,h,kn,sd:(seed*131+i*61+7)|0});
+      // THIN OUT plants on steep ground: real bush doesn't cling to a near-cliff. Measure the
+      // local crest gradient; the steeper it is, the more likely this slot is left bare — so the
+      // quick rounded drop-offs near the clearing read as smooth bare hillside, not a stamp wall.
+      const sl=Math.abs((crest(x+12)-crest(x-12))/24);
+      if(kn==='grass' && sl>1.2) continue;               // grass never grows on a steep slope — gentle ground only
+      if(sl>1.8 && r()<Math.min(0.62,(sl-1.8)*0.26)) continue;
+      const by=crest(x)+bury; h=fitH(h,by,kn);        // never let a tall crown clip the frame top
+      items.push({x,by,h,kn,sd:(seed*131+i*61+7)|0});
     }
     items.sort((a,b)=>b.h-a.h);                         // tallest → back
-    return {crest, html:bankPath(edgeX,innerX,crest,fill)
-      +items.map(it=>KIND[it.kn](it.x,it.by,it.h,fill,it.sd,out)).join('')};
+    // a plant rooted on a STEEP part of the crest leans downhill — and near the clearing
+    // downhill is toward the page centre, so the lean naturally points the foliage in at
+    // the hero. tilt is driven straight off the local crest gradient (flat plateau → upright;
+    // steep drop-off → up to ~13° of lean), capped so a tall palm only tips, never bends.
+    const lean=it=>{
+      const g=KIND[it.kn](it.x,it.by,it.h,fill,it.sd,out);
+      const sl=(crest(it.x+11)-crest(it.x-11))/22;       // downhill-to-centre slope (sign carries the side)
+      // nīkau is a tall palm — let it tip only a TINY bit on steep ground (cap 4°, gentle ramp) so the
+      // trunk still reads upright; every other stamp leans freely downhill (cap 15°).
+      const nk=it.kn==='nikau', cap=nk?4:15, mult=nk?1.3:4.6;
+      const a=Math.max(-cap,Math.min(cap, sl*mult));     // degrees; ~0 on the flat, downhill lean where steep
+      return Math.abs(a)<0.6 ? g : `<g transform="rotate(${a.toFixed(1)} ${it.x.toFixed(1)} ${it.by.toFixed(1)})">${g}</g>`;
+    };
+    return {crest, html:bankPath(edgeX,innerX,crest,fill)+items.map(lean).join('')};
   }
 
   // a central footer mound: a low, lumpy bush hill rising in the centre at the base.
@@ -270,8 +575,8 @@
   }
   // plant a small clump on a footer mound (front-layer stamps only — no big trees).
   function footThicket(mound,seed,kinds,fill,xs){
-    const r=rng(seed); let g='';
-    for(const fx of xs){ if(r()<0.82){ const [kn,a,b]=kinds[(r()*kinds.length)|0], h=a+(b-a)*r();
+    const r=rng(seed); let g=''; const pick=kindPicker(r,kinds);
+    for(const fx of xs){ if(r()<0.82){ const [kn,a,b]=pick(), h=a+(b-a)*r();
       g+=KIND[kn](fx+(r()-0.5)*22, mound.cY(fx)+5, h, fill, (seed^(fx*7))|0, fx<600?-1:1); } }
     return g;
   }
@@ -286,11 +591,12 @@
     let d='M0,806 L0,'+crest(0).toFixed(1); const N=80;
     for(let i=1;i<=N;i++){const x=1200*i/N; d+=' L'+x.toFixed(1)+','+crest(x).toFixed(1);}
     let html=`<path fill="${fill}" d="${d} L1200,806 Z"/>`;
-    const slotW=1200/n, items=[];
+    const slotW=1200/n, items=[], pick=kindPicker(r,kinds);
     for(let i=0;i<n;i++){
       const x=slotW*(i+0.5)+(r()-0.5)*slotW*0.6;
-      const [kn,a,b]=kinds[(r()*kinds.length)|0], h=a+(b-a)*r();
-      items.push({x,by:crest(x)+6,h,kn,sd:(seed^(i*97+3))|0});
+      const [kn,a,b]=pick();
+      const by=crest(x)+6, h=fitH(a+(b-a)*r(),by,kn);
+      items.push({x,by,h,kn,sd:(seed^(i*97+3))|0});
     }
     items.sort((p,q)=>q.h-p.h);
     html+=items.map(it=>KIND[it.kn](it.x,it.by,it.h,fill,it.sd,it.x<600?-1:1)).join('');
@@ -314,8 +620,8 @@
     const r=rng(seed); let s='';
     // a loose V drifting across the upper sky strip (away from the moon at top-left).
     // farther birds sit higher & smaller — a little aerial perspective.
-    const flock=[[470,128,26],[548,104,30],[628,86,36],[712,99,30],[792,120,25],
-                 [598,150,21],[690,156,19]];
+    const flock=[[470,98,24],[548,82,28],[628,70,32],[712,84,27],[792,102,22],
+                 [598,114,18],[690,120,17]];
     for(const [bx,by,bw] of flock)
       s+=birdHole(bx+(r()-0.5)*24, by+(r()-0.5)*14, bw*(0.85+r()*0.3), (r()-0.5)*0.5);
     return s;
@@ -342,34 +648,53 @@
   // FAR sheets carry SMALL + MANY stamps (aerial perspective → an expansive valley); the
   // sizes shrink and the counts climb the further back the sheet sits.
   const hazeKinds=[['pohutukawa',22,34],['cabbage',24,38],['ponga',24,38],['nikau',26,40],
-                   ['flax',18,30],['toetoe',20,32],['grass',16,26]];
+                   ['flax',18,30],['toetoe',20,32],['grass',11,18]];
   const deepKinds=[['pohutukawa',30,48],['cabbage',32,50],['ponga',32,50],['nikau',34,52],
-                   ['flax',24,40],['toetoe',26,42],['grass',22,36]];
-  const farKinds=[['ponga',50,82],['nikau',54,86],['pohutukawa',46,78],['cabbage',48,80],
-                  ['flax',40,66],['toetoe',42,68],['grass',34,54],['frond',40,64]];
-  const midKinds=[['ponga',84,132],['nikau',90,140],['pohutukawa',78,124],['cabbage',82,128],
-                  ['flax',68,106],['toetoe',70,108],['grass',54,82],['frond',62,98]];
+                   ['flax',24,40],['toetoe',26,42],['grass',15,25]];
+  // FAR & MID stamps run TALLER than strict aerial-perspective would call for, on purpose:
+  // these are the layers we most want filling the band beside the hero, so their crowns reach
+  // up high into the space that used to read as empty clearing.
+  const farKinds=[['ponga',78,126],['nikau',80,124],['pohutukawa',74,120],['cabbage',76,122],
+                  ['flax',62,102],['toetoe',64,104],['grass',36,58],['frond',62,100]];
+  const midKinds=[['ponga',112,178],['nikau',120,190],['pohutukawa',104,168],['cabbage',110,174],
+                  ['flax',92,144],['toetoe',95,148],['grass',52,80],['frond',84,134]];
 
   // ---- SHEETS 1.25 & 1.5 · TWO FULL-WIDTH FOREST BANDS, STACKED ------------
-  // two receding treelines run right across the top: the palest HAZE band highest, then
-  // the slightly darker DEEP band just below it. The page text reads on the flat deep
-  // hillside; only a thin sky strip + the small moon sit above the haze treeline. Tiny,
-  // numerous stamps on both so the far ridges read as dense, expansive bush.
-  $('l-haze').innerHTML=band(120,12,hazeKinds,40,'var(--haze)',sub(21)).html;
-  $('l-deep').innerHTML=band(188,15,deepKinds,30,'var(--deep)',sub(19)).html;
+  // two receding treelines, bunched TIGHT near the horizon (perspective: distant ranges
+  // crowd together, near sheets spread apart). The palest HAZE band sits just below an
+  // open sky strip, then the DEEP band only ~45u below it. The page text reads on the flat
+  // deep hillside. Tiny, numerous stamps on both so the far ridges read as dense, expansive
+  // bush. The crest ladder then OPENS UP toward the foreground (see the bays below):
+  //   haze 140 · deep 185 · far 243 · mid 318 · bush 415 · margin 537 · fore 690
+  //   gaps    45     58      75      97      122       153  — growing, back → front.
+  $('l-haze').innerHTML=band(140,10,hazeKinds,54,'var(--haze)',sub(21)).html;
+  $('l-deep').innerHTML=band(185,12,deepKinds,42,'var(--deep)',sub(19)).html;
 
   // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
   // two shoulder banks opening a slightly WIDER gap than the deep range → the valley
   // steps outward as it comes forward. Distant mixed treeline on the plateau.
+  // FAR sits CLOSEST to the text margin (innerX≈374/826) — the further-back a sheet is, the
+  // tighter it hugs the central column, so each nearer sheet steps outward and the back
+  // ranges stay visible in the strip beside the text. FAR is also the densest of the bays.
+  // xbias 0.55 packs far's stamps UP toward the clearing end of each bay (in toward the text)
+  // and the higher crest (edgeY 218) keeps them high — far reads as a treeline climbing in
+  // beside the hero, not a low spread along the outer slope.
+  // far holds a high band across the flank then makes a QUICK, ROUNDED drop to the valley floor
+  // right by the text (diveY 806 so it reaches the floor → no vertical cut; high divePow 7 so it
+  // stays full then rounds off fast near the clearing). Less dense than before (count 18).
   $('l-far').innerHTML=
-      bay(0,   372,300,804,14,farKinds,14,'var(--far)',sub(8),-1,8,3.0).html
-    + bay(1200,828,300,804,14,farKinds,14,'var(--far)',sub(9),+1,8,3.0).html;
+      bay(0,   374,218,806,14,farKinds,15,'var(--far)',sub(8),-1,8,7,0.8).html
+    + bay(1200,826,218,806,14,farKinds,15,'var(--far)',sub(9),+1,8,7,0.8).html;
 
   // ---- SHEET 3 · MID RANGE CARD --------------------------------------------
   // a wider gap again; the nearer, larger mixed treeline rises from each shoulder.
+  // EVEN DEPTH TAPER, far → margin: each sheet's rounded drop-off steps out from the text by an
+  // even ~62 viewBox units (far 374 closest to the text · mid 312 · bush 250 · margin 188 nearest
+  // the edge), so the flank reads as a smooth tonal staircase from light-near-text to dark-at-edge.
+  // All reach the floor (diveY 806) with a quick rounded curve (divePow 5) — no straight cut.
   $('l-mid').innerHTML=
-      bay(0,   352,405,803,16,midKinds,10,'var(--mid)',sub(10),-1,8,2.6).html
-    + bay(1200,848,405,803,16,midKinds,10,'var(--mid)',sub(11),+1,8,2.6).html;
+      bay(0,   312,296,806,16,midKinds,8,'var(--mid)',sub(10),-1,8,5).html
+    + bay(1200,888,296,806,16,midKinds,8,'var(--mid)',sub(11),+1,8,5).html;
 
   // ---- SHEET 4 · BUSH BAND (backmost plant band → the TALL canopy) ----------
   // a natural bush bank massed in the margins, rolling high at the frame edge and
@@ -378,10 +703,14 @@
   // the furthest, softest ground.)
   const bushKinds=[['ponga',210,300],['nikau',240,330],['pohutukawa',185,255],['cabbage',180,245]];
   const bushFoot=centreMound(sub(15),64,'var(--bush)');             // furthest valley-floor band
-  const footFar=[['flax',38,60],['toetoe',38,58],['grass',32,52],['frond',36,58]];
+  const footFar=[['flax',38,60],['toetoe',38,58],['grass',22,36],['frond',36,58]];
+  // bush steps OUTWARD from the text (innerX≈334/866) — further forward than far/mid, so the
+  // lighter back ranges stay visible in the band beside the hero. It still makes a STEEP but
+  // organic drop to the valley floor (diveY≈796, divePow 3.0) — a fast rolling curve, not a
+  // vertical wall — and the trees on that shoulder lean downhill into the clearing (see `lean`).
   $('l-bush').innerHTML=
-      bay(0,   332,510,800,22,bushKinds,4,'var(--bush)',sub(1),-1).html
-    + bay(1200,868,510,800,22,bushKinds,4,'var(--bush)',sub(2),+1).html
+      bay(0,   250,415,806,22,bushKinds,4,'var(--bush)',sub(1),-1,9,5).html
+    + bay(1200,950,415,806,22,bushKinds,4,'var(--bush)',sub(2),+1,9,5).html
     + bushFoot.html + footThicket(bushFoot,sub(16),footFar,'var(--bush)',[430,505,600,695,770]);
 
   // ---- SHEET 5 · FRAMING TREES (mid plant band, in front of the text) -------
@@ -390,10 +719,10 @@
   // scene reads small-in-front, large-behind.
   const marginKinds=[['ponga',150,205],['cabbage',150,205],['flax',120,170],['toetoe',120,165]];
   const marginFoot=centreMound(sub(17),54,'var(--margin)');         // middle valley-floor band
-  const footMid=[['flax',54,82],['toetoe',52,78],['grass',44,68],['frond',50,76]];
+  const footMid=[['flax',54,82],['toetoe',52,78],['grass',31,48],['frond',50,76]];
   $('l-margin').innerHTML=
-      bay(0,   308,612,800,20,marginKinds,4,'var(--margin)',sub(3),-1).html
-    + bay(1200,892,612,800,20,marginKinds,4,'var(--margin)',sub(4),+1).html
+      bay(0,   188,537,806,20,marginKinds,3,'var(--margin)',sub(3),-1,9,5).html
+    + bay(1200,1012,537,806,20,marginKinds,3,'var(--margin)',sub(4),+1,9,5).html
     + marginFoot.html + footThicket(marginFoot,sub(18),footMid,'var(--margin)',[455,520,585,650,715,760]);
 
   // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI (frontmost, smallest) ---------
@@ -403,14 +732,14 @@
   // (standing on the same crest) and a perched fantail.
   // few, BOLD, taller plants (well separated) so the dark front silhouettes read
   // clearly against the lighter bands behind instead of merging into one blob.
-  const foreKinds=[['grass',92,138],['frond',130,188],['flax',116,162],['toetoe',116,156]];
+  const foreKinds=[['grass',64,97],['frond',130,188],['flax',116,162],['toetoe',116,156]];
   // LEFT fore bay left empty of plants: the focal kiwi IS the bold foreground element
   // on the left, so its silhouette stands alone & clean against the lighter bands (no
   // ferns crossing it). The right bay keeps its bold plants to balance the frame.
-  const foreL=bay(0,   286,695,800,16,foreKinds,0,'var(--fore)',sub(5),-1,4);
-  const foreR=bay(1200,914,695,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
+  const foreL=bay(0,   150,690,800,16,foreKinds,0,'var(--fore)',sub(5),-1,4);
+  const foreR=bay(1200,1050,690,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
   const mound=centreMound(sub(13),44,'var(--fore)');                // nearest/darkest floor band
-  const footNear=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',72,104]];
+  const footNear=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',50,73]];
   let fore=foreL.html+foreR.html+mound.html
     + footThicket(mound,sub(14),footNear,'var(--fore)',[486,534,584,620,668,714]);
   const kr=rng(sub(12));
@@ -419,9 +748,54 @@
   // body & long bill are silhouetted high against the lighter bush/mid bands with
   // nothing crossing it. Bill tip stays well clear of the text column (CLEAR_L=378).
   const kS=1.18+kr()*0.08, kx=98+(kr()-0.5)*20;
-  fore+=kiwi(kx, foreL.crest(kx)-47*kS, kS, 'var(--fore)');         // feet on the bank crest
-  fore+=fantail(232+(kr()-0.5)*22,600,1.04+kr()*0.08,'var(--fore)');
+  // feet on the bank crest — but never let the lowest toe (cy+58*s) dip below the visible
+  // bottom edge. On a wide window the bottom strip is sliced off, which used to clip the
+  // kiwi's feet when the random crest dipped low; lift it just enough to keep the bird whole.
+  const kcy=Math.min(foreL.crest(kx)-47*kS, BOTTOM_PAD-58*kS);
+  fore+=kiwi(kx, kcy, kS, 'var(--fore)');
+  // FANTAILS — two pīwakawaka perched together on a foreground twig on the RIGHT,
+  // turned to face each other (bills nearly touching). The left bird is the stamp drawn
+  // normally (faces right); the right bird is the SAME stamp mirrored about its own centre
+  // (scale -1) so it faces left. A tapered twig, rooted in the right bank, carries them.
+  const ftS=1.2, ftL=910, ftR=970, ftCy=604;                 // centres ~60 apart → bills meet mid-air
+  // the shared perch — a tapered LIMB built from a centreline (waypoints tip→root) + a
+  // half-width per point, offset to one closed paper-cut. blocky=true cuts straight angular
+  // facets between waypoints (no curve smoothing) for a bare paper-cut branch look. The main
+  // limb is buried at y~800 so it reads as growing from the bank; small offshoots fork off it.
+  const limb=(W,HW,fill,blocky)=>{
+    const N=W.length, seg=blocky?1:14, cr=(a,b,c,d,t,k)=>{const u=t*t,v=u*t;
+      return 0.5*(2*b[k]+(-a[k]+c[k])*t+(2*a[k]-5*b[k]+4*c[k]-d[k])*u+(-a[k]+3*b[k]-3*c[k]+d[k])*v);};
+    const pts=[],hs=[];
+    for(let i=0;i<N-1;i++){const p0=W[Math.max(0,i-1)],p1=W[i],p2=W[i+1],p3=W[Math.min(N-1,i+2)];
+      for(let j=0;j<seg;j++){const t=j/seg;
+        pts.push(blocky?[p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t]:[cr(p0,p1,p2,p3,t,0),cr(p0,p1,p2,p3,t,1)]);
+        hs.push(HW[i]+(HW[i+1]-HW[i])*t);}}
+    pts.push(W[N-1]); hs.push(HW[N-1]);
+    const A=[],B=[];
+    for(let i=0;i<pts.length;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];
+      let dx=b[0]-a[0],dy=b[1]-a[1];const L=Math.hypot(dx,dy)||1;const nx=-dy/L,ny=dx/L,h=hs[i];
+      A.push([pts[i][0]+nx*h,pts[i][1]+ny*h]); B.push([pts[i][0]-nx*h,pts[i][1]-ny*h]);}
+    let d='M'+A[0][0].toFixed(1)+','+A[0][1].toFixed(1);
+    for(let i=1;i<A.length;i++) d+=' L'+A[i][0].toFixed(1)+','+A[i][1].toFixed(1);
+    for(let i=B.length-1;i>=0;i--) d+=' L'+B[i][0].toFixed(1)+','+B[i][1].toFixed(1);
+    return `<path fill="${fill}" d="${d} Z"/>`;
+  };
+  fore+=limb([[1066,600],[1044,628],[1024,658]], [1, 3, 6], 'var(--fore)', true)      // up-fork at elbow
+      + limb([[1082,758],[1058,748],[1037,740]], [1, 3, 5], 'var(--fore)', true)      // side twig off trunk
+      + limb([[862,604],[876,620],[888,632]],    [0.8, 2.5, 4], 'var(--fore)', true)  // small up-twig near tip
+      + limb([[852,628],[904,631],[956,636],[1000,641],[1024,662],[1036,716],[1041,802]],
+             [1.5, 5, 6, 7, 8.5, 10, 11.5], 'var(--fore)', true);                     // main limb
+  fore+=fantail(ftL, ftCy, ftS, 'var(--fore)');              // left bird — faces right
+  fore+=`<g transform="translate(${(2*ftR).toFixed(1)} 0) scale(-1 1)">`
+      + fantail(ftR, ftCy+5, ftS, 'var(--fore)') + `</g>`;   // right bird — mirrored → faces left
   $('l-fore').innerHTML=fore;
+
+  // DEBUG VIEW: load with ?fartint=1 to tint the FAR sheet bright red (every other sheet stays
+  // as-is) so you can see exactly where far shows vs where the front sheets occlude it. Add
+  // ?faronly=1 to also blank every other sheet and see far entirely on its own.
+  {const q=new URLSearchParams(location.search);
+   if(q.has('faronly')){ for(const k of ['sky','haze','deep','mid','bush','margin','fore']){ const s=$('l-'+k); if(s) s.innerHTML=''; } }
+   if(q.has('faronly')||q.has('fartint')) document.documentElement.style.setProperty('--far','#e0322f');}
 
   // narrow screens crop to the central clearing (only viewBox x~415-785 shows), so
   // the desktop margin/foreground foliage is off-screen. Frame the mobile view from
@@ -433,8 +807,12 @@
       `<path fill="var(--bush)" d="M356,800 L356,752 Q480,720 600,738 Q720,756 844,746 L844,800 Z"/>`+
       treeFern(432,760,214,'var(--bush)',302,{baseAng:-120,spread:128})+
       treeFern(768,760,214,'var(--bush)',304,{baseAng:-60,spread:128})+
-      grass(440,768,120,72,12,'var(--bush)',305)+grass(760,768,120,72,12,'var(--bush)',306));
+      grass(440,768,56,41,26,'var(--bush)',305)+grass(760,768,56,41,26,'var(--bush)',306));
   }
+
+  // the scene now exists: enable aurora's masked-marble swap and apply it if active.
+  SCENE_BUILT=true;
+  if(document.body.classList.contains('pal-aurora')) auroraMaskify(true);
 
   /* ---------- real projects ---------- */
   fetch('../data/projects.json')

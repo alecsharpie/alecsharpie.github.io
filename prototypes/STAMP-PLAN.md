@@ -28,10 +28,14 @@ Clear trunk that forks into a few bare limbs, each tipped by a dense radiating
 **spiky mop-head** of stiff sword-leaves (a shaggy pom-pom), lower leaves arching down.
 
 ## 3. `nikau` — nīkau palm
-Smooth ringed trunk swelling to a bulbous **crownshaft**, from which a tidy upright
-**cone** of fine pinnate feather fronds radiates — outer fronds at ~45°, the single
-outermost frond on each side dropped so the cone edge stays clean and fully leafed
-(no bare ribs).
+Smooth ringed trunk swelling to a bulbous **crownshaft**. Just below the bulge a
+**drooping beaded fruit panicle** weeps down around the trunk top — continuous tapered
+ribbon strands (joined to the trunk by a solid neck collar so it cuts as one piece, Rule
+6) with little fruit beads riding the spine. Above the bulge a tidy upright **cone** of
+fine pinnate feather fronds radiates — outer fronds at ~50°, the outermost frond on each
+side dropped, and every leaflet that would splay past the cone-edge angle clipped
+(`coneClip`) so the silhouette edge stays clean and fully leafed (no bare ribs, no
+strays).
 
 ## 4. `pohutukawa` — rātā / broadleaf  (alias `canopyTree`)
 Short trunk forking into a **candelabra** of boughs that each split into twigs; a
@@ -41,8 +45,10 @@ near the trunk, so the broad billowing crown reads airy — not one solid blob.
 ## 5. `flax` — harakeke
 A fan of stiff sword-leaves rising from one base; the **outer two** standing blades
 rise fairly vertically then nod over to about half height. A skirt of drooping old
-**"grandad"** leaves flops down around the base, and tall kōrari **flower stalks**
-carry dense spikes of curved tubular flowers above the fan.
+**"grandad"** leaves flops down around the base, and tall kōrari **flower stalks** rise
+well above the fan — each a mostly-bare stem carrying a few spaced, side-alternating
+**clusters** of curved tubular flowers (each flower bows outward then curls back up to a
+point) in a sparse candelabra, topped by a slim terminal bud-spire.
 
 ## 6. `toetoe` — plume grass
 A short, wide, **droopy cascading tussock** (many arching blades peaking low and

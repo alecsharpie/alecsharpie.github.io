@@ -29,7 +29,7 @@ A card's colour is determined solely by how far back it sits. The ramp, back to
 front, never reverses:
 
 ```
-light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore
+light  >  sky  >  haze  >  deep  >  far  >  mid  >  bush  >  margin  >  fore
 ```
 
 Corollary: **nothing can be lighter than what is behind it.**
@@ -62,9 +62,15 @@ mat** or painted vignette doing the work — those were removed.
 
 ---
 
-### Sanctioned exception
-The only thing outside these rules is the **text-shadow halo** on the page content
-(headings, project copy). It's a legibility aid so the dark paper-cut text stays
-readable over darker cards — a UI concession, not part of the scene's physics.
+### Sanctioned exceptions
+1. The **text-shadow halo** on the page content (headings, project copy). It's a
+   legibility aid so the dark paper-cut text stays readable over darker cards — a UI
+   concession, not part of the scene's physics.
+2. The **`aurora` palette** is the one deliberate rule-break. Instead of flat cards on a
+   monotonic ramp, every sheet is filled with the *same* speckled aurora gradient (one
+   shared marble of light cast across the whole scene), each depth level multiplied
+   darker the nearer it sits. It trades Rules 1–2/5 (one light, flat cards, no gradient)
+   for atmosphere; the depth fade-to-black is still strictly monotonic, so the stacking
+   still reads. See SHEETS.md for the build.
 
 See [`SHEETS.md`](./SHEETS.md) for the layer-by-layer breakdown.

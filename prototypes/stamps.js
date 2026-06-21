@@ -119,7 +119,7 @@ function fiddleheadPath(bx,baseY,h,dir=1,w0=3){
    leaflets down both sides. By putting the control overhead and the tip out to the
    side, a frond grows straight UP from the hub and then arches OUT to its tip; the
    lower `bareBase` fraction is a leafless stipe. */
-function ribFrond({cx,cy,ex,ey,leaves=16,leafLen=24,leafAngle=0.6,rib=3,bareBase=0.2,trimSide=0}){
+function ribFrond({cx,cy,ex,ey,leaves=16,leafLen=24,leafAngle=0.6,rib=3,bareBase=0.2,trimSide=0,trimFrac=1,coneHalf=0,outerSign=0}){
   const B=t=>[2*(1-t)*t*cx+t*t*ex, 2*(1-t)*t*cy+t*t*ey];
   const T=t=>{let dx=2*(1-t)*cx+2*t*(ex-cx),dy=2*(1-t)*cy+2*t*(ey-cy);const L=Math.hypot(dx,dy)||1;return[dx/L,dy/L];};
   let d='';const rb=[];
@@ -129,8 +129,13 @@ function ribFrond({cx,cy,ex,ey,leaves=16,leafLen=24,leafAngle=0.6,rib=3,bareBase
   for(let i=1;i<=leaves;i++){const t=i/leaves;if(t<bareBase)continue;const p=B(t),tg=T(t),nx=-tg[1],ny=tg[0],tx=tg[0],ty=tg[1];
     const tn=(t-bareBase)/(1-bareBase),prof=Math.min(1,tn*4.5)*(1-tn*0.78),ll=leafLen*(0.35+prof);
     for(const side of[1,-1]){let dxx=nx*side+tx*leafAngle,dyy=ny*side+ty*leafAngle;const L=Math.hypot(dxx,dyy)||1;dxx/=L;dyy/=L;
-      if(trimSide>0&&dxx>0)continue; if(trimSide<0&&dxx<0)continue;   // clean outer edge → cone silhouette
+      // drop outer-side leaflets to clean the cone edge; trimFrac<1 removes only the
+      // basal stretch (t<=trimFrac) — the ones that splay out past the next frond's rib
+      if(t<=trimFrac){ if(trimSide>0&&dxx>0)continue; if(trimSide<0&&dxx<0)continue; }
       const px=-dyy,py=dxx,tipx=p[0]+dxx*ll,tipy=p[1]+dyy*ll,hw=ll*0.22+1.0,bend=ll*0.10*side;
+      // cone clip: drop any outer-side leaflet whose tip splays past the cone edge angle
+      // (= the outermost frond's rachis), so nothing pokes through the clean silhouette.
+      if(coneHalf&&outerSign){const ang=Math.atan2(tipx,-tipy); if(outerSign>0?ang>coneHalf:ang<-coneHalf)continue;}
       const c1x=p[0]+dxx*ll*0.45+px*hw+tx*bend,c1y=p[1]+dyy*ll*0.45+py*hw+ty*bend;
       const c2x=p[0]+dxx*ll*0.45-px*hw+tx*bend,c2y=p[1]+dyy*ll*0.45-py*hw+ty*bend;
       d+=`M${p[0].toFixed(1)},${p[1].toFixed(1)} Q${c1x.toFixed(1)},${c1y.toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} Q${c2x.toFixed(1)},${c2y.toFixed(1)} ${p[0].toFixed(1)},${p[1].toFixed(1)} Z `;}}
@@ -147,25 +152,32 @@ function frondCrown(cx,cy,frondLen,fronds,r,opts={}){
   const {leafAngle=0.55,leafLenK=0.2,ribK=0.04,bareBase=0.22,
          maxLean=90,leanPow=1.3,rise=0.5,riseLean=0.22,outK=0.95,
          droopK=0.35,lenLo=0.8,lenHi=0.18,lenOut=0.18,innerRatio=0.4,jit=4,tilt=0,coneTrim=0,centerGap=0,
-         coreBand=0,coreShort=1,dropOuter=0}=opts;
+         coreBand=0,coreShort=1,dropOuter=0,coneTrim2=0,coneTrim2Frac=0.5,coneClip=0}=opts;
   const D=Math.PI/180;let g='';
-  const frondAt=(len,th,trimSide=0)=>{
+  // the outermost drawn frond sets the cone edge angle; clip leaflets that splay past it
+  const afMax=(fronds<=1)?0:1-2*dropOuter/(fronds-1);
+  const coneHalf=coneClip?maxLean*Math.pow(afMax,leanPow)*D*coneClip:0;
+  const frondAt=(len,th,trimSide=0,trimFrac=1)=>{
     let ex=Math.sin(th)*len*outK, rl=riseLean;
     const ey=-Math.cos(th)*len + droopK*len*Math.abs(Math.sin(th));
     if(trimSide){ rl=riseLean-0.14; }                // outer cone fronds curve very slightly inwards
     const ccx=ex*rl, ccy=-rise*len;
     const leaves=Math.max(16,Math.round(len/4.6));
-    return `<path d="${ribFrond({cx:ccx,cy:ccy,ex,ey,leaves,leafLen:len*leafLenK,leafAngle,rib:Math.max(2.6,len*ribK),bareBase,trimSide})}"/>`;
+    return `<path d="${ribFrond({cx:ccx,cy:ccy,ex,ey,leaves,leafLen:len*leafLenK,leafAngle,rib:Math.max(2.6,len*ribK),bareBase,trimSide,trimFrac,coneHalf,outerSign:Math.sign(ex)})}"/>`;
   };
   for(let i=0;i<fronds;i++){
     if(i<dropOuter||i>=fronds-dropOuter)continue;          // drop the outermost frond(s) on each side
     const f=(fronds===1)?0:(i/(fronds-1))*2-1, af=Math.abs(f);
     if(af<centerGap)continue;                              // leave a gap in the upright centre
     const th=Math.sign(f)*Math.pow(af,leanPow)*maxLean*D+(r()-0.5)*jit*D;
-    // outer fronds of a cone keep leaflets only on the inner side → clean cone edge
-    const trimSide=(coneTrim&&af>coneTrim)?Math.sign(f||1):0;
+    // outermost fronds keep leaflets only on the inner side → clean cone edge;
+    // the next fronds in (coneTrim2..coneTrim) get a partial outer-side trim, dropping
+    // only the basal leaflets that splay past the outermost frond's rib.
+    let trimSide=0, trimFrac=1;
+    if(coneTrim&&af>coneTrim){ trimSide=Math.sign(f||1); }
+    else if(coneTrim2&&af>coneTrim2){ trimSide=Math.sign(f||1); trimFrac=coneTrim2Frac; }
     const lenMul=(af<coreBand)?coreShort:1;               // shorten the upright near-centre fronds
-    g+=frondAt(frondLen*(lenLo+lenOut*af+r()*lenHi)*lenMul, th, trimSide);
+    g+=frondAt(frondLen*(lenLo+lenOut*af+r()*lenHi)*lenMul, th, trimSide, trimFrac);
   }
   // inner ring: shorter, more upright fronds filling the crown core
   const inner=Math.round(fronds*innerRatio);
@@ -210,7 +222,7 @@ function ponga(x,baseY,h,fill,seed,opts={}){
   const {fronds=12,spread,baseAng}=opts;
   const r=rng(seed);let g=`<g fill="${fill}">`;
   const trunkH=h*0.28, frondLen=h*0.44;          // short trunk, long → wide vase crown
-  const tw=Math.max(8,h*0.032), topY=baseY-trunkH;
+  const tw=Math.max(3,h*0.032), topY=baseY-trunkH;
   // thick, squarish fibrous trunk: near-vertical sides with a slight flare at the foot, and a
   // shoulder near the top that converges into the crown so it meets the leaves cleanly
   g+=`<path d="M${(x-tw*1.5).toFixed(1)},${baseY} L${(x-tw).toFixed(1)},${(baseY-trunkH*0.22).toFixed(1)} L${(x-tw).toFixed(1)},${(topY+frondLen*0.10).toFixed(1)} L${(x-tw*0.5).toFixed(1)},${topY.toFixed(1)} L${(x+tw*0.5).toFixed(1)},${topY.toFixed(1)} L${(x+tw).toFixed(1)},${(topY+frondLen*0.10).toFixed(1)} L${(x+tw).toFixed(1)},${(baseY-trunkH*0.22).toFixed(1)} L${(x+tw*1.5).toFixed(1)},${baseY} Z"/>`;
@@ -235,7 +247,7 @@ function ponga(x,baseY,h,fill,seed,opts={}){
   const nc=3;
   for(let i=0;i<nc;i++){
     const t=(i/(nc-1))-0.5;
-    const ch=frondLen*(1.16+(0.5-Math.abs(t))*0.52+r()*0.06);  // centre tall, sides short → staggered
+    const ch=frondLen*(1.0+(0.5-Math.abs(t))*0.44+r()*0.06);  // centre tall, sides short → staggered
     const dir=t<0?-1:1, sw=Math.max(1.6,frondLen*0.024);       // coil faces in toward the centre
     // all rooted at the crown hub (same origin as the fronds), fanned out by rotation
     g+=`<g transform="rotate(${(t*52).toFixed(1)} ${x.toFixed(1)} ${topY.toFixed(1)})"><path d="${fiddleheadPath(x,topY,ch,dir,sw)}"/></g>`;
@@ -270,7 +282,7 @@ function cabbageHead(hx,hy,rad,r){
 }
 function cabbageTree(x,baseY,h,fill,seed){
   const r=rng(seed);let g=`<g fill="${fill}">`;
-  const top=baseY-h, forkY=baseY-h*0.52, tw=Math.max(3.2,h*0.026);
+  const top=baseY-h, forkY=baseY-h*0.52, tw=Math.max(1.4,h*0.026);
   // heads: one tall centre, two lower side heads on splayed branches
   const heads=[[x+h*0.04,top,h*0.20],[x-h*0.24,baseY-h*0.70,h*0.165],[x+h*0.23,baseY-h*0.63,h*0.155]];
   // trunk to the fork, then a bare limb out to each head
@@ -301,7 +313,7 @@ function blob(cx,cy,rx,ry,lobes,r){
    (pohutukawa.jpg). One connected paper-cut. */
 function pohutukawa(x,baseY,h,fill,seed){
   const r=rng(seed);let g=`<g fill="${fill}">`;
-  const trunkH=h*0.38, forkY=baseY-trunkH*0.55, tw=Math.max(4,h*0.030);
+  const trunkH=h*0.38, forkY=baseY-trunkH*0.55, tw=Math.max(1.8,h*0.030);
   const crownCy=baseY-h*0.70;
   const rx=h*0.52, ry=h*0.24;
   // short trunk to the low fork
@@ -334,10 +346,10 @@ function pohutukawa(x,baseY,h,fill,seed){
   }
   // foliage clumps at the twig tips — billowing lobes round the canopy edge. They overlap
   // along the top into one broad dome but leave airy sky-gaps lower down between the branches.
-  for(const [tx,ty] of tips) g+=`<path d="${blob(tx,ty,rx*0.30,ry*0.74,10,r)}"/>`;
+  for(const [tx,ty] of tips) g+=`<path d="${blob(tx,ty,rx*0.26,ry*0.60,10,r)}"/>`;
   // a couple of lobes bridging the top so the dome crest reads continuous
-  g+=`<path d="${blob(x-rx*0.16,crownCy-ry*0.80,rx*0.26,ry*0.5,10,r)}"/>`;
-  g+=`<path d="${blob(x+rx*0.16,crownCy-ry*0.78,rx*0.26,ry*0.5,10,r)}"/>`;
+  g+=`<path d="${blob(x-rx*0.16,crownCy-ry*0.78,rx*0.22,ry*0.42,10,r)}"/>`;
+  g+=`<path d="${blob(x+rx*0.16,crownCy-ry*0.76,rx*0.22,ry*0.42,10,r)}"/>`;
   return g+`</g>`;
 }
 /* legacy name kept for the scene (silhouette.html) */
@@ -347,7 +359,7 @@ const canopyTree = pohutukawa;
 function nikau(x,baseY,h,fill,seed,opts={}){
   const {spread,baseAng,fronds=7}=opts;
   const r=rng(seed);let g=`<g fill="${fill}">`;
-  const tw=Math.max(3.8,h*0.023),topY=baseY-h;
+  const tw=Math.max(1.5,h*0.023),topY=baseY-h;
   // tall smooth ringed trunk: runs from the foot up to the base of the crownshaft
   const csBot=topY+h*0.18;                              // where the crownshaft starts
   g+=`<path d="M${(x-tw).toFixed(1)},${baseY} L${(x-tw*0.7).toFixed(1)},${csBot.toFixed(1)} L${(x+tw*0.7).toFixed(1)},${csBot.toFixed(1)} L${(x+tw).toFixed(1)},${baseY} Z"/>`;
@@ -355,14 +367,43 @@ function nikau(x,baseY,h,fill,seed,opts={}){
   // then necks back in to a slim neck just under the crown (a distinct swelling).
   const csTop=topY+h*0.06, csMid=topY+h*0.13, bulge=tw*2.6;
   g+=`<path d="M${(x-tw*0.7).toFixed(1)},${csBot.toFixed(1)} C${(x-bulge).toFixed(1)},${csMid.toFixed(1)} ${(x-bulge*0.55).toFixed(1)},${(csTop+h*0.015).toFixed(1)} ${(x-tw*0.45).toFixed(1)},${csTop.toFixed(1)} L${(x+tw*0.45).toFixed(1)},${csTop.toFixed(1)} C${(x+bulge*0.55).toFixed(1)},${(csTop+h*0.015).toFixed(1)} ${(x+bulge).toFixed(1)},${csMid.toFixed(1)} ${(x+tw*0.7).toFixed(1)},${csBot.toFixed(1)} Z"/>`;
+  // drooping flower/fruit panicle bursting from the neck just below the bulge and
+  // weeping down around the trunk top. Each strand is a continuous tapered ribbon (so it
+  // reads as ONE connected cut, RULES §6) with little fruit beads riding along its spine.
+  const ix=x, iy=csBot, nStem=11, reach=bulge*1.7, drop=h*0.16, beadR=Math.max(0.9,h*0.013);
+  // solid collar at the neck so every strand joins the trunk as one piece
+  g+=`<ellipse cx="${ix.toFixed(1)}" cy="${iy.toFixed(1)}" rx="${(reach*0.32).toFixed(1)}" ry="${(beadR*1.8).toFixed(1)}"/>`;
+  for(let s=0;s<nStem;s++){
+    const u=(s/(nStem-1))*2-1, au=Math.abs(u);          // -1..1 across the spread
+    const ex2=ix+u*reach*0.78, ey2=iy+drop*(0.82+0.18*(1-au));  // all strands weep down, centre lowest
+    const cx2=ix+u*reach, cy2=iy+drop*0.16;              // control out near the top → arch out then down
+    const B=t=>[(1-t)*(1-t)*ix+2*(1-t)*t*cx2+t*t*ex2, (1-t)*(1-t)*iy+2*(1-t)*t*cy2+t*t*ey2];
+    const Tg=t=>{let dx=2*(1-t)*(cx2-ix)+2*t*(ex2-cx2),dy=2*(1-t)*(cy2-iy)+2*t*(ey2-cy2);const L=Math.hypot(dx,dy)||1;return[dx/L,dy/L];};
+    // tapered ribbon spine
+    const N=12,top=[],bot=[];
+    for(let i=0;i<=N;i++){const t=i/N,p=B(t),tg=Tg(t),nx=-tg[1],ny=tg[0],w=beadR*0.8*(1-t)+beadR*0.3*t;
+      top.push([p[0]+nx*w,p[1]+ny*w]);bot.unshift([p[0]-nx*w,p[1]-ny*w]);}
+    g+=`<path d="M${top.concat(bot).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')} Z"/>`;
+    // fruit beads as knobs riding on (and overlapping) the spine — stay one piece
+    const beads=8;
+    for(let b=1;b<=beads;b++){const t=b/beads,p=B(t),br=beadR*(0.95-0.45*t);
+      g+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${br.toFixed(1)}"/>`;}
+  }
   // crown emanates right at the slim neck atop the bulb, so the swelling reads below it.
-  const cy=csTop-h*0.005,fl=h*0.4;
+  const cy=csTop-h*0.005,fl=h*0.44;
+  // solid hub bridging the crownshaft neck and the frond bases — closes the gap below the crown
+  g+=`<path d="M${(x-tw*1.0).toFixed(1)},${csTop.toFixed(1)} L${(x+tw*1.0).toFixed(1)},${csTop.toFixed(1)} L${(x+bulge*0.44).toFixed(1)},${(cy-h*0.07).toFixed(1)} L${(x-bulge*0.44).toFixed(1)},${(cy-h*0.07).toFixed(1)} Z"/>`;
+  g+=`<circle cx="${x.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(bulge*0.42).toFixed(1)}"/>`;
   // feather fronds grow UP from the crownshaft then arch OUT — the most upright crown of
   // the three (least lean, least droop): a tall shuttlecock of fine pinnate fronds.
-  const crownOpts={maxLean:45,leanPow:1.0,rise:0.30,riseLean:0.5,outK:1.0,droopK:0.04,
-       leafAngle:0.92,leafLenK:0.26,ribK:0.026,bareBase:0.3,lenLo:0.92,lenHi:0,lenOut:-0.04,innerRatio:0.22,jit:0,coneTrim:0,dropOuter:1};
+  const crownOpts={maxLean:50,leanPow:1.0,rise:0.30,riseLean:0.5,outK:1.0,droopK:0.04,
+       leafAngle:0.92,leafLenK:0.26,ribK:0.026,bareBase:0.3,lenLo:0.92,lenHi:0,lenOut:-0.04,innerRatio:0.22,jit:0,coneTrim:0.5,coneClip:1.0,dropOuter:1};
   if(spread!=null) crownOpts.maxLean=spread*0.5;
   if(baseAng!=null) crownOpts.tilt=baseAng+90;
+  // solid cone core behind the fronds — fills interior gaps so the crown body reads as one
+  // piece; kept inside the outer-frond edge (~30°) so it never shows past the textured top.
+  const coreH=fl*0.5, coreW=Math.tan(23*Math.PI/180)*coreH;
+  g+=`<path d="M${x.toFixed(1)},${cy.toFixed(1)} L${(x-coreW).toFixed(1)},${(cy-coreH).toFixed(1)} L${(x+coreW).toFixed(1)},${(cy-coreH).toFixed(1)} Z"/>`;
   g+=frondCrown(x,cy,fl,fronds,r,crownOpts);
   return g+`</g>`;
 }
@@ -375,55 +416,76 @@ function flax(x,baseY,h,fill,seed){
   // skip the two outermost upright blades on each side so the fan stays narrow.
   for(let i=2;i<n-2;i++){const t=(i/(n-1))-0.5;
     const edge=(i===2||i===n-3);                                 // the two outermost upright blades
-    const lean=(edge?t*0.55:t*1.3)+(r()-0.5)*0.10, len=h*(0.74+ (0.22-Math.abs(t)*0.30) + r()*0.22);  // varied lengths
+    const lean=(edge?t*0.85:t*1.75)+(r()-0.5)*0.10, len=h*(0.74+ (0.22-Math.abs(t)*0.30) + r()*0.22);  // varied lengths
     // the outermost two rise more vertically then arch over, drooping to about half height
     const arch=edge?1.05:Math.abs(t)*0.7;                         // outer leaves bend over near the tip
     const droop=Math.sign(t||1)*len*(edge?0.2:Math.abs(t)*0.6);   // outer tips nod down (less outward swing)
     const tipx=x+lean*len*0.82+droop, tipy=baseY-len*(1-arch*0.42);   // outer tips nod lower
     const bw=Math.max(5.0,h*0.058)*(1-Math.abs(t)*0.24);         // broad blade base
+    const bx=x+t*h*0.18;                                          // tight root cluster → blades fan out from a point
     // control points so the blade holds its width well up the shaft, then tapers near the tip;
     // upper control pushed further out than the tip so the blade bows over (arches) near the point
     const lowy=baseY-len*0.42, midy=baseY-len*0.78;
-    const lx=x+lean*len*0.22, mx=x+lean*len*0.62+droop*1.25;
+    const lx=bx+lean*len*0.22, mx=x+lean*len*0.62+droop*1.25;
     const wlow=bw*1.0, wmid=bw*0.62;                             // width profile: full low, still broad high
-    g+=`<path d="M${(x-bw).toFixed(1)},${baseY} `
+    g+=`<path d="M${(bx-bw).toFixed(1)},${baseY} `
       +`C${(lx-wlow).toFixed(1)},${lowy.toFixed(1)} ${(mx-wmid).toFixed(1)},${midy.toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} `
-      +`C${(mx+wmid).toFixed(1)},${midy.toFixed(1)} ${(lx+wlow).toFixed(1)},${lowy.toFixed(1)} ${(x+bw).toFixed(1)},${baseY} Z"/>`;}
+      +`C${(mx+wmid).toFixed(1)},${midy.toFixed(1)} ${(lx+wlow).toFixed(1)},${lowy.toFixed(1)} ${(bx+bw).toFixed(1)},${baseY} Z"/>`;}
   // a few old "grandad" leaves: the outermost oldest blades arch up then flop over, their
   // tips drooping right back down toward the ground (harakeke.jpg) — a touch of realism.
-  const grandads=[[-1,1.0],[1,0.92],[-1,0.78],[1,1.06],[-1,0.66],[1,0.74],[-1,0.88]];
-  for(const [sd,k] of grandads){
-    const reach=h*0.5*k, bw=Math.max(5.2,h*0.066);
-    const tipx=x+sd*reach, tipy=baseY-h*0.11*k;                 // tip flops down low & out
-    const c1x=x+sd*h*0.12, c1y=baseY-h*0.46*k;                  // steep rise off the base
-    const c2x=x+sd*h*0.44, c2y=baseY-h*0.66*k;                  // arches over the high outer bend
-    g+=`<path d="M${(x-sd*bw).toFixed(1)},${baseY} `
+  // [side, size, lift] — lift fans the spray across angles: 0 = flops low to the ground,
+  // 1 = held out near-horizontal to bridge the gap up into the upright fan.
+  const grandads=[[-1,1.0,0.0],[1,0.92,0.72],[-1,0.78,0.46],[1,1.06,0.08],[-1,0.66,0.86],[1,0.74,0.30],[-1,0.88,0.20]];
+  for(const [sd,k,lift] of grandads){
+    const reach=h*(0.50+lift*0.14)*k, bw=Math.max(5.2,h*0.072);
+    const tipx=x+sd*reach, tipy=baseY-h*(0.13+lift*0.52)*k;     // lift raises the tip → leaf points out, not down
+    const gbx=x+sd*h*0.13;                                      // root off-centre so the bases don't stack into a block
+    const c1x=x+sd*h*0.28, c1y=baseY-h*(0.34+lift*0.12)*k;      // rise fairly upright, then reach out
+    const c2x=x+sd*h*0.46, c2y=baseY-h*(0.70+lift*0.22)*k;      // arches over the high outer bend
+    g+=`<path d="M${(gbx-sd*bw).toFixed(1)},${baseY} `
       +`C${(c1x-sd*bw*0.5).toFixed(1)},${c1y.toFixed(1)} ${(c2x-sd*bw*0.5).toFixed(1)},${(c2y-bw).toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} `
-      +`C${(c2x+sd*bw*0.5).toFixed(1)},${(c2y+bw*0.4).toFixed(1)} ${(c1x+sd*bw*0.5).toFixed(1)},${c1y.toFixed(1)} ${(x+sd*bw).toFixed(1)},${baseY} Z"/>`;
+      +`C${(c2x+sd*bw*0.5).toFixed(1)},${(c2y+bw*0.4).toFixed(1)} ${(c1x+sd*bw*0.5).toFixed(1)},${c1y.toFixed(1)} ${(gbx+sd*bw).toFixed(1)},${baseY} Z"/>`;
   }
-  // tall flower stalks (kōrari) rising well above the fan, each carrying a dense spike of
-  // curved tubular flowers sweeping up & outward (harakeke.jpg)
+  // tall flower stalks (kōrari) rising well above the fan. Each stalk is mostly BARE,
+  // carrying a handful of distinct flower CLUSTERS spaced up its length and alternating
+  // side to side — a sparse candelabra, not a dense spike. Each cluster is a small fan of
+  // curved tubular flowers ("claws") that bow outward then curl back up to a point (harakeke.jpg).
   const stalks=[[-0.10,1.34,-1],[0.06,1.46,1],[0.18,1.22,1]];
+  // one curved, tapered flower tube growing from `node` along base-angle `a` (radians from
+  // vertical, signed toward its side), length L, base half-width w0; bows out then curls up.
+  const flower=(nx0,ny0,a,L,w0)=>{
+    const u=ang=>[Math.sin(ang),-Math.cos(ang)];
+    const ud=u(a), uu=u(a*0.62);                                // base dir (out) → tip dir (up), gentle curl
+    const cx2=nx0+ud[0]*L*0.55, cy2=ny0+ud[1]*L*0.55;
+    const ex2=cx2+uu[0]*L*0.6, ey2=cy2+uu[1]*L*0.6;
+    const B=t=>[(1-t)*(1-t)*nx0+2*(1-t)*t*cx2+t*t*ex2,(1-t)*(1-t)*ny0+2*(1-t)*t*cy2+t*t*ey2];
+    const Tg=t=>{let dx=2*(1-t)*(cx2-nx0)+2*t*(ex2-cx2),dy=2*(1-t)*(cy2-ny0)+2*t*(ey2-cy2);const M=Math.hypot(dx,dy)||1;return[dx/M,dy/M];};
+    const N=10,top=[],bot=[];
+    for(let i=0;i<=N;i++){const t=i/N,p=B(t),tg=Tg(t),w=w0*Math.pow(1-t,0.82);  // slim curved-tube belly → clean point
+      top.push([p[0]-tg[1]*w,p[1]+tg[0]*w]);bot.unshift([p[0]+tg[1]*w,p[1]-tg[0]*w]);}
+    return `<path d="M${top.concat(bot).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')} Z"/>`;
+  };
   for(const [slean,sh,sdir] of stalks){
-    const sl=slean+(r()-0.5)*0.05, sH=h*sh, sw=Math.max(2.0,h*0.018);
+    const sl=slean+(r()-0.5)*0.05, sH=h*sh, sw=Math.max(2.0,h*0.017);
     const tipx=x+sl*sH*0.6, tipy=baseY-sH, mx=x+sl*sH*0.32, my=baseY-sH*0.55;
     g+=`<path d="M${(x-sw).toFixed(1)},${baseY} Q${(mx-sw).toFixed(1)},${my.toFixed(1)} ${(tipx-sw*0.6).toFixed(1)},${tipy.toFixed(1)} Q${(mx+sw).toFixed(1)},${my.toFixed(1)} ${(x+sw).toFixed(1)},${baseY} Z"/>`;
-    // dense flower spike over the upper ~55% of the stalk — staggered nodes, each a pair of
-    // long fat curved tubular flowers sweeping steeply up & out, densest mid-spike
-    const nf=11;
-    for(let k=0;k<nf;k++){const tt=0.46+k*0.05;
-      const fx=x+sl*sH*0.6*tt, fy=baseY-sH*tt;
-      const taper=Math.sin((0.25+0.75*(1-k/(nf-1)))*Math.PI*0.5);  // fuller low, tapering up
-      for(const side of [1,-1]){
-        const lead=(k%2===0?1:-1)*sdir;
-        const fl=h*0.11*taper*(side===lead?1:0.82)*(0.9+r()*0.2);   // long flowers
-        const up=0.86;                                          // sweep steeply upward
-        const ex=fx+side*fl*(1-up*0.55), ey=fy-fl*up-fl*0.28;   // curved tip up & out
-        const cx2=fx+side*fl*0.42, cy2=fy-fl*0.62;
-        const fw=Math.max(3.0,h*0.032)*taper;                  // fat tube
-        g+=`<path d="M${(fx-fw*0.5).toFixed(1)},${fy.toFixed(1)} Q${cx2.toFixed(1)},${cy2.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)} Q${(cx2-side*fw).toFixed(1)},${(cy2+fw*0.9).toFixed(1)} ${(fx+fw*0.5).toFixed(1)},${fy.toFixed(1)} Z"/>`;
+    const at=tt=>[x+sl*sH*0.6*tt, baseY-sH*tt];                 // a point on the stalk centreline
+    // a few clusters up the upper half, alternating side; fuller & longer low, sparser high
+    const nc=6;
+    for(let c=0;c<nc;c++){
+      const tt=0.45+c*0.085, node=at(tt), side=(c%2?1:-1)*sdir;
+      const taper=0.55+0.45*(1-(tt-0.45)/0.46);                 // size falls off up the stalk
+      const nPet=Math.max(2,Math.round(1.4+taper*1.6));         // ~3 flowers low → ~2 high
+      const cl=h*0.12*taper, w0=Math.max(2.0,h*0.025)*taper;
+      for(let j=0;j<nPet;j++){
+        const frac=nPet>1?j/(nPet-1):0.5;
+        const a=side*(0.10+0.34*frac);                          // tight upright fan: inner ~6° → outer ~25°
+        g+=flower(node[0],node[1],a,cl*(0.82+0.30*frac)*(0.9+r()*0.2),w0);
       }
     }
+    // terminal bud: a slim pointed spire of two near-vertical buds at the very tip
+    const tip=at(0.95), tb=h*0.09;
+    for(const a of [-0.09,0.09]) g+=flower(tip[0],tip[1],a,tb*(0.92+r()*0.16),Math.max(1.7,h*0.018));
   }
   return g+`</g>`;
 }
@@ -478,7 +540,7 @@ function toetoe(x,baseY,h,fill,seed){
   for(let j=0;j<ns;j++){const i=order[j];const t=(i/(ns-1))-0.5;   // t in [-0.5,0.5]
     const bx=x+t*baseW+(r()-0.5)*baseW*0.10;          // stems rise from a tight central cluster
     const lean=t*0.6+(r()-0.5)*0.10;                  // fan the plumes out wider so they overlap less
-    const stemH=h*(0.40+r()*0.5);                     // strongly staggered heights -> plumes sit apart
+    const stemH=h*(0.52+r()*0.5);                     // strongly staggered heights -> plumes sit apart
     const tipx=bx+lean*stemH*0.6, tipy=baseY-stemH;
     const cmx=bx+lean*stemH*0.28, cmy=baseY-stemH*0.6;// arch control
     g+=`<path d="M${(bx-1.2).toFixed(1)},${baseY} Q${(cmx-1.0).toFixed(1)},${cmy.toFixed(1)} ${(tipx-0.8).toFixed(1)},${tipy.toFixed(1)} L${(tipx+0.8).toFixed(1)},${tipy.toFixed(1)} Q${(cmx+1.0).toFixed(1)},${cmy.toFixed(1)} ${(bx+1.2).toFixed(1)},${baseY} Z"/>`;
@@ -495,17 +557,19 @@ function toetoe(x,baseY,h,fill,seed){
 function grass(x,baseY,w,h,n,fill,seed){
   const r=rng(seed);let g=`<g fill="${fill}">`;
   for(let i=0;i<n;i++){
-    // bases cluster tightly toward the centre so the tuft reads as one shared root
-    const t=(i+0.5)/n, spread=(t-0.5)*Math.pow(Math.abs(t-0.5)*2,0.7)*Math.sign(t-0.5);
-    const bx=x+spread*w*0.78+(r()-0.5)*w*0.05;
-    // most blades share a gentle rightward lean; a few (~1 in 4) cross-lean for life
-    const cross=r()<0.3;
-    const baseLean=0.13+r()*0.2;
-    const lean=cross?-(0.1+r()*0.14):baseLean*(0.7+(0.5-Math.abs(t-0.5))*1.0);
-    const bh=h*(0.5+r()*0.55);                                 // varied heights, less spiky
-    const curve=lean*0.5+(r()-0.5)*0.1;                        // slight S so tips drift, not stiff
+    const t=(i+0.5)/n, off=(t-0.5)*2;                         // -1..1 across the tuft
+    // bases spread across the full width, packed a little tighter toward the shared root
+    const bx=x+Math.sign(off)*Math.pow(Math.abs(off),1.15)*w*0.5+(r()-0.5)*w*0.04;
+    // mound profile: blades are tall in the middle and taper shorter at the sides
+    const env=1-Math.pow(Math.abs(off),1.7)*0.82;
+    const bh=h*env*(0.78+r()*0.3);
+    // blades splay outward from the centre, with a good dose of random tilt for a wild tuft
+    const lean=off*0.2+(r()-0.5)*0.34;
+    // mostly a gentle S, but ~1 in 3 blades takes a stronger bend here and there
+    const bend=r()<0.34?(r()-0.5)*0.55:0;
+    const curve=lean*0.5+(r()-0.5)*0.14+bend;
     const tipx=bx+lean*bh, tipy=baseY-bh;
-    const bw=1.9+r()*1.5;                                      // bolder, cuttable base
+    const bw=2.1+r()*1.3;                                      // bolder, cuttable base; wide enough to fill gaps
     const mx=bx+curve*bh, my=baseY-bh*0.5;
     g+=`<path d="M${(bx-bw).toFixed(1)},${baseY} Q${(mx-bw*0.35).toFixed(1)},${my.toFixed(1)} ${tipx.toFixed(1)},${tipy.toFixed(1)} Q${(mx+bw*0.35).toFixed(1)},${my.toFixed(1)} ${(bx+bw).toFixed(1)},${baseY} Z"/>`;
   }

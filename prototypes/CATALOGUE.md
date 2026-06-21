@@ -32,9 +32,9 @@ In grid order (see `catalogue.html`):
 | Stamp | te reo / type | Notes |
 |---|---|---|
 | `cabbageTree` | tī kōuka | forked trunk + three dense spiky sword-leaf mop-heads |
-| `nikau` | nīkau palm | ringed trunk + bulging crownshaft + a clean upright **cone** of feather fronds (the outermost frond on each side dropped for a tidy edge); `opts:{fronds,spread,baseAng}` |
+| `nikau` | nīkau palm | ringed trunk + bulging crownshaft + a drooping beaded **fruit panicle** below the bulge (continuous strands joined to the trunk by a neck collar) + a clean upright **cone** of feather fronds (outermost frond dropped; everything beyond the cone-edge angle clipped so no leaflet pokes past the silhouette); `opts:{fronds,spread,baseAng}` |
 | `pohutukawa` | pōhutukawa / rātā | short trunk forking into a candelabra of boughs that **split into twigs**, each carrying a lobed foliage clump, leaving airy sky-gaps near the branches (alias `canopyTree`) |
-| `flax` | harakeke | upright fan of stiff sword leaves (outer two nodding to ~half height) + drooping old "grandad" leaves + tall kōrari flower stalks |
+| `flax` | harakeke | upright fan of stiff sword leaves (outer two nodding to ~half height) + drooping old "grandad" leaves + tall **kōrari flower stalks**: mostly-bare stems carrying spaced, side-alternating **clusters** of curved tubular flowers (bow out then curl up to a point) in a sparse candelabra, each topped by a slim terminal bud-spire |
 | `toetoe` | plume grass | short, wide, droopy cascading tussock + tall stems topped by slim **one-sided, upward-fluffed curving** plumes |
 | `grass` | reed tuft | `grass(x,baseY,w,h,n,fill,seed)` — `n` blades over width `w` |
 | `frond` | single fern frond | `frond(x,baseY,len,fill,seed,dir)` — ground frond at angle `dir`° |
@@ -50,8 +50,10 @@ a wide weeping crown, alias `treeFern`; `opts:{fronds,spread,baseAng}`) and `kor
 `rng(seed)` deterministic PRNG · `rachis(...)` + `frondPath(...)` the pinnate-frond path
 generator (used by `frond`) · `ribFrond(...)` a pinnate frond along an arbitrary quadratic
 rib, with optional one-sided leaflets (`trimSide`) · `frondCrown(...)` fans fronds up-then-out
-from one hub, sized/leaned per `opts` (`maxLean`, `droopK`, `leanPow`, `coneTrim` one-sided
-outer edges, `centerGap`, `coreShort`, `dropOuter`…); shared by `nikau`, `ponga`, `mamaku` ·
+from one hub, sized/leaned per `opts` (`maxLean`, `droopK`, `leanPow`, `coneTrim` full one-sided
+outer edges, `coneClip` clips every leaflet splaying past the outer-frond cone angle
+(+ `coneTrim2`/`coneTrim2Frac` a partial basal outer trim), `centerGap`, `coreShort`,
+`dropOuter`…); shared by `nikau`, `ponga`, `mamaku` ·
 `koruPath(...)` bare fiddlehead spiral (used by `koru`) · `fiddleheadPath(...)` stalk-into-tight-coil
 crozier (used by `ponga`) · `plumePath(...)` one-sided curved foxtail plume (used by `toetoe`) ·
 `cabbageHead(...)` spiky mop-head (used by `cabbageTree`) · `blob(...)` one scalloped foliage

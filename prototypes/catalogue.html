@@ -28,17 +28,23 @@
   const CARD='#1c1006';
   // each entry: [label, te-reo/latin, builder(returns svg inner), baseY, vbH]
   const W=220, H=260, B=232;   // cell width, height, baseline
+  // Base heights MIRROR the silhouette's MID band (silhouette.html `midKinds`) — the
+  // one band that contains every plant species — using each species' mid-band midpoint.
+  // So the relative sizing you see here matches the scene. SCALE zooms the whole grid
+  // up to fill the cells; edit a base number to re-sort a species, then port it back to
+  // the silhouette band ranges. Kiwi/fantail use the scene's focal scales.
+  const SCALE=1.45, h=k=>Math.round(k*SCALE);
   const items=[
-    ['Cabbage tree','tī kōuka',()=>cabbageTree(110,B,200,CARD,12)],
-    ['Nīkau palm','nīkau',     ()=>nikau(110,B,168,CARD,101)],
-    ['Pōhutukawa','rātā',      ()=>pohutukawa(110,B,200,CARD,103)],
-    ['Flax','harakeke',        ()=>flax(110,B,150,CARD,7)],
-    ['Toetoe','plume grass',   ()=>toetoe(110,B,200,CARD,5)],
-    ['Grass tuft','',          ()=>grass(110,B,120,80,16,CARD,201)],
-    ['Fern frond','',          ()=>frond(110,B,150,CARD,9,-92)],
-    ['Ponga','silver fern',    ()=>ponga(110,B,232,CARD,4)],
-    ['Kiwi','',                ()=>kiwi(110,150,1.0,CARD)],
-    ['Fantail','pīwakawaka',   ()=>fantail(110,130,2.4,CARD)],
+    ['Cabbage tree','tī kōuka',()=>cabbageTree(110,B,h(118),CARD,12)],
+    ['Nīkau palm','nīkau',     ()=>nikau(110,B,h(118),CARD,101)],
+    ['Pōhutukawa','rātā',      ()=>pohutukawa(110,B,h(126),CARD,103)],
+    ['Flax','harakeke',        ()=>flax(110,B,h(72),CARD,7)],
+    ['Toetoe','plume grass',   ()=>toetoe(110,B,h(89),CARD,5)],
+    ['Grass tuft','',          ()=>grass(110,B,Math.round(h(48)*1.05),h(48),Math.round(h(48)*1.05/2.2),CARD,201)],
+    ['Fern frond','',          ()=>frond(110,B,h(72),CARD,9,-92)],
+    ['Ponga','silver fern',    ()=>ponga(110,B,h(158),CARD,4)],
+    ['Kiwi','',                ()=>kiwi(110,150,1.18,CARD)],
+    ['Fantail','pīwakawaka',   ()=>fantail(110,130,1.04,CARD)],
   ];
   const grid=document.getElementById('grid');
   for(const [label,sub,build] of items){

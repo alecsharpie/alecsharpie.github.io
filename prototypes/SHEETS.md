@@ -8,20 +8,22 @@ the scene is a **hole** cut down to that one light. Card tone differs only by de
 on a strictly monotonic ramp:
 
 ```
-light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore
+light  >  sky  >  haze  >  deep  >  far  >  mid  >  bush  >  margin  >  fore
 ```
 
 The **sun** and the **birds** are holes in the sky card (sheet 1) — the only bright
 holes, both the same `--light` brightness, both kept clear of the text.
 
-There is **no reading-window cut**. The **deepest range is now a FULL-WIDTH forest band**
-high on the frame, and the page text reads on **that flat forested hillside** (`--deep`),
-not bare sky — only a thin strip of sky + the small **moon** sit above its distant
-treeline. The nearer cards — far, mid, bush, margin, fore — are still massed in the
-margins and **dive away from the centre on organic curves**, opening a central column
-that now reveals the **deep band** (a plain flat card, so the copy stays legible on its
-halo). Every shape stays a full, natural paper-cut — no flat margin cut-offs (see
-RULES.md §7b). The whole forest is raised high (very little bare sky, mostly bush).
+There is **no reading-window cut**. The two deepest ranges are now **FULL-WIDTH forest
+bands** bunched tight near the horizon — the palest **haze** band just under an open sky
+strip, then the **deep** band only ~45u below it — and the page text reads on **that flat
+forested hillside** (`--deep`), not bare sky; only a thin strip of sky + the small **moon**
+sit above the haze treeline. The nearer cards — far, mid, bush, margin, fore — are still
+massed in the margins and **dive away from the centre on organic curves**, opening a
+central column that reveals the **deep band** (a plain flat card, so the copy stays
+legible on its halo). Every shape stays a full, natural paper-cut — no flat margin
+cut-offs (see RULES.md §7b). The whole forest is raised high (very little bare sky,
+mostly bush).
 
 **CONVERGING valley:** each successive range opens a *wider* central gap than the one
 behind it (the inner edge steps outward deep→fore), so the ranges funnel inward to the
@@ -31,9 +33,28 @@ At the base a **stacked central mound** (one band per front sheet, each lower/da
 nearer) closes the column with a little receding valley-floor — the "footer" the copy
 ends on.
 
-**Colour schemes:** four palettes (`sepia` · `dusk` · `forest` · `ember`) switch live
-from the corner swatches (choice persists; `?palette=…` also works). Each keeps the
-strict monotonic ramp and the one warm light.
+**Colour schemes:** two dozen palettes switch live from the corner swatches (choice persists;
+`?palette=…` also works), grouped into families:
+- **Moody** (`sepia` · `dusk` · `forest` · `ember`) — mid-tone clearing, full-saturation
+  scene; atmosphere over contrast.
+- **Paper** (`paper` · `bone` · `slate` · `sage` · `mist` · `blush` · `sand` · `lavender`)
+  — a near-white light panel and barely-tinted cards fading to a near-black foreground;
+  dark ink stays crisp on the bright clearing (maximum legibility).
+- **Aotearoa** (`kauri` · `kowhai` · `pohutukawa` · `pounamu`) — the paper recipe pushed
+  more saturated and keyed to unmistakably NZ colours.
+- **Greens** — bright ones (`fern` · `moss` · `manuka` · `rimu` · `nikau`) keep the paper
+  recipe (black copy); the **dark** ones (`ngahere` · `kelp`, `dark:true` → `.pal-dark`)
+  invert it to a dim native-bush night with white copy and crisp air-gap shadows.
+
+Every palette keeps the strict monotonic ramp and the one warm light — **except `aurora`**.
+Aurora is the **one sanctioned rule-breaker**: instead of flat cards it fills every sheet
+with the **same** speckled aurora gradient (`patternUnits=userSpaceOnUse`, so every sheet
+and stamp samples one shared marble of light by position) — deep blue/black night up top,
+magenta-rose curtains through the middle, aurora green toward the horizon — each depth
+level the same marble multiplied **darker** the nearer it sits, so depth still reads while
+the foreground stays tinted-and-speckled rather than flat black. Built from a baked
+grayscale value-noise field (`buildAuroraNoise`/`genNoise`) plus a low-frequency warp that
+waves the colour bands like real curtains. Text is plain **white**, no halo.
 
 ## Procedural scatter (the plants reshuffle each load)
 
@@ -90,39 +111,51 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
 ## The cards (each a single flat colour, on a strict back→front ramp)
 
 ### SHEET 1 · SKY CARD
-`l-sky` · `--sky` `#e0a455` · depth 0.03
+`l-sky` · `--sky` `#e0a455` · depth 0.02
 - A flat sky-toned card filling the whole frame (mostly hidden now — only the thin
-  strip above the deep forest band shows).
-- **Hole:** the small **moon** (circle at cx 232, cy 82, r 31), high in the sky strip
-  above the deep treeline, revealing `--light` — the one bright hole.
+  strip above the haze forest band shows).
+- **Holes:** the small **moon** (circle at cx 232, cy 72, r 22), high in the sky strip
+  above the haze treeline, **plus a loose skein of birds in flight** (`birdsSkein` →
+  `birdHole`, a simple two-winged silhouette) drifting across the upper sky strip,
+  clear of the moon and above the haze treeline. Both reveal `--light` — every bright
+  thing is the one light (RULES §3–4).
 
-### SHEET 1.5 · DEEPEST RANGE — FULL-WIDTH FOREST BAND
+### SHEET 1.25 · HAZE BAND — FULL-WIDTH FOREST BAND (furthest, palest)
+`l-haze` · `--haze` `#d79b4e` · depth 0.03
+- The furthest, palest range, spanning the **whole width** high on the frame (`band()`),
+  with a **distant hazy treeline across the top** of tiny, numerous stamps (~11–40). It
+  sits just below the open sky strip; the moon + birds float above it.
+
+### SHEET 1.5 · DEEP RANGE — FULL-WIDTH FOREST BAND
 `l-deep` · `--deep` `#ce9148` · depth 0.04
-- The furthest, palest range, now spanning the **whole width** high on the frame
-  (`band()`), with a **distant treeline across the top**. The page text reads on its
-  flat card below the ridge; only a thin sky strip + the small moon sit above it. This
-  is the back wall the nearer ranges funnel down into.
+- The second full-width band, only ~45u below the haze band (the two are bunched tight
+  near the horizon for aerial perspective). A `band()` of slightly larger stamps (~15–52).
+  The page text reads on its flat card below the ridge. This is the back wall the nearer
+  ranges funnel down into.
 
 ### SHEET 2 · FAR RANGE CARD
-`l-far` · `--far` `#bd7e3c` · depth 0.07
+`l-far` · `--far` `#bd7e3c` · depth 0.06
 - Two **generated shoulder banks** (raised high) with a **plateau** profile (`divePow`
   ~3) — they hold their crest height as a **broad receding hill-band** across the margin,
   then dive to the base only at the text-column edge, so plenty of the range is visible
   yet behind the whole text column there is **only sky**. A **distant mixed treeline**
-  (all catalogue stamps, small ~40–104) rides each plateau, rooted on the generated crest.
+  (all catalogue stamps, small ~24–86) rides each plateau, rooted on the generated crest.
 
 ### SHEET 3 · MID RANGE CARD
 `l-mid` · `--mid` `#8a5729` · depth 0.11
 - Two **plateau shoulder banks** (`divePow` ~2.6) that hold a visible hill-band then dive
-  into the central valley. A nearer, larger **mixed treeline** (all stamps, ~60–160) rides
+  into the central valley. A nearer, larger **mixed treeline** (all stamps, ~38–140) rides
   each shoulder, receding between the far range and the bush band.
 
 ### SHEET 4 · BUSH BAND (backmost plant band → tall canopy)
 `l-bush` · `--bush` `#562e14` · depth 0.22
-- A natural bush bank **massed in the margins** (procedural crest), diving away from
-  the centre. As the **back** plant band it carries the **tallest** trees, rooted on
-  the crest from the palette **ponga · nīkau · pōhutukawa · cabbage tree** (height
-  band ~185–330). They tower behind the text; the centre stays open.
+- A natural bush bank **massed in the margins** (procedural crest). Unlike the ranges
+  behind it, the bush wall **plateaus toward the clearing** (`divePow` 2.4 + a high
+  `diveY` 486) so the tall canopy stays massed right up beside the hero text — the side
+  bays meet just below the title, leaving only a tall central slot. As the **back** plant
+  band it carries the **tallest** trees, rooted on the crest from the palette
+  **ponga · nīkau · pōhutukawa · cabbage tree** (height band ~180–330). They tower behind
+  the text; the central slot stays open.
 - *(On mobile only — where just the clearing shows — a low bush band + outward-arching
   tree ferns + grass are added to frame the view from the bottom.)*
 
@@ -138,8 +171,12 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
 - The frontmost, darkest card: a low natural **corner bank** in each margin. Its
   plants stand **proud** of the bank (small bury) so the dark silhouettes read against
   the lighter bands behind — a few bold **grass · single frond · flax · toetoe**
-  (height band ~92–188) — plus the focal **kiwi** planted on the bank crest (left
-  frame, clear of the text) and a perched **fantail (pīwakawaka)**.
+  (height band ~64–188), kept on the **right** bay only. The **left** bay is left
+  **plant-free** so the focal **kiwi** — enlarged, stood near the frame edge where the
+  bank rides highest, facing right into the clearing — is the sole bold foreground
+  silhouette there, reading cleanly against the lighter bush/mid bands with nothing
+  crossing it (bill clear of the text column). A perched **fantail (pīwakawaka)** sits
+  just beside it.
 - A **stacked central footer floor** closes the base of the sky column: one low
   `centreMound` + `footThicket` per front sheet (bush behind/palest → margin → fore
   nearest/darkest), so the footer reads as a small **receding valley-floor** of bush
@@ -157,7 +194,7 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
 
 ## Parallax
 
-All six cards drift on vertical scroll, separation **max at the top → settled /
-registered at the bottom**, normalised over the page height. The depth numbers above
-are the per-sheet parallax weights (front sheets move most). The light panel does
-not move.
+All eight scene cards (sky, haze, deep, far, mid, bush, margin, fore) drift on vertical
+scroll, separation **max at the top → settled / registered at the bottom**, normalised
+over the page height. The depth numbers above are the per-sheet parallax weights (front
+sheets move most). The light panel does not move.
