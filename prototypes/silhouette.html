@@ -13,7 +13,8 @@
          light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore               */
     --light:#ffe7b4;   /* 0 — flat diffused light panel (and sun + bird holes)    */
     --sky:#e0a455;     /* 1 — sky card                                            */
-    --deep:#ce9148;    /* 1.5 — deepest range card (palest, furthest)             */
+    --haze:#d79b4e;    /* 1.25 — furthest hazy treeline band (palest of the bush) */
+    --deep:#ce9148;    /* 1.5 — deep range card                                   */
     --far:#bd7e3c;     /* 2 — far range card                                      */
     --mid:#8a5729;     /* 3 — mid range card                                      */
     --bush:#562e14;    /* 4 — bush band + focal kiwi                              */
@@ -81,6 +82,7 @@
 
 <div class="stage stage-back">
   <div class="layer" data-depth="0.02"><svg id="l-sky"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.03"><svg id="l-haze"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.04"><svg id="l-deep"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.06"><svg id="l-far"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.11"><svg id="l-mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
@@ -118,6 +120,7 @@
   <button data-pal="dusk"   title="Dusk"></button>
   <button data-pal="forest" title="Forest"></button>
   <button data-pal="ember"  title="Ember"></button>
+  <button data-pal="aurora" title="Aurora"></button>
 </div>
 
 <script src="stamps.js"></script>
@@ -165,12 +168,17 @@
   // persists. Each keeps the strict monotonic depth ramp light > sky > deep > far > mid
   // > bush > margin > fore; the warm sun/glow (--light) stays the one light.
   const PALETTES={
-    sepia:  {light:'#ffe7b4',sky:'#e0a455',deep:'#ce9148',far:'#bd7e3c',mid:'#8a5729',bush:'#562e14',margin:'#2a1809',fore:'#120a04',ink:'#231506',inkSoft:'#5b3a1c'},
-    dusk:   {light:'#ffe1ad',sky:'#8693bb',deep:'#767fac',far:'#67729e',mid:'#4e587f',bush:'#384164',margin:'#232a48',fore:'#10142b',ink:'#10131f',inkSoft:'#313a58'},
-    forest: {light:'#fcf3bf',sky:'#b7cc78',deep:'#a1bf6a',far:'#8bb15c',mid:'#688f46',bush:'#476a33',margin:'#2c4720',fore:'#132410',ink:'#16240f',inkSoft:'#3a5a2a'},
-    ember:  {light:'#ffdfa4',sky:'#d6824f',deep:'#c16e49',far:'#ad5942',mid:'#7f3f44',bush:'#562d3a',margin:'#331c2a',fore:'#160c17',ink:'#200c12',inkSoft:'#542c38'},
+    sepia:  {light:'#ffe7b4',sky:'#e0a455',haze:'#d79b4e',deep:'#ce9148',far:'#bd7e3c',mid:'#8a5729',bush:'#562e14',margin:'#2a1809',fore:'#120a04',ink:'#231506',inkSoft:'#5b3a1c'},
+    dusk:   {light:'#ffe1ad',sky:'#8693bb',haze:'#7e89b3',deep:'#767fac',far:'#67729e',mid:'#4e587f',bush:'#384164',margin:'#232a48',fore:'#10142b',ink:'#10131f',inkSoft:'#313a58'},
+    forest: {light:'#fcf3bf',sky:'#b7cc78',haze:'#acc671',deep:'#a1bf6a',far:'#8bb15c',mid:'#688f46',bush:'#476a33',margin:'#2c4720',fore:'#132410',ink:'#16240f',inkSoft:'#3a5a2a'},
+    ember:  {light:'#ffdfa4',sky:'#d6824f',haze:'#cb784c',deep:'#c16e49',far:'#ad5942',mid:'#7f3f44',bush:'#562d3a',margin:'#331c2a',fore:'#160c17',ink:'#200c12',inkSoft:'#542c38'},
+    // AURORA — the light panel is the green aurora glow (so the moon + birds glow green,
+    // like curtains of light), under a magenta-rose night sky that ramps back through
+    // violet → indigo → near-black forest. The greatest luminance jump is light→sky, so
+    // the holes blaze against a dark sky — the most dramatic palette.
+    aurora: {light:'#b6ffcb',sky:'#c95d97',haze:'#b9558f',deep:'#a44d88',far:'#8a4684',mid:'#6a3d77',bush:'#4a3163',margin:'#2c2147',fore:'#14112b',ink:'#1a0c22',inkSoft:'#5a3560'},
   };
-  const RAMP=['light','sky','deep','far','mid','bush','margin','fore'];
+  const RAMP=['light','sky','haze','deep','far','mid','bush','margin','fore'];
   function applyPalette(name){
     const p=PALETTES[name]||PALETTES.sepia, s=document.documentElement.style;
     for(const k of RAMP) s.setProperty('--'+k,p[k]);
@@ -289,13 +297,38 @@
     return {crest,html};
   }
 
+  // ---- BIRDS · light-holes in the sky (RULES §3,§4) ------------------------
+  // native birds in flight are HOLES cut in the sky card — never painted — so they
+  // glow at exactly --light, identical to the moon. One simple two-winged silhouette
+  // (a flying "m" with a little body); kept in the thin sky strip above the deep
+  // treeline and well clear of the moon. A loose drifting skein, like kāhu riding
+  // the valley updraught.
+  function birdHole(cx,cy,w,tilt=0){
+    const ca=Math.cos(tilt), sa=Math.sin(tilt), u=w/2;
+    const P=(x,y)=>`${(cx+(x*ca-y*sa)).toFixed(1)},${(cy+(x*sa+y*ca)).toFixed(1)}`;
+    return `<path fill="#000" d="M${P(-u,0)} Q${P(-u*0.42,-u*0.40)} ${P(0,-u*0.05)}`+
+      ` Q${P(u*0.42,-u*0.40)} ${P(u,0)} Q${P(u*0.46,-u*0.13)} ${P(0,u*0.12)}`+
+      ` Q${P(-u*0.46,-u*0.13)} ${P(-u,0)} Z"/>`;
+  }
+  function birdsSkein(seed){
+    const r=rng(seed); let s='';
+    // a loose V drifting across the upper sky strip (away from the moon at top-left).
+    // farther birds sit higher & smaller — a little aerial perspective.
+    const flock=[[470,128,26],[548,104,30],[628,86,36],[712,99,30],[792,120,25],
+                 [598,150,21],[690,156,19]];
+    for(const [bx,by,bw] of flock)
+      s+=birdHole(bx+(r()-0.5)*24, by+(r()-0.5)*14, bw*(0.85+r()*0.3), (r()-0.5)*0.5);
+    return s;
+  }
+
   // ---- SHEET 1 · SKY CARD ---------------------------------------------------
-  // a flat sky-toned card filling the whole frame. the sun is the only hole cut in
-  // this sheet, revealing the light panel behind (every bright thing is that one light).
+  // a flat sky-toned card filling the whole frame. the sun (moon) and the birds are
+  // the only holes cut in this sheet, revealing the light panel behind.
   $('l-sky').innerHTML=
     `<defs><mask id="cut-sky" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">
        <rect width="1200" height="800" fill="#fff"/>
        <circle cx="${SUN.cx}" cy="${SUN.cy}" r="${SUN.r}" fill="#000"/>
+       ${birdsSkein(sub(20))}
      </mask></defs>
      <rect width="1200" height="800" fill="var(--sky)" mask="url(#cut-sky)"/>`;
 
@@ -306,31 +339,37 @@
   // behind it (innerX steps outward, deep→fore), so the ranges funnel inward to the
   // narrow deep gap high in the centre — the eye is drawn down into a valley. Every gap
   // still contains the text column [CLEAR_L,CLEAR_R], so the copy stays on pure sky.
-  const deepKinds=[['pohutukawa',38,62],['cabbage',40,64],['ponga',42,66],['nikau',44,68],
-                   ['flax',30,50],['toetoe',32,52]];
-  const farKinds=[['ponga',60,98],['nikau',66,104],['pohutukawa',54,94],['cabbage',58,96],
-                  ['flax',48,80],['toetoe',50,82],['grass',40,64],['frond',46,76]];
-  const midKinds=[['ponga',96,150],['nikau',104,160],['pohutukawa',86,140],['cabbage',92,148],
-                  ['flax',78,120],['toetoe',80,124],['grass',60,92],['frond',70,112]];
+  // FAR sheets carry SMALL + MANY stamps (aerial perspective → an expansive valley); the
+  // sizes shrink and the counts climb the further back the sheet sits.
+  const hazeKinds=[['pohutukawa',22,34],['cabbage',24,38],['ponga',24,38],['nikau',26,40],
+                   ['flax',18,30],['toetoe',20,32],['grass',16,26]];
+  const deepKinds=[['pohutukawa',30,48],['cabbage',32,50],['ponga',32,50],['nikau',34,52],
+                   ['flax',24,40],['toetoe',26,42],['grass',22,36]];
+  const farKinds=[['ponga',50,82],['nikau',54,86],['pohutukawa',46,78],['cabbage',48,80],
+                  ['flax',40,66],['toetoe',42,68],['grass',34,54],['frond',40,64]];
+  const midKinds=[['ponga',84,132],['nikau',90,140],['pohutukawa',78,124],['cabbage',82,128],
+                  ['flax',68,106],['toetoe',70,108],['grass',54,82],['frond',62,98]];
 
-  // ---- SHEET 1.5 · DEEPEST RANGE — FULL-WIDTH FOREST BAND ------------------
-  // the furthest, palest range now spans the WHOLE width, high up: the page text reads
-  // on this flat forested hillside (not bare sky), and a distant treeline runs right
-  // across the top. Only a thin strip of sky + the small moon sit above it.
-  $('l-deep').innerHTML=band(200,16,deepKinds,20,'var(--deep)',sub(19)).html;
+  // ---- SHEETS 1.25 & 1.5 · TWO FULL-WIDTH FOREST BANDS, STACKED ------------
+  // two receding treelines run right across the top: the palest HAZE band highest, then
+  // the slightly darker DEEP band just below it. The page text reads on the flat deep
+  // hillside; only a thin sky strip + the small moon sit above the haze treeline. Tiny,
+  // numerous stamps on both so the far ridges read as dense, expansive bush.
+  $('l-haze').innerHTML=band(120,12,hazeKinds,40,'var(--haze)',sub(21)).html;
+  $('l-deep').innerHTML=band(188,15,deepKinds,30,'var(--deep)',sub(19)).html;
 
   // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
   // two shoulder banks opening a slightly WIDER gap than the deep range → the valley
   // steps outward as it comes forward. Distant mixed treeline on the plateau.
   $('l-far').innerHTML=
-      bay(0,   372,336,804,14,farKinds,9,'var(--far)',sub(8),-1,8,3.0).html
-    + bay(1200,828,336,804,14,farKinds,9,'var(--far)',sub(9),+1,8,3.0).html;
+      bay(0,   372,300,804,14,farKinds,14,'var(--far)',sub(8),-1,8,3.0).html
+    + bay(1200,828,300,804,14,farKinds,14,'var(--far)',sub(9),+1,8,3.0).html;
 
   // ---- SHEET 3 · MID RANGE CARD --------------------------------------------
   // a wider gap again; the nearer, larger mixed treeline rises from each shoulder.
   $('l-mid').innerHTML=
-      bay(0,   352,426,803,16,midKinds,7,'var(--mid)',sub(10),-1,8,2.6).html
-    + bay(1200,848,426,803,16,midKinds,7,'var(--mid)',sub(11),+1,8,2.6).html;
+      bay(0,   352,405,803,16,midKinds,10,'var(--mid)',sub(10),-1,8,2.6).html
+    + bay(1200,848,405,803,16,midKinds,10,'var(--mid)',sub(11),+1,8,2.6).html;
 
   // ---- SHEET 4 · BUSH BAND (backmost plant band → the TALL canopy) ----------
   // a natural bush bank massed in the margins, rolling high at the frame edge and
@@ -341,8 +380,8 @@
   const bushFoot=centreMound(sub(15),64,'var(--bush)');             // furthest valley-floor band
   const footFar=[['flax',38,60],['toetoe',38,58],['grass',32,52],['frond',36,58]];
   $('l-bush').innerHTML=
-      bay(0,   332,536,800,22,bushKinds,3,'var(--bush)',sub(1),-1).html
-    + bay(1200,868,536,800,22,bushKinds,3,'var(--bush)',sub(2),+1).html
+      bay(0,   332,510,800,22,bushKinds,4,'var(--bush)',sub(1),-1).html
+    + bay(1200,868,510,800,22,bushKinds,4,'var(--bush)',sub(2),+1).html
     + bushFoot.html + footThicket(bushFoot,sub(16),footFar,'var(--bush)',[430,505,600,695,770]);
 
   // ---- SHEET 5 · FRAMING TREES (mid plant band, in front of the text) -------
@@ -353,8 +392,8 @@
   const marginFoot=centreMound(sub(17),54,'var(--margin)');         // middle valley-floor band
   const footMid=[['flax',54,82],['toetoe',52,78],['grass',44,68],['frond',50,76]];
   $('l-margin').innerHTML=
-      bay(0,   308,604,800,20,marginKinds,3,'var(--margin)',sub(3),-1).html
-    + bay(1200,892,604,800,20,marginKinds,3,'var(--margin)',sub(4),+1).html
+      bay(0,   308,612,800,20,marginKinds,4,'var(--margin)',sub(3),-1).html
+    + bay(1200,892,612,800,20,marginKinds,4,'var(--margin)',sub(4),+1).html
     + marginFoot.html + footThicket(marginFoot,sub(18),footMid,'var(--margin)',[455,520,585,650,715,760]);
 
   // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI (frontmost, smallest) ---------
@@ -365,16 +404,23 @@
   // few, BOLD, taller plants (well separated) so the dark front silhouettes read
   // clearly against the lighter bands behind instead of merging into one blob.
   const foreKinds=[['grass',92,138],['frond',130,188],['flax',116,162],['toetoe',116,156]];
-  const foreL=bay(0,   286,676,800,16,foreKinds,2,'var(--fore)',sub(5),-1,4);
-  const foreR=bay(1200,914,676,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
+  // LEFT fore bay left empty of plants: the focal kiwi IS the bold foreground element
+  // on the left, so its silhouette stands alone & clean against the lighter bands (no
+  // ferns crossing it). The right bay keeps its bold plants to balance the frame.
+  const foreL=bay(0,   286,695,800,16,foreKinds,0,'var(--fore)',sub(5),-1,4);
+  const foreR=bay(1200,914,695,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
   const mound=centreMound(sub(13),44,'var(--fore)');                // nearest/darkest floor band
   const footNear=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',72,104]];
   let fore=foreL.html+foreR.html+mound.html
     + footThicket(mound,sub(14),footNear,'var(--fore)',[486,534,584,620,668,714]);
   const kr=rng(sub(12));
-  const kS=0.84+kr()*0.06, kx=244+(kr()-0.5)*44;
-  fore+=kiwi(kx, foreL.crest(kx)-47*kS, kS, 'var(--fore)');         // feet planted on the bank crest
-  fore+=fantail(176+(kr()-0.5)*30,636,1.02+kr()*0.08,'var(--fore)');
+  // FOCAL KIWI — the icon of the scene, now bold & legible. Stood near the frame edge
+  // (where the fore bank rides highest) and facing RIGHT into the clearing, so the
+  // body & long bill are silhouetted high against the lighter bush/mid bands with
+  // nothing crossing it. Bill tip stays well clear of the text column (CLEAR_L=378).
+  const kS=1.18+kr()*0.08, kx=98+(kr()-0.5)*20;
+  fore+=kiwi(kx, foreL.crest(kx)-47*kS, kS, 'var(--fore)');         // feet on the bank crest
+  fore+=fantail(232+(kr()-0.5)*22,600,1.04+kr()*0.08,'var(--fore)');
   $('l-fore').innerHTML=fore;
 
   // narrow screens crop to the central clearing (only viewBox x~415-785 shows), so
