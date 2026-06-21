@@ -13,6 +13,7 @@
          light  >  sky  >  far  >  mid  >  bush  >  margin  >  fore               */
     --light:#ffe7b4;   /* 0 — flat diffused light panel (and sun + bird holes)    */
     --sky:#e0a455;     /* 1 — sky card                                            */
+    --deep:#ce9148;    /* 1.5 — deepest range card (palest, furthest)             */
     --far:#bd7e3c;     /* 2 — far range card                                      */
     --mid:#8a5729;     /* 3 — mid range card                                      */
     --bush:#562e14;    /* 4 — bush band + focal kiwi                              */
@@ -47,6 +48,14 @@
     border:14px solid #0a0a09;
     box-shadow:inset 0 0 0 1px #2b2620, inset 0 0 0 8px #050504, inset 0 0 0 9px #221e17;}
 
+  /* colour-scheme switcher — small swatches in the top-right corner */
+  .palettes{position:fixed;top:24px;right:26px;z-index:70;display:flex;gap:8px}
+  .palettes button{width:19px;height:19px;border-radius:50%;padding:0;cursor:pointer;
+    border:1.5px solid rgba(255,255,255,.55);box-shadow:0 1px 5px rgba(0,0,0,.55);
+    transition:transform .12s ease}
+  .palettes button:hover{transform:scale(1.18)}
+  .palettes button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+
   /* content: black paper-cut text floating in the lit central clearing */
   .intro h1,.intro p,.content h2,.content h3,.proj p,.proj .meta,.cool a,.intro .links a{
     text-shadow:0 0 13px rgba(255,244,222,.92),0 0 5px rgba(255,244,222,.95)}
@@ -72,6 +81,7 @@
 
 <div class="stage stage-back">
   <div class="layer" data-depth="0.02"><svg id="l-sky"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="layer" data-depth="0.04"><svg id="l-deep"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.06"><svg id="l-far"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.11"><svg id="l-mid"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.22"><svg id="l-bush"  viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
@@ -102,6 +112,13 @@
 </div>
 
 <div class="frame"></div>
+
+<div class="palettes" id="palettes" aria-label="Colour scheme">
+  <button data-pal="sepia"  title="Sepia"></button>
+  <button data-pal="dusk"   title="Dusk"></button>
+  <button data-pal="forest" title="Forest"></button>
+  <button data-pal="ember"  title="Ember"></button>
+</div>
 
 <script src="stamps.js"></script>
 <script>
@@ -143,6 +160,30 @@
   // one master seed per load (override with ?seed=N to reproduce a composition).
   const SEED=(+new URLSearchParams(location.search).get('seed'))||(Math.random()*1e9)|0;
   const sub=n=>(SEED*2654435761 + n*40503)|0;        // independent per-bay seeds
+
+  // COLOUR SCHEMES — switch live via the corner swatches (or ?palette=…); the choice
+  // persists. Each keeps the strict monotonic depth ramp light > sky > deep > far > mid
+  // > bush > margin > fore; the warm sun/glow (--light) stays the one light.
+  const PALETTES={
+    sepia:  {light:'#ffe7b4',sky:'#e0a455',deep:'#ce9148',far:'#bd7e3c',mid:'#8a5729',bush:'#562e14',margin:'#2a1809',fore:'#120a04',ink:'#231506',inkSoft:'#5b3a1c'},
+    dusk:   {light:'#ffe1ad',sky:'#8693bb',deep:'#767fac',far:'#67729e',mid:'#4e587f',bush:'#384164',margin:'#232a48',fore:'#10142b',ink:'#10131f',inkSoft:'#313a58'},
+    forest: {light:'#fcf3bf',sky:'#b7cc78',deep:'#a1bf6a',far:'#8bb15c',mid:'#688f46',bush:'#476a33',margin:'#2c4720',fore:'#132410',ink:'#16240f',inkSoft:'#3a5a2a'},
+    ember:  {light:'#ffdfa4',sky:'#d6824f',deep:'#c16e49',far:'#ad5942',mid:'#7f3f44',bush:'#562d3a',margin:'#331c2a',fore:'#160c17',ink:'#200c12',inkSoft:'#542c38'},
+  };
+  const RAMP=['light','sky','deep','far','mid','bush','margin','fore'];
+  function applyPalette(name){
+    const p=PALETTES[name]||PALETTES.sepia, s=document.documentElement.style;
+    for(const k of RAMP) s.setProperty('--'+k,p[k]);
+    s.setProperty('--ink',p.ink); s.setProperty('--ink-soft',p.inkSoft);
+    try{localStorage.setItem('palette',name)}catch(e){}
+    for(const b of document.querySelectorAll('.palettes button')) b.setAttribute('aria-pressed', b.dataset.pal===name);
+  }
+  let curPal=new URLSearchParams(location.search).get('palette')
+    || (()=>{try{return localStorage.getItem('palette')}catch(e){return null}})() || 'sepia';
+  if(!PALETTES[curPal]) curPal='sepia';
+  for(const b of document.querySelectorAll('.palettes button')) b.style.background=PALETTES[b.dataset.pal].sky;
+  document.getElementById('palettes').addEventListener('click',e=>{const b=e.target.closest('button'); if(b) applyPalette(b.dataset.pal);});
+  applyPalette(curPal);
 
   // adapt the stamp library to a common (x,baseY,h,fill,seed,out) call. ONLY the
   // ten authoritative catalogue stamps (catalogue.html) are used here. Crowns are
@@ -209,15 +250,22 @@
       +items.map(it=>KIND[it.kn](it.x,it.by,it.h,fill,it.sd,out)).join('')};
   }
 
-  // the central FOREGROUND mound: a low, lumpy bush hill that caps the base of the
-  // central sky column (the "footer" middle the page text ends on). It stays low, so
-  // the reading column above it is open sky; only the footer copy sits over it (on its
-  // halo). Returns its crest so a couple of low tufts can root on it.
-  function centreMound(seed){
-    const r=rng(seed), nz=noise(r,9);
-    const cY=x=>800-42*Math.exp(-Math.pow((x-600)/300,2)*1.1)+nz((x-300)/600)*0.7;
-    let d='M300,806'; for(let i=0;i<=44;i++){const x=300+600*i/44; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
-    return {cY, html:`<path fill="var(--fore)" d="${d} L900,806 Z"/>`};
+  // a central footer mound: a low, lumpy bush hill rising in the centre at the base.
+  // STACKED across the bush/margin/fore sheets (each lower + darker + nearer) it builds
+  // a little receding valley-floor that closes the foot of the central sky column — the
+  // "footer" the page copy ends on. `amp` = how tall it humps; returns its crest.
+  function centreMound(seed,amp,fill){
+    const r=rng(seed), nz=noise(r,8);
+    const cY=x=>800-amp*Math.exp(-Math.pow((x-600)/310,2)*1.15)+nz((x-300)/600)*0.7;
+    let d='M290,806'; for(let i=0;i<=46;i++){const x=290+620*i/46; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
+    return {cY, html:`<path fill="${fill}" d="${d} L910,806 Z"/>`};
+  }
+  // plant a small clump on a footer mound (front-layer stamps only — no big trees).
+  function footThicket(mound,seed,kinds,fill,xs){
+    const r=rng(seed); let g='';
+    for(const fx of xs){ if(r()<0.82){ const [kn,a,b]=kinds[(r()*kinds.length)|0], h=a+(b-a)*r();
+      g+=KIND[kn](fx+(r()-0.5)*22, mound.cY(fx)+5, h, fill, (seed^(fx*7))|0, fx<600?-1:1); } }
+    return g;
   }
 
   // ---- SHEET 1 · SKY CARD ---------------------------------------------------
@@ -233,26 +281,36 @@
   // distant treelines carry ALL the catalogue plant stamps (small, since they're far),
   // so the back ranges read as full mixed bush. The big trees only ever get filtered
   // OUT of the front layers — never the back.
+  // CONVERGING RANGES: each successive range opens a WIDER central gap than the one
+  // behind it (innerX steps outward, deep→fore), so the ranges funnel inward to the
+  // narrow deep gap high in the centre — the eye is drawn down into a valley. Every gap
+  // still contains the text column [CLEAR_L,CLEAR_R], so the copy stays on pure sky.
+  const deepKinds=[['pohutukawa',34,58],['cabbage',36,60],['ponga',38,62],['nikau',40,64],
+                   ['flax',28,48],['toetoe',30,50],['grass',24,40]];
   const farKinds=[['ponga',60,98],['nikau',66,104],['pohutukawa',54,94],['cabbage',58,96],
                   ['flax',48,80],['toetoe',50,82],['grass',40,64],['frond',46,76]];
   const midKinds=[['ponga',96,150],['nikau',104,160],['pohutukawa',86,140],['cabbage',92,148],
                   ['flax',78,120],['toetoe',80,124],['grass',60,92],['frond',70,112]];
 
+  // ---- SHEET 1.5 · DEEPEST RANGE CARD --------------------------------------
+  // the furthest, palest range — the narrow gap it leaves high in the centre is the
+  // valley's vanishing point. Tiny mixed treeline on a wide plateau.
+  $('l-deep').innerHTML=
+      bay(0,   378,288,805,12,deepKinds,8,'var(--deep)',sub(19),-1,8,3.3).html
+    + bay(1200,822,288,805,12,deepKinds,8,'var(--deep)',sub(20),+1,8,3.3).html;
+
   // ---- SHEET 2 · FAR RANGE CARD --------------------------------------------
-  // the far range now ALSO opens a central clearing: two shoulder banks that dive to
-  // the base, so behind the whole text column there is ONLY sky. A distant mixed
-  // treeline rides each shoulder. Raised high up the frame → little bare sky, lots of
-  // bush. (innerX = the text-column edge, so the far card stops exactly at the sky.)
+  // two shoulder banks opening a slightly WIDER gap than the deep range → the valley
+  // steps outward as it comes forward. Distant mixed treeline on the plateau.
   $('l-far').innerHTML=
-      bay(0,   CLEAR_L,338,804,14,farKinds,9,'var(--far)',sub(8),-1,8,3.0).html
-    + bay(1200,CLEAR_R,338,804,14,farKinds,9,'var(--far)',sub(9),+1,8,3.0).html;
+      bay(0,   372,336,804,14,farKinds,9,'var(--far)',sub(8),-1,8,3.0).html
+    + bay(1200,828,336,804,14,farKinds,9,'var(--far)',sub(9),+1,8,3.0).html;
 
   // ---- SHEET 3 · MID RANGE CARD --------------------------------------------
-  // two natural mountain shoulders that dive into the same central clearing. A nearer,
-  // larger mixed treeline rises from each shoulder, receding between far and bush.
+  // a wider gap again; the nearer, larger mixed treeline rises from each shoulder.
   $('l-mid').innerHTML=
-      bay(0,   374,430,803,16,midKinds,7,'var(--mid)',sub(10),-1,8,2.6).html
-    + bay(1200,826,430,803,16,midKinds,7,'var(--mid)',sub(11),+1,8,2.6).html;
+      bay(0,   352,426,803,16,midKinds,7,'var(--mid)',sub(10),-1,8,2.6).html
+    + bay(1200,848,426,803,16,midKinds,7,'var(--mid)',sub(11),+1,8,2.6).html;
 
   // ---- SHEET 4 · BUSH BAND (backmost plant band → the TALL canopy) ----------
   // a natural bush bank massed in the margins, rolling high at the frame edge and
@@ -260,18 +318,24 @@
   // trees, all rooted ON the bank crest so no trunk floats. (Rolls the most — it is
   // the furthest, softest ground.)
   const bushKinds=[['ponga',210,300],['nikau',240,330],['pohutukawa',185,255],['cabbage',180,245]];
+  const bushFoot=centreMound(sub(15),64,'var(--bush)');             // furthest valley-floor band
+  const footFar=[['flax',38,60],['toetoe',38,58],['grass',32,52],['frond',36,58]];
   $('l-bush').innerHTML=
-      bay(0,   366,540,800,22,bushKinds,3,'var(--bush)',sub(1),-1).html
-    + bay(1200,834,540,800,22,bushKinds,3,'var(--bush)',sub(2),+1).html;
+      bay(0,   332,536,800,22,bushKinds,3,'var(--bush)',sub(1),-1).html
+    + bay(1200,868,536,800,22,bushKinds,3,'var(--bush)',sub(2),+1).html
+    + bushFoot.html + footThicket(bushFoot,sub(16),footFar,'var(--bush)',[430,505,600,695,770]);
 
   // ---- SHEET 5 · FRAMING TREES (mid plant band, in front of the text) -------
   // medium shrubs & smaller trees on a natural bank hugging the margins; centre kept
   // open (they never cross the clearing). Smaller than the bush band behind → the
   // scene reads small-in-front, large-behind.
   const marginKinds=[['ponga',150,205],['cabbage',150,205],['flax',120,170],['toetoe',120,165]];
+  const marginFoot=centreMound(sub(17),54,'var(--margin)');         // middle valley-floor band
+  const footMid=[['flax',54,82],['toetoe',52,78],['grass',44,68],['frond',50,76]];
   $('l-margin').innerHTML=
-      bay(0,   262,606,800,20,marginKinds,3,'var(--margin)',sub(3),-1).html
-    + bay(1200,938,606,800,20,marginKinds,3,'var(--margin)',sub(4),+1).html;
+      bay(0,   308,604,800,20,marginKinds,3,'var(--margin)',sub(3),-1).html
+    + bay(1200,892,604,800,20,marginKinds,3,'var(--margin)',sub(4),+1).html
+    + marginFoot.html + footThicket(marginFoot,sub(18),footMid,'var(--margin)',[455,520,585,650,715,760]);
 
   // ---- SHEET 6 · FOREGROUND BANK + FOCAL KIWI (frontmost, smallest) ---------
   // the darkest card: a low natural bank in each corner. Its plants stand PROUD of
@@ -281,18 +345,12 @@
   // few, BOLD, taller plants (well separated) so the dark front silhouettes read
   // clearly against the lighter bands behind instead of merging into one blob.
   const foreKinds=[['grass',92,138],['frond',130,188],['flax',116,162],['toetoe',116,156]];
-  const foreL=bay(0,   342,678,800,16,foreKinds,2,'var(--fore)',sub(5),-1,4);
-  const foreR=bay(1200,858,678,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
-  const mound=centreMound(sub(13));                                 // footer-middle bush, capping the base
-  let fore=foreL.html+foreR.html+mound.html;
-  // a visible little bush thicket in the footer middle (front-layer plants only — no big
-  // trees — so the centre of the footer reads as a clump of harakeke, toetoe & ferns).
-  const fc=rng(sub(14));
-  const footKinds=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',72,104]];
-  for(const fx of [486,534,584,620,668,714]){ if(fc()<0.8){
-    const [kn,a,b]=footKinds[(fc()*footKinds.length)|0], h=a+(b-a)*fc();
-    fore+=KIND[kn](fx+(fc()-0.5)*24, mound.cY(fx)+5, h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1);
-  }}
+  const foreL=bay(0,   286,676,800,16,foreKinds,2,'var(--fore)',sub(5),-1,4);
+  const foreR=bay(1200,914,676,800,16,foreKinds,2,'var(--fore)',sub(6),+1,4);
+  const mound=centreMound(sub(13),44,'var(--fore)');                // nearest/darkest floor band
+  const footNear=[['flax',98,130],['toetoe',92,122],['frond',88,120],['grass',72,104]];
+  let fore=foreL.html+foreR.html+mound.html
+    + footThicket(mound,sub(14),footNear,'var(--fore)',[486,534,584,620,668,714]);
   const kr=rng(sub(12));
   const kS=0.84+kr()*0.06, kx=244+(kr()-0.5)*44;
   fore+=kiwi(kx, foreL.crest(kx)-47*kS, kS, 'var(--fore)');         // feet planted on the bank crest

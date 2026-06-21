@@ -15,12 +15,23 @@ The **sun** and the **birds** are holes in the sky card (sheet 1) — the only b
 holes, both the same `--light` brightness, both kept clear of the text.
 
 There is **no reading-window cut**. The page text reads in a **central sky column**:
-**every** card in front of the sky — far, mid, bush, margin, fore — is massed in the
-margins and **dives away from the centre on organic curves**, so the text always
+**every** card in front of the sky — deep, far, mid, bush, margin, fore — is massed in
+the margins and **dives away from the centre on organic curves**, so the text always
 floats over **pure sky** (not even the far range sits behind it). Every shape stays a
 full, natural paper-cut — no flat margin cut-offs (see RULES.md §7b). The whole forest
-is raised high up the frame (little bare sky, lots of bush); only at the very base
-does a low **central mound** close the column — the "footer" the page copy ends on.
+is raised high up the frame (little bare sky, lots of bush).
+
+**CONVERGING valley:** each successive range opens a *wider* central gap than the one
+behind it (the inner edge steps outward deep→fore), so the ranges funnel inward to the
+narrow **deep** gap high in the centre — the valley's vanishing point — and the eye is
+drawn down into it. Every gap still contains the text column, so the copy stays on sky.
+At the base a **stacked central mound** (one band per front sheet, each lower/darker/
+nearer) closes the column with a little receding valley-floor — the "footer" the copy
+ends on.
+
+**Colour schemes:** four palettes (`sepia` · `dusk` · `forest` · `ember`) switch live
+from the corner swatches (choice persists; `?palette=…` also works). Each keeps the
+strict monotonic ramp and the one warm light.
 
 ## Procedural scatter (the plants reshuffle each load)
 
@@ -85,6 +96,11 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
   can't exist on a single sheet — it would fall out — so the birds are bright cuts,
   not painted shapes.)
 
+### SHEET 1.5 · DEEPEST RANGE CARD
+`l-deep` · `--deep` `#ce9148` · depth 0.04
+- The furthest, palest range, raised highest. The **narrow central gap** it leaves is
+  the valley's **vanishing point**. A tiny mixed treeline rides its wide plateau.
+
 ### SHEET 2 · FAR RANGE CARD
 `l-far` · `--far` `#bd7e3c` · depth 0.07
 - Two **generated shoulder banks** (raised high) with a **plateau** profile (`divePow`
@@ -122,10 +138,11 @@ All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); 
   the lighter bands behind — a few bold **grass · single frond · flax · toetoe**
   (height band ~92–188) — plus the focal **kiwi** planted on the bank crest (left
   frame, clear of the text) and a perched **fantail (pīwakawaka)**.
-- A low **central mound** (`centreMound`) closes the base of the sky column, carrying a
-  small **bush thicket** — a clump of harakeke, toetoe, ferns & grass (front-layer
-  stamps only, no big trees) — the visible "footer middle" the page copy ends on. The
-  reading column above it stays open sky; the footer line sits over it (on its halo).
+- A **stacked central footer floor** closes the base of the sky column: one low
+  `centreMound` + `footThicket` per front sheet (bush behind/palest → margin → fore
+  nearest/darkest), so the footer reads as a small **receding valley-floor** of bush
+  (harakeke, toetoe, ferns, grass — no big trees). The reading column above it stays
+  open sky; the footer line sits over it (on its halo).
 
 ---
 
