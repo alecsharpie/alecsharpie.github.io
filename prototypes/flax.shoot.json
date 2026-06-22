@@ -1,0 +1,8 @@
+{
+  "_comment": "Flax kōrari stalks focus. node ~/.claude/skills/screenshot-verify/shoot.mjs 'prototypes/stamp.html?name=flax' --config prototypes/flax.shoot.json --out shots/flax",
+  "wait": 400,
+  "shots": [
+    { "name": "full",   "w": 640, "h": 720, "scroll": 0, "dsf": 3 },
+    { "name": "stalks", "w": 640, "h": 720, "scroll": 0, "dsf": 4, "clip": { "x": 250, "y": 70, "width": 200, "height": 300 } }
+  ]
+}

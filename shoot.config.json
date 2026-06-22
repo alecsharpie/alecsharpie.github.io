@@ -1,0 +1,15 @@
+{
+  "_comment": "Framings for the silhouette diorama. Run from repo root: node ~/.claude/skills/screenshot-verify/shoot.mjs index.html",
+  "wait": 800,
+  "shots": [
+    { "name": "desktop-top",    "w": 1440, "h": 900, "scroll": 0.0 },
+    { "name": "desktop-mid",    "w": 1440, "h": 900, "scroll": 0.5 },
+    { "name": "desktop-bottom", "w": 1440, "h": 900, "scroll": 1.0 },
+    { "name": "mobile-top",     "w": 390,  "h": 844, "scroll": 0.0 },
+    { "name": "mobile-mid",     "w": 390,  "h": 844, "scroll": 0.5 },
+    { "name": "mobile-bottom",  "w": 390,  "h": 844, "scroll": 1.0 },
+    { "name": "mobile-narrow",  "w": 360,  "h": 800, "scroll": 0.0 },
+    { "name": "detail-left",    "w": 1440, "h": 900, "scroll": 0.0, "clip": { "x": 0,    "y": 30, "width": 380, "height": 820 } },
+    { "name": "detail-right",   "w": 1440, "h": 900, "scroll": 0.0, "clip": { "x": 1060, "y": 30, "width": 380, "height": 820 } }
+  ]
+}

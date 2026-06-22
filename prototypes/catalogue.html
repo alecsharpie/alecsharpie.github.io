@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stamp catalogue — shadow box</title>
+<style>
+  :root{--light:#ffe7b4;--card:#1c1006;--ink:#4a2f12}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0a09;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:#e7d6b8;padding:28px}
+  h1{font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+  p.sub{color:#9c8a6a;margin-bottom:24px;font-size:.9rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+  .cell{background:var(--light);border-radius:10px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.5)}
+  .cell svg{display:block;width:100%;height:auto}
+  .cap{padding:8px 12px;background:#15120c;color:#cdbfa0;font-size:.8rem;display:flex;justify-content:space-between}
+  .cap b{color:#fff;font-weight:600}
+  .cap span{color:#8d7c5d}
+</style>
+</head>
+<body>
+<h1>Stamp catalogue</h1>
+<p class="sub">Each NZ-bush paper-cut stamp on the lit panel — perfected in isolation, then placed in the scene.</p>
+<div class="grid" id="grid"></div>
+
+<script src="../js/stamps.js"></script>
+<script>
+  const CARD='#1c1006';
+  // each entry: [label, te-reo/latin, builder(returns svg inner), baseY, vbH]
+  const W=220, H=260, B=232;   // cell width, height, baseline
+  // Base heights MIRROR the silhouette's MID band (silhouette.html `midKinds`) — the
+  // one band that contains every plant species — using each species' mid-band midpoint.
+  // So the relative sizing you see here matches the scene. SCALE zooms the whole grid
+  // up to fill the cells; edit a base number to re-sort a species, then port it back to
+  // the silhouette band ranges. Kiwi/fantail use the scene's focal scales.
+  const SCALE=1.45, h=k=>Math.round(k*SCALE);
+  const items=[
+    ['Cabbage tree','tī kōuka',()=>cabbageTree(110,B,h(118),CARD,12)],
+    ['Nīkau palm','nīkau',     ()=>nikau(110,B,h(118),CARD,101)],
+    ['Pōhutukawa','rātā',      ()=>pohutukawa(110,B,h(126),CARD,103)],
+    ['Flax','harakeke',        ()=>flax(110,B,h(72),CARD,7)],
+    ['Toetoe','plume grass',   ()=>toetoe(110,B,h(89),CARD,5)],
+    ['Grass tuft','',          ()=>grass(110,B,Math.round(h(48)*1.05),h(48),Math.round(h(48)*1.05/2.2),CARD,201)],
+    ['Fern frond','',          ()=>frond(110,B,h(72),CARD,9,-92)],
+    ['Ponga','silver fern',    ()=>ponga(110,B,h(158),CARD,4)],
+    ['Kiwi','',                ()=>kiwi(110,150,1.18,CARD)],
+    ['Fantail','pīwakawaka',   ()=>fantail(110,130,1.04,CARD)],
+  ];
+  const grid=document.getElementById('grid');
+  for(const [label,sub,build] of items){
+    const cell=document.createElement('div');cell.className='cell';
+    cell.innerHTML=
+      `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${build()}</svg>`+
+      `<div class="cap"><b>${label}</b><span>${sub}</span></div>`;
+    grid.appendChild(cell);
+  }
+</script>
+</body>
+</html>
