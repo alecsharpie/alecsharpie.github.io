@@ -1,6 +1,6 @@
 # Stamp catalogue — NZ-bush paper-cuts
 
-All the cut-out shapes in the shadow box live in [`stamps.js`](./stamps.js) as a
+All the cut-out shapes in the shadow box live in [`stamps.js`](../js/stamps.js) as a
 library of reusable **stamps**. Each stamp is a single connected paper-cut — one
 `<g fill="…">` of solid black card, cuttable from one sheet (RULES.md §6, §7b).
 

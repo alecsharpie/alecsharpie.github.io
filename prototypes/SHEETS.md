@@ -94,7 +94,7 @@ tidy. Tidiness is structural, not luck:
   sub-seeds (never mirror-symmetric). The kiwi (planted on the fore crest) & fantail
   are focal anchors with only tiny jitter. Override the load with `?seed=N`.
 
-All the cut-out plants are reusable **stamps** from [`stamps.js`](./stamps.js); the
+All the cut-out plants are reusable **stamps** from [`stamps.js`](../js/stamps.js); the
 [stamp catalogue](./catalogue.html) renders each in isolation.
 
 ---

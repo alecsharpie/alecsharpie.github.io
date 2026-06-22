@@ -227,7 +227,8 @@
   // edge (edge-tall), so every draw rises in the margins and dives to the open
   // centre. Bigger plants live on the back sheets, smaller on the front sheets.
   // one master seed per load (override with ?seed=N to reproduce a composition).
-  const SEED=(+new URLSearchParams(location.search).get('seed'))||(Math.random()*1e9)|0;
+  const seedParam=new URLSearchParams(location.search).get('seed');
+  const SEED=(seedParam!=null&&seedParam!=='')?(+seedParam|0):(Math.random()*1e9)|0;
   const sub=n=>(SEED*2654435761 + n*40503)|0;        // independent per-bay seeds
 
   // COLOUR SCHEMES — switch live via the corner swatches (or ?palette=…); the choice
@@ -833,7 +834,10 @@
       const c=$('projects');
       for(const p of data.projects){
         const div=document.createElement('div');div.className='proj';
-        const date=new Date(p.date).toLocaleDateString('en-US',{year:'numeric',month:'long'});
+        // parse "YYYY-MM-DD" as LOCAL noon, not UTC midnight: a bare ISO date parses as UTC,
+        // which rolls back to the previous month for any viewer west of UTC (the Americas).
+        const raw=/^\d{4}-\d{2}-\d{2}$/.test(p.date)?p.date+'T12:00:00':p.date;
+        const date=new Date(raw).toLocaleDateString('en-US',{year:'numeric',month:'long'});
         let h=`<h3>${p.title}</h3><div class="meta">${date}${p.tags?' · '+p.tags.map(t=>'#'+t).join(' '):''}</div><p>${p.description}</p><p>`;
         for(const [text,url] of Object.entries(p.links||{})){
           const link=url.startsWith('http')?url:`https://${url}`;
