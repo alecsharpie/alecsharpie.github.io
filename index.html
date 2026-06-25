@@ -988,7 +988,20 @@
     else { cur=target; running=false; }            // settled — stop until next scroll
   }
   addEventListener('scroll',readProgress,{passive:true});
-  addEventListener('resize',()=>{readMax();readProgress();refreshEdges();});
+  // Mobile Safari fires `resize` continuously WHILE scrolling, as the bottom URL/search
+  // bar grows and shrinks — a height-only change (the toolbar never changes width). Doing
+  // the full re-layout on every one of those ticks (re-cloning the edge frames + re-snapping
+  // the parallax from a shifted `max`) is what makes the whole scene jump as you scroll. So
+  // gate the heavy work on a REAL width change (orientation flip / desktop resize); for a
+  // toolbar-only height change just refresh the cached scroll range so the next genuine
+  // scroll stays accurate, and leave the scene untouched.
+  let lastW=window.innerWidth;
+  addEventListener('resize',()=>{
+    readMax();
+    if(window.innerWidth===lastW) return;   // URL-bar show/hide: don't rebuild or re-snap
+    lastW=window.innerWidth;
+    readProgress(); refreshEdges();
+  });
   readMax(); readProgress();
   if(reduce){ for(const L of [...layers,...edgeLayers]) L.el.style.transform='none'; }
   else kick();
