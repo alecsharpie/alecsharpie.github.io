@@ -925,7 +925,7 @@
       let g=`<path fill="${fill}" d="${d}"/>`, items=[], pick=kindPicker(r,kinds);
       // place plants both by VERTICAL change (fills the steep dive) AND by HORIZONTAL spacing
       // (fills the high plateau that flanks the hero) — so foliage covers the whole visible margin.
-      const xstep=Math.abs(span)*0.10;
+      const xstep=Math.abs(span)*0.082;
       let lastY=crest(edge)+vstep*3, lastX=edge-xstep*3;
       for(let i=0;i<=240;i++){
         const x=edge+span*(i/240), cy=crest(x);
@@ -948,9 +948,9 @@
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344],['grass',150,232]];
 
-    $('l-far').innerHTML    = tallBay(-1,372,182,kFar,'var(--far)',sub(8),112,1.5)   + tallBay(+1,828,182,kFar,'var(--far)',sub(9),112,1.5);
-    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),170,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),170,1.5);
-    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),250,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),250,1.6);
+    $('l-far').innerHTML    = tallBay(-1,372,182,kFar,'var(--far)',sub(8),100,1.5)   + tallBay(+1,828,182,kFar,'var(--far)',sub(9),100,1.5);
+    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),150,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),150,1.5);
+    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),220,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),220,1.6);
     $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),200,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),200,1.7);
     let mfore = tallBay(-1,228,366,kFore,'var(--fore)',sub(5),250,1.8)+tallBay(+1,972,366,kFore,'var(--fore)',sub(6),250,1.8);
 
