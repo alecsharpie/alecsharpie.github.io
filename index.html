@@ -923,11 +923,14 @@
       for(let i=1;i<=N;i++){const x=edge+span*(i/N); d+=` L${x.toFixed(1)},${crest(x).toFixed(1)}`;}
       d+=` L${innerX.toFixed(1)},${MOB_H+8} Z`;
       let g=`<path fill="${fill}" d="${d}"/>`, items=[], pick=kindPicker(r,kinds);
-      let lastY=crest(edge)+vstep*3;
+      // place plants both by VERTICAL change (fills the steep dive) AND by HORIZONTAL spacing
+      // (fills the high plateau that flanks the hero) — so foliage covers the whole visible margin.
+      const xstep=Math.abs(span)*0.10;
+      let lastY=crest(edge)+vstep*3, lastX=edge-xstep*3;
       for(let i=0;i<=240;i++){
         const x=edge+span*(i/240), cy=crest(x);
-        if(Math.abs(cy-lastY)>=vstep*(0.78+0.44*r())){
-          lastY=cy;
+        if(Math.abs(cy-lastY)>=vstep*(0.78+0.44*r()) || Math.abs(x-lastX)>=xstep*(0.8+0.5*r())){
+          lastY=cy; lastX=x;
           const t=Math.max(0,Math.min(1,(cy-edgeY)/(FLOOR-edgeY)));   // 0 near top → 1 at the floor
           const [kn,a,b]=pick(); const h=(a+(b-a)*r())*(0.76+0.24*t); // bolder toward the floor, still tall up top
           items.push({x:clampX(x,h,kn,side),by:cy+10,h,kn,sd:(seed^(i*61))|0});
@@ -945,11 +948,11 @@
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344],['grass',150,232]];
 
-    $('l-far').innerHTML    = tallBay(-1,372,200,kFar,'var(--far)',sub(8),112,1.0)   + tallBay(+1,828,200,kFar,'var(--far)',sub(9),112,1.0);
-    $('l-mid').innerHTML    = tallBay(-1,338,232,kMid,'var(--mid)',sub(10),170,1.0)  + tallBay(+1,862,232,kMid,'var(--mid)',sub(11),170,1.0);
-    $('l-bush').innerHTML   = tallBay(-1,304,272,kBush,'var(--bush)',sub(1),250,1.0) + tallBay(+1,896,272,kBush,'var(--bush)',sub(2),250,1.0);
-    $('l-margin').innerHTML = tallBay(-1,266,322,kMargin,'var(--margin)',sub(3),200,1.0)+tallBay(+1,934,322,kMargin,'var(--margin)',sub(4),200,1.0);
-    let mfore = tallBay(-1,228,384,kFore,'var(--fore)',sub(5),250,1.0)+tallBay(+1,972,384,kFore,'var(--fore)',sub(6),250,1.0);
+    $('l-far').innerHTML    = tallBay(-1,372,182,kFar,'var(--far)',sub(8),112,1.5)   + tallBay(+1,828,182,kFar,'var(--far)',sub(9),112,1.5);
+    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),170,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),170,1.5);
+    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),250,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),250,1.6);
+    $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),200,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),200,1.7);
+    let mfore = tallBay(-1,228,366,kFore,'var(--fore)',sub(5),250,1.8)+tallBay(+1,972,366,kFore,'var(--fore)',sub(6),250,1.8);
 
     // valley floor: a low central mound closing the foot of the clearing (connected to the base),
     // a small foreground thicket on it, then the focal kiwi facing right into the clearing (as desktop).
