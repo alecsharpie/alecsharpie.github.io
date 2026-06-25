@@ -170,12 +170,6 @@
      The hard outer cut tucks under the 14px frame border. */
   .edge-l{left:0}
   .edge-r{right:0}
-  /* AURORA ONLY: every sheet is marble, so there is no empty clearing for the column edge to
-     meet — column and centre show different slices of the marble and butt on a pattern-jump.
-     Aurora is the sanctioned gradient rule-breaker (RULES.md exception 2), so here, and only
-     here, feather the inner edge to dissolve that seam. The flat palettes stay fully opaque. */
-  body.pal-aurora .edge-l{-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent);mask-image:linear-gradient(90deg,#000 58%,transparent)}
-  body.pal-aurora .edge-r{-webkit-mask-image:linear-gradient(270deg,#000 58%,transparent);mask-image:linear-gradient(270deg,#000 58%,transparent)}
   @media (max-width:760px){
     .edge{display:block;width:25vw}
     .intro,.content{padding-left:26vw;padding-right:26vw}
@@ -771,7 +765,7 @@
   // trees, all rooted ON the bank crest so no trunk floats. (Rolls the most — it is
   // the furthest, softest ground.)
   const bushKinds=[['ponga',210,300],['nikau',240,330],['pohutukawa',185,255],['cabbage',180,245]];
-  // On mobile the central footer mound is confined to the clearing (x420..780, >MARGIN_W) so it
+  // On mobile the central footer mound is confined to the clearing (x420..780, inside CLEAR_L) so it
   // never appears in the side-frame columns (which would split one hill across two views).
   // On mobile the side columns cover the outer ~25vw each (≈ central-x 415-507 and 692-785), so
   // the central footer must stay NARROW and inside that clear zone, or the columns' hard inner
@@ -879,16 +873,16 @@
    if(q.has('faronly')){ for(const k of ['sky','haze','deep','mid','bush','margin','fore']){ const s=$('l-'+k); if(s) s.innerHTML=''; } }
    if(q.has('faronly')||q.has('fartint')) document.documentElement.style.setProperty('--far','#e0322f');}
 
-  // MOBILE FRAMING — reuse the desktop layers as side frames. The slice crops the scene to
-  // its central clearing, so the rich margin foliage (bush, tree ferns, the kiwi) is off-frame
-  // and the sides read empty. Rather than draw new mobile-only bush, CLONE the built layer
-  // SVGs into two thin edge columns and show the INNER EDGE of each forest margin in them:
-  // each clone gets a narrow viewBox window that ENDS just inside the central clearing
-  // ([0..MARGIN_W] on the left, [1200-MARGIN_W..1200] on the right), anchored so the clearing
-  // side faces inward. So the visible inner boundary is the forest's own ragged silhouette
-  // tapering into open ground — no blur — while the dense outer cut hides under the frame
-  // border. Re-run on palette change so the clones track the live colours.
-  const MARGIN_W=388;                                      // viewBox units of margin shown per side (ends just inside the clearing ~378)
+  // MOBILE FRAMING — reuse the desktop layers as side frames. The centre stage is the full
+  // 1200x800 scene under "xMidYMid slice" (cover): on a portrait phone it over-zooms to cover
+  // the height, cropping width hard to the central clearing (~viewBox 415..785), so the rich
+  // margin foliage is off-frame and the sides read empty. Rather than draw new mobile-only
+  // bush, CLONE the built layer SVGs into two thin edge columns — but the columns must read as
+  // the SAME diorama, not pasted-on panels. So each column shows the forest margin sitting just
+  // OUTSIDE the centre crop, at the SAME scale (px-per-viewBox-unit) as the centre, butted
+  // against the crop edge: the silhouette, the air-gap shadows and the ground all continue at
+  // one scale into the clearing where the text reads. No compression, no feather. Recomputed on
+  // a real width change (orientation) and on palette change so the clones track the live scene.
   // the clones must parallax in lockstep with the main scene, so each carries its source
   // layer's depth; `edgeLayers` is transformed alongside `layers` in the rAF loop, and
   // `lastAmp` lets a fresh clone (palette/resize re-clone) snap to the current scroll offset.
@@ -897,6 +891,12 @@
     if(!SCENE_BUILT || !matchMedia('(max-width:760px)').matches) return;
     const L=$('edge-l'), R=$('edge-r'); if(!L||!R) return;
     L.innerHTML=''; R.innerHTML=''; edgeLayers=[];
+    // Reconstruct the centre stage's cover crop for THIS viewport so the columns can continue it.
+    const W=innerWidth, H=innerHeight;
+    const sc=Math.max(W/1200, H/800);          // cover scale (px per viewBox unit) — height-led on a phone
+    const xL=600-W/(2*sc), xR=600+W/(2*sc);    // centre crop's left / right viewBox edges
+    const yT=400-H/(2*sc), visH=H/sc;          // centre crop's vertical window (columns share it, full-height)
+    const colU=0.25*W/sc;                      // viewBox units a 25vw column spans at the centre's scale
     const srcs=document.querySelectorAll('.stage .layer svg'), N=srcs.length;
     srcs.forEach((orig,j)=>{
       const depth=parseFloat(orig.parentElement.dataset.depth);
@@ -908,12 +908,14 @@
         d.removeAttribute('id');                            // keep getElementById pointing at the originals
         d.dataset.depth=depth; d.style.willChange='transform'; d.style.transitionDelay=delay;
       }
-      // LEFT: window [0..MARGIN_W], its INNER side (x=MARGIN_W, into the clearing) anchored inward.
-      dl.setAttribute('viewBox',`0 0 ${MARGIN_W} 800`);
-      dl.setAttribute('preserveAspectRatio','xMaxYMid slice');
-      // RIGHT: window [1200-MARGIN_W..1200], its INNER side (x=1200-MARGIN_W) anchored inward.
-      dr.setAttribute('viewBox',`${1200-MARGIN_W} 0 ${MARGIN_W} 800`);
-      dr.setAttribute('preserveAspectRatio','xMinYMid slice');
+      // LEFT: the colU-wide margin window ending exactly at the centre crop's left edge (xL),
+      // same vertical window — so it butts the centre seamlessly at the column's inner edge.
+      dl.setAttribute('viewBox',`${(xL-colU).toFixed(2)} ${yT.toFixed(2)} ${colU.toFixed(2)} ${visH.toFixed(2)}`);
+      // RIGHT: the colU-wide margin window starting exactly at the centre crop's right edge (xR).
+      dr.setAttribute('viewBox',`${xR.toFixed(2)} ${yT.toFixed(2)} ${colU.toFixed(2)} ${visH.toFixed(2)}`);
+      // viewBox aspect == column pixel aspect by construction, so slice == meet here (exact fill).
+      dl.setAttribute('preserveAspectRatio','xMidYMid slice');
+      dr.setAttribute('preserveAspectRatio','xMidYMid slice');
       L.appendChild(dl); R.appendChild(dr);
       edgeLayers.push({el:dl,depth},{el:dr,depth});
     });
