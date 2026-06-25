@@ -886,9 +886,9 @@
       $('l-'+k).setAttribute('viewBox',`0 0 1200 ${MOB_H}`);
 
     // SKY strip + moon hole + a drifting skein, all kept high & clear of the text (RULES §3,§4).
-    let cut=`<rect width="1200" height="${MOB_H}" fill="#fff"/><circle cx="600" cy="140" r="48" fill="#000"/>`;
+    let cut=`<rect width="1200" height="${MOB_H}" fill="#fff"/><circle cx="392" cy="150" r="46" fill="#000"/>`;
     {const r=rng(sub(20));
-     for(const [bx,by,bw] of [[486,206,22],[556,180,26],[636,168,30],[716,184,24],[600,232,17]])
+     for(const [bx,by,bw] of [[560,196,22],[636,172,27],[716,160,30],[792,178,24],[690,224,17]])
        cut+=birdHole(bx+(r()-0.5)*24, by+(r()-0.5)*14, bw, (r()-0.5)*0.5);}
     $('l-sky').innerHTML=
       `<defs><mask id="cut-sky-m" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="${MOB_H}">${cut}</mask></defs>`+
@@ -945,11 +945,11 @@
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344],['grass',150,232]];
 
-    $('l-far').innerHTML    = tallBay(-1,372,210,kFar,'var(--far)',sub(8),130,1.0)   + tallBay(+1,828,210,kFar,'var(--far)',sub(9),130,1.0);
-    $('l-mid').innerHTML    = tallBay(-1,338,240,kMid,'var(--mid)',sub(10),195,1.0)  + tallBay(+1,862,240,kMid,'var(--mid)',sub(11),195,1.0);
-    $('l-bush').innerHTML   = tallBay(-1,304,280,kBush,'var(--bush)',sub(1),290,1.0) + tallBay(+1,896,280,kBush,'var(--bush)',sub(2),290,1.0);
-    $('l-margin').innerHTML = tallBay(-1,266,330,kMargin,'var(--margin)',sub(3),235,1.0)+tallBay(+1,934,330,kMargin,'var(--margin)',sub(4),235,1.0);
-    let mfore = tallBay(-1,228,390,kFore,'var(--fore)',sub(5),285,1.0)+tallBay(+1,972,390,kFore,'var(--fore)',sub(6),285,1.0);
+    $('l-far').innerHTML    = tallBay(-1,372,200,kFar,'var(--far)',sub(8),112,1.0)   + tallBay(+1,828,200,kFar,'var(--far)',sub(9),112,1.0);
+    $('l-mid').innerHTML    = tallBay(-1,338,232,kMid,'var(--mid)',sub(10),170,1.0)  + tallBay(+1,862,232,kMid,'var(--mid)',sub(11),170,1.0);
+    $('l-bush').innerHTML   = tallBay(-1,304,272,kBush,'var(--bush)',sub(1),250,1.0) + tallBay(+1,896,272,kBush,'var(--bush)',sub(2),250,1.0);
+    $('l-margin').innerHTML = tallBay(-1,266,322,kMargin,'var(--margin)',sub(3),200,1.0)+tallBay(+1,934,322,kMargin,'var(--margin)',sub(4),200,1.0);
+    let mfore = tallBay(-1,228,384,kFore,'var(--fore)',sub(5),250,1.0)+tallBay(+1,972,384,kFore,'var(--fore)',sub(6),250,1.0);
 
     // valley floor: a low central mound closing the foot of the clearing (connected to the base),
     // a small foreground thicket on it, then the focal kiwi facing right into the clearing (as desktop).
