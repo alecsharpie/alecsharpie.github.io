@@ -881,53 +881,86 @@
   // kiwi at the base. Same paper-cut stamps, arranged TALL instead of wide.
   if(MB){
     CANYON=true;                              // keep the (now superseded) side-frame cloner out
-    const MOB_H=1800;                         // tall viewBox: cover keeps foliage large AND full-height,
-                                              // while the 444u central column stays ~200px wide for text.
+    const MOB_H=1800, FLOOR=MOB_H-24;         // tall portrait viewBox; valley floor just shy of the base
     for(const k of ['sky','haze','deep','far','mid','bush','margin','fore'])
       $('l-'+k).setAttribute('viewBox',`0 0 1200 ${MOB_H}`);
 
-    // SKY — flat card over the whole tall frame; a moon hole high in the clear centre, birds below.
-    let cut=`<rect width="1200" height="${MOB_H}" fill="#fff"/><circle cx="620" cy="205" r="50" fill="#000"/>`;
+    // SKY strip + moon hole + a drifting skein, all kept high & clear of the text (RULES §3,§4).
+    let cut=`<rect width="1200" height="${MOB_H}" fill="#fff"/><circle cx="600" cy="140" r="48" fill="#000"/>`;
     {const r=rng(sub(20));
-     for(const [bx,by,bw] of [[500,360,24],[572,326,28],[648,300,30],[726,330,25],[610,420,18]])
-       cut+=birdHole(bx+(r()-0.5)*26, by+(r()-0.5)*16, bw, (r()-0.5)*0.5);}
+     for(const [bx,by,bw] of [[486,206,22],[556,180,26],[636,168,30],[716,184,24],[600,232,17]])
+       cut+=birdHole(bx+(r()-0.5)*24, by+(r()-0.5)*14, bw, (r()-0.5)*0.5);}
     $('l-sky').innerHTML=
       `<defs><mask id="cut-sky-m" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="${MOB_H}">${cut}</mask></defs>`+
       `<rect width="1200" height="${MOB_H}" fill="var(--sky)" mask="url(#cut-sky-m)"/>`;
-    $('l-haze').innerHTML=''; $('l-deep').innerHTML='';
 
-    // ONE foliage wall up a margin: a thin ragged backing bank hugging the frame edge, then
-    // plants stacked bottom→top and clamped clear of the central text column. side -1=L, +1=R.
-    const mwall=(side,reach,kinds,fill,seed,gap)=>{
-      const r=rng(seed), pick=kindPicker(r,kinds), nz=noise(r,reach*0.16);
-      const edge=side<0?0:1200, inX=y=>edge-side*(reach*0.30+nz(y/MOB_H));
-      const N=48; let d=`M${edge},-4`;
-      for(let i=0;i<=N;i++){const y=MOB_H*i/N; d+=` L${inX(y).toFixed(1)},${y.toFixed(1)}`;}
-      d+=` L${edge},${MOB_H+4} Z`;
-      let g=`<path fill="${fill}" d="${d}"/>`, items=[];
-      for(let by=MOB_H+gap*0.4; by>-gap; by-=gap*(0.78+0.46*r())){
-        const [kn,a,b]=pick(), h=a+(b-a)*r();
-        const x=clampX(edge-side*(reach*(0.16+0.5*r())), h, kn, side);
-        items.push({x,by,h,kn,sd:(seed^((by*7)|0))|0});
+    // FULL-WIDTH back bands (as on desktop): a pale haze treeline under the sky strip, then the
+    // DEEP card — the flat backdrop the page text reads on. Both fill DOWN to the base, so the
+    // central column reveals deep at every scroll position (the nearer margins dive away from it).
+    const tallBand=(baseY,kinds,n,fill,seed,roll)=>{
+      const r=rng(seed), nz=noise(r,roll), crest=x=>baseY+nz(x/1200);
+      let d=`M0,${MOB_H+8} L0,${crest(0).toFixed(1)}`; const N=92;
+      for(let i=1;i<=N;i++){const x=1200*i/N; d+=` L${x.toFixed(1)},${crest(x).toFixed(1)}`;}
+      let html=`<path fill="${fill}" d="${d} L1200,${MOB_H+8} Z"/>`;
+      const slotW=1200/n, pick=kindPicker(r,kinds); let items=[];
+      for(let i=0;i<n;i++){const x=slotW*(i+0.5)+(r()-0.5)*slotW*0.6, [kn,a,b]=pick(), by=crest(x)+6, h=a+(b-a)*r();
+        items.push({x,by,h,kn,sd:(seed^(i*97+3))|0});}
+      items.sort((p,q)=>q.h-p.h);
+      html+=items.map(it=>STAMP[it.kn].draw(it.x,it.by,it.h,fill,it.sd,it.x<600?-1:1)).join('');
+      return html;
+    };
+    $('l-haze').innerHTML=tallBand(250,[['pohutukawa',22,34],['cabbage',24,38],['ponga',24,38],['nikau',26,40],['flax',18,30],['grass',11,18]],50,'var(--haze)',sub(21),12);
+    $('l-deep').innerHTML=tallBand(322,[['pohutukawa',30,48],['cabbage',32,50],['ponga',32,50],['nikau',34,52],['flax',24,40],['grass',15,25]],40,'var(--deep)',sub(19),14);
+
+    // a TALL hillside bank up one margin: ground rises from the centre-floor to the frame edge,
+    // plants rooted ON the crest with their feet buried in the bank — one connected sheet, never
+    // floating (RULES §6). The crest dives to the floor SHORT of the clearing, so the central
+    // column keeps revealing the flat deep card and nothing dark crosses the text (RULES §7b).
+    const tallBay=(side,innerX,edgeY,kinds,fill,seed,vstep,divePow)=>{
+      const r=rng(seed), edge=side<0?0:1200, span=innerX-edge;
+      const crest=makeCrest(edge,innerX,edgeY,FLOOR,r,34,divePow);
+      const N=80; let d=`M${edge},${MOB_H+8} L${edge.toFixed(1)},${crest(edge).toFixed(1)}`;
+      for(let i=1;i<=N;i++){const x=edge+span*(i/N); d+=` L${x.toFixed(1)},${crest(x).toFixed(1)}`;}
+      d+=` L${innerX.toFixed(1)},${MOB_H+8} Z`;
+      let g=`<path fill="${fill}" d="${d}"/>`, items=[], pick=kindPicker(r,kinds);
+      let lastY=crest(edge)+vstep*3;
+      for(let i=0;i<=240;i++){
+        const x=edge+span*(i/240), cy=crest(x);
+        if(Math.abs(cy-lastY)>=vstep*(0.78+0.44*r())){
+          lastY=cy;
+          const t=Math.max(0,Math.min(1,(cy-edgeY)/(FLOOR-edgeY)));   // 0 near top → 1 at the floor
+          const [kn,a,b]=pick(); const h=(a+(b-a)*r())*(0.76+0.24*t); // bolder toward the floor, still tall up top
+          items.push({x:clampX(x,h,kn,side),by:cy+10,h,kn,sd:(seed^(i*61))|0});
+        }
       }
+      items.sort((p,q)=>q.h-p.h);
       for(const it of items) g+=STAMP[it.kn].draw(it.x,it.by,it.h,fill,it.sd,side);
       return g;
     };
 
-    // back→front: smaller + further in behind, bolder + at the edge in front (vertical aerial depth)
-    const wFar   =[['ponga',70,118],['nikau',74,122],['pohutukawa',66,108],['flax',56,94],['toetoe',58,96]];
-    const wMid   =[['ponga',108,168],['nikau',116,180],['pohutukawa',98,158],['cabbage',102,164],['flax',86,136]];
-    const wBush  =[['ponga',196,284],['nikau',226,316],['pohutukawa',176,246],['cabbage',172,236]];
-    const wMargin=[['ponga',148,202],['cabbage',148,202],['flax',118,168],['toetoe',118,162]];
-    const wFore  =[['frond',128,186],['flax',114,160],['toetoe',114,154],['grass',62,95]];
+    // back→front: smaller + reaching closer to the centre behind, bolder + further out in front.
+    const kFar=[['ponga',150,250],['nikau',160,270],['pohutukawa',140,236],['cabbage',146,244],['flax',120,200],['toetoe',124,204],['frond',120,196]];
+    const kMid=[['ponga',230,360],['nikau',248,392],['pohutukawa',210,340],['cabbage',220,352],['flax',186,300],['frond',182,292]];
+    const kBush=[['ponga',330,500],['nikau',380,560],['pohutukawa',300,452],['cabbage',312,470]];
+    const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
+    const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344],['grass',150,232]];
 
-    $('l-far').innerHTML    = mwall(-1,470,wFar,   'var(--far)',   sub(8), 150)+mwall(+1,470,wFar,   'var(--far)',   sub(9), 150);
-    $('l-mid').innerHTML    = mwall(-1,420,wMid,   'var(--mid)',   sub(10),210)+mwall(+1,420,wMid,   'var(--mid)',   sub(11),210);
-    $('l-bush').innerHTML   = mwall(-1,372,wBush,  'var(--bush)',  sub(1), 300)+mwall(+1,372,wBush,  'var(--bush)',  sub(2), 300);
-    $('l-margin').innerHTML = mwall(-1,332,wMargin,'var(--margin)',sub(3), 250)+mwall(+1,332,wMargin,'var(--margin)',sub(4), 250);
-    let mfore = mwall(-1,300,wFore,'var(--fore)',sub(5),300)+mwall(+1,300,wFore,'var(--fore)',sub(6),300);
-    // FOCAL KIWI at the base of the left wall, facing right into the clearing (as on desktop).
-    const kS=1.45; mfore += kiwi(150, MOB_H-96, kS, 'var(--fore)');
+    $('l-far').innerHTML    = tallBay(-1,372,210,kFar,'var(--far)',sub(8),130,1.0)   + tallBay(+1,828,210,kFar,'var(--far)',sub(9),130,1.0);
+    $('l-mid').innerHTML    = tallBay(-1,338,240,kMid,'var(--mid)',sub(10),195,1.0)  + tallBay(+1,862,240,kMid,'var(--mid)',sub(11),195,1.0);
+    $('l-bush').innerHTML   = tallBay(-1,304,280,kBush,'var(--bush)',sub(1),290,1.0) + tallBay(+1,896,280,kBush,'var(--bush)',sub(2),290,1.0);
+    $('l-margin').innerHTML = tallBay(-1,266,330,kMargin,'var(--margin)',sub(3),235,1.0)+tallBay(+1,934,330,kMargin,'var(--margin)',sub(4),235,1.0);
+    let mfore = tallBay(-1,228,390,kFore,'var(--fore)',sub(5),285,1.0)+tallBay(+1,972,390,kFore,'var(--fore)',sub(6),285,1.0);
+
+    // valley floor: a low central mound closing the foot of the clearing (connected to the base),
+    // a small foreground thicket on it, then the focal kiwi facing right into the clearing (as desktop).
+    {const r=rng(sub(13)), amp=140, mcY=x=>FLOOR-amp*Math.exp(-Math.pow((x-600)/250,2))+noise(r,18)((x-300)/600)*0.6;
+     let md=`M280,${MOB_H+8}`;
+     for(let i=0;i<=44;i++){const x=280+640*i/44; md+=` L${x.toFixed(1)},${mcY(x).toFixed(1)}`;}
+     mfore += `<path fill="var(--fore)" d="${md} L920,${MOB_H+8} Z"/>`;
+     const footK=[['grass',150,210],['frond',150,220],['flax',150,214],['toetoe',150,206]], fr=rng(sub(14)), fpick=kindPicker(fr,footK);
+     for(const fx of [372,452,600,748,828]){ if(fr()<0.9){ const [kn,a,b]=fpick(), h=a+(b-a)*fr();
+       mfore += STAMP[kn].draw(fx+(fr()-0.5)*30, mcY(fx)+6, h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1); } }}
+    const kS=2.3; mfore += kiwi(296, FLOOR-58, kS, 'var(--fore)');
     $('l-fore').innerHTML=mfore;
   }
 
