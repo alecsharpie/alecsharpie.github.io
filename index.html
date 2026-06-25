@@ -427,7 +427,7 @@
   // recoloured live via CSS vars) and the aurora masked-marble form. Originals are cached
   // so switching back is instant.
   const AURORA_ORIG={};
-  let AURORA_MASKED=false, SCENE_BUILT=false;
+  let AURORA_MASKED=false, SCENE_BUILT=false, CANYON=false;
   function auroraMaskify(on){
     if(!SCENE_BUILT || on===AURORA_MASKED) return;
     if(on){
@@ -873,6 +873,64 @@
    if(q.has('faronly')){ for(const k of ['sky','haze','deep','mid','bush','margin','fore']){ const s=$('l-'+k); if(s) s.innerHTML=''; } }
    if(q.has('faronly')||q.has('fartint')) document.documentElement.style.setProperty('--far','#e0322f');}
 
+  // ===== MOBILE — PORTRAIT FOREST CANYON (Tier 2, iteration 1) ===============
+  // Desktop keeps its wide 1200x800 cover scene (built above) UNTOUCHED. A portrait phone can
+  // only crop that to the empty central clearing or shrink it to a thin strip — never lush — so
+  // on mobile we OVERWRITE the layers with a portrait-native build: dense foliage WALLS up both
+  // margins, a clear central column for the text, sky + moon above, foreground and the focal
+  // kiwi at the base. Same paper-cut stamps, arranged TALL instead of wide.
+  if(MB){
+    CANYON=true;                              // keep the (now superseded) side-frame cloner out
+    const MOB_H=1800;                         // tall viewBox: cover keeps foliage large AND full-height,
+                                              // while the 444u central column stays ~200px wide for text.
+    for(const k of ['sky','haze','deep','far','mid','bush','margin','fore'])
+      $('l-'+k).setAttribute('viewBox',`0 0 1200 ${MOB_H}`);
+
+    // SKY — flat card over the whole tall frame; a moon hole high in the clear centre, birds below.
+    let cut=`<rect width="1200" height="${MOB_H}" fill="#fff"/><circle cx="620" cy="205" r="50" fill="#000"/>`;
+    {const r=rng(sub(20));
+     for(const [bx,by,bw] of [[500,360,24],[572,326,28],[648,300,30],[726,330,25],[610,420,18]])
+       cut+=birdHole(bx+(r()-0.5)*26, by+(r()-0.5)*16, bw, (r()-0.5)*0.5);}
+    $('l-sky').innerHTML=
+      `<defs><mask id="cut-sky-m" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="${MOB_H}">${cut}</mask></defs>`+
+      `<rect width="1200" height="${MOB_H}" fill="var(--sky)" mask="url(#cut-sky-m)"/>`;
+    $('l-haze').innerHTML=''; $('l-deep').innerHTML='';
+
+    // ONE foliage wall up a margin: a thin ragged backing bank hugging the frame edge, then
+    // plants stacked bottom→top and clamped clear of the central text column. side -1=L, +1=R.
+    const mwall=(side,reach,kinds,fill,seed,gap)=>{
+      const r=rng(seed), pick=kindPicker(r,kinds), nz=noise(r,reach*0.16);
+      const edge=side<0?0:1200, inX=y=>edge-side*(reach*0.30+nz(y/MOB_H));
+      const N=48; let d=`M${edge},-4`;
+      for(let i=0;i<=N;i++){const y=MOB_H*i/N; d+=` L${inX(y).toFixed(1)},${y.toFixed(1)}`;}
+      d+=` L${edge},${MOB_H+4} Z`;
+      let g=`<path fill="${fill}" d="${d}"/>`, items=[];
+      for(let by=MOB_H+gap*0.4; by>-gap; by-=gap*(0.78+0.46*r())){
+        const [kn,a,b]=pick(), h=a+(b-a)*r();
+        const x=clampX(edge-side*(reach*(0.16+0.5*r())), h, kn, side);
+        items.push({x,by,h,kn,sd:(seed^((by*7)|0))|0});
+      }
+      for(const it of items) g+=STAMP[it.kn].draw(it.x,it.by,it.h,fill,it.sd,side);
+      return g;
+    };
+
+    // back→front: smaller + further in behind, bolder + at the edge in front (vertical aerial depth)
+    const wFar   =[['ponga',70,118],['nikau',74,122],['pohutukawa',66,108],['flax',56,94],['toetoe',58,96]];
+    const wMid   =[['ponga',108,168],['nikau',116,180],['pohutukawa',98,158],['cabbage',102,164],['flax',86,136]];
+    const wBush  =[['ponga',196,284],['nikau',226,316],['pohutukawa',176,246],['cabbage',172,236]];
+    const wMargin=[['ponga',148,202],['cabbage',148,202],['flax',118,168],['toetoe',118,162]];
+    const wFore  =[['frond',128,186],['flax',114,160],['toetoe',114,154],['grass',62,95]];
+
+    $('l-far').innerHTML    = mwall(-1,470,wFar,   'var(--far)',   sub(8), 150)+mwall(+1,470,wFar,   'var(--far)',   sub(9), 150);
+    $('l-mid').innerHTML    = mwall(-1,420,wMid,   'var(--mid)',   sub(10),210)+mwall(+1,420,wMid,   'var(--mid)',   sub(11),210);
+    $('l-bush').innerHTML   = mwall(-1,372,wBush,  'var(--bush)',  sub(1), 300)+mwall(+1,372,wBush,  'var(--bush)',  sub(2), 300);
+    $('l-margin').innerHTML = mwall(-1,332,wMargin,'var(--margin)',sub(3), 250)+mwall(+1,332,wMargin,'var(--margin)',sub(4), 250);
+    let mfore = mwall(-1,300,wFore,'var(--fore)',sub(5),300)+mwall(+1,300,wFore,'var(--fore)',sub(6),300);
+    // FOCAL KIWI at the base of the left wall, facing right into the clearing (as on desktop).
+    const kS=1.45; mfore += kiwi(150, MOB_H-96, kS, 'var(--fore)');
+    $('l-fore').innerHTML=mfore;
+  }
+
   // MOBILE FRAMING — reuse the desktop layers as side frames. The centre stage is the full
   // 1200x800 scene under "xMidYMid slice" (cover): on a portrait phone it over-zooms to cover
   // the height, cropping width hard to the central clearing (~viewBox 415..785), so the rich
@@ -889,6 +947,7 @@
   let edgeLayers=[], lastAmp=0;
   function refreshEdges(){
     if(!SCENE_BUILT || !matchMedia('(max-width:760px)').matches) return;
+    if(CANYON) return;                         // Tier 2 portrait canyon replaces the side-frame clones
     const L=$('edge-l'), R=$('edge-r'); if(!L||!R) return;
     L.innerHTML=''; R.innerHTML=''; edgeLayers=[];
     // Reconstruct the centre stage's cover crop for THIS viewport so the columns can continue it.
