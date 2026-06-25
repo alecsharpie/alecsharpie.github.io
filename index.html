@@ -961,6 +961,13 @@
      for(const fx of [372,452,600,748,828]){ if(fr()<0.9){ const [kn,a,b]=fpick(), h=a+(b-a)*fr();
        mfore += STAMP[kn].draw(fx+(fr()-0.5)*30, mcY(fx)+6, h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1); } }}
     const kS=2.3; mfore += kiwi(296, FLOOR-58, kS, 'var(--fore)');
+    // two pīwakawaka perched together on a foreground twig on the RIGHT, facing each other
+    // (the right bird is the same stamp mirrored about its own centre) — echoing desktop.
+    mfore += limb([[968,FLOOR-150],[952,FLOOR-84],[946,FLOOR-16],[946,MOB_H+8]],[2,5,9,12],'var(--fore)',true);
+    {const ftS=1.85, ftL=872, ftR=934, ftCy=FLOOR-172;
+     mfore += limb([[ftL-12,ftCy+30],[ftL+30,ftCy+58],[ftL+86,ftCy+86],[ftR+44,ftCy+150]],[1.2,3.5,6,9],'var(--fore)',true);
+     mfore += fantail(ftL, ftCy, ftS, 'var(--fore)')
+            + `<g transform="translate(${(2*ftR).toFixed(1)} 0) scale(-1 1)">`+fantail(ftR, ftCy+6, ftS, 'var(--fore)')+`</g>`;}
     $('l-fore').innerHTML=mfore;
   }
 
