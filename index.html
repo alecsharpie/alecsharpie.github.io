@@ -968,7 +968,9 @@
     // back→front: smaller + reaching closer to the centre behind, bolder + further out in front.
     // NOTE: no lone `frond` in the airy far/mid layers — a single frond against the light reads as
     // a floating leaf (it has no clustered base). Fronds live only in the dense foreground thicket.
-    const kFar=[['ponga',150,250],['nikau',160,270],['pohutukawa',140,236],['cabbage',146,244],['flax',120,200],['toetoe',124,204]];
+    // pōhutukawa (big heavy crimson crown) thinned across the mobile diorama: dropped from the far
+    // wall + the footer mounds, kept only in mid/bush so it still appears, just less often.
+    const kFar=[['ponga',150,250],['nikau',160,270],['cabbage',146,244],['flax',120,200],['toetoe',124,204]];
     const kMid=[['ponga',230,360],['nikau',248,392],['pohutukawa',210,340],['cabbage',220,352],['flax',186,300]];
     const kBush=[['ponga',330,500],['nikau',380,560],['pohutukawa',300,452],['cabbage',312,470]];
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
@@ -990,11 +992,11 @@
       const x0=cx-wd*2.3, x1=cx+wd*2.3; let d=`M${x0.toFixed(0)},${MOB_H+8}`;
       for(let i=0;i<=48;i++){const x=x0+(x1-x0)*i/48; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
       let h=`<path fill="${fill}" d="${d} L${x1.toFixed(0)},${MOB_H+8} Z"/>`;
-      const mbKinds=[['ponga',46,86],['cabbage',48,88],['pohutukawa',44,80],['flax',38,68],['toetoe',40,72]], pick=kindPicker(r,mbKinds);
-      // dense small treeline right across the mound (two passes) — packs the footer back layers.
-      for(let pass=0;pass<2;pass++) for(let fx=304+pass*19;fx<=888;fx+=34){ if(fx>x0&&fx<x1&&r()<0.9){
-        const [kn,a,b]=pick(), ph=(a+(b-a)*r())*hMul, jx=fx+(r()-0.5)*26;
-        h+=STAMP[kn].draw(jx, cY(jx)+(kn==='flax'?34:6), ph, fill, (seed^((fx*7+pass*1009)|0))|0, fx<596?-1:1); } }
+      const mbKinds=[['ponga',46,86],['cabbage',48,88],['flax',38,68],['toetoe',40,72]], pick=kindPicker(r,mbKinds);
+      // a small treeline across the mound — packs the footer back layers (kept moderate).
+      for(let fx=312;fx<=884;fx+=42){ if(fx>x0&&fx<x1&&r()<0.78){
+        const [kn,a,b]=pick(), ph=(a+(b-a)*r())*hMul, jx=fx+(r()-0.5)*28;
+        h+=STAMP[kn].draw(jx, cY(jx)+(kn==='flax'?34:6), ph, fill, (seed^((fx*7)|0))|0, fx<596?-1:1); } }
       $(layer).innerHTML += h;
     };
     moundBand('l-far',   206,'var(--far)',   sub(31),0.8);
