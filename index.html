@@ -174,6 +174,10 @@
     .edge{display:block;width:25vw}
     .intro,.content{padding-left:26vw;padding-right:26vw}
     .intro h1{font-size:clamp(2.1rem,9vw,4.8rem)}
+    /* lift the © line up into the open clearing so it floats ABOVE the dense forest-floor
+       foliage at the very bottom (which sits in front of it), instead of hiding behind it. */
+    .content{padding-bottom:12vh}
+    footer{padding-bottom:27vh}
   }
 </style>
 </head>
@@ -916,7 +920,7 @@
     // 378..822, plus a little extra clamp pad so a stray crown tip never reaches the copy. Flax
     // gets extra room because it leans inward (below), so its tilted fronds still clear the text.
     const MCL=362, MCR=838, TOP_M=34;
-    const mclampX=(x,h,kn,side)=>{ const w=((STAMP[kn].cw||0.5)+(kn==='flax'?0.18:0))*h+8;
+    const mclampX=(x,h,kn,side)=>{ const w=((STAMP[kn].cw||0.5)+(kn==='flax'?0.18:kn==='nikau'?0.18:0))*h+8;
       return side<0 ? Math.min(x,MCL-w) : Math.max(x,MCR+w); };
 
     // a TALL hillside bank up one margin: ground rises from the centre-floor to the frame edge,
@@ -952,8 +956,10 @@
       items.sort((p,q)=>q.h-p.h);
       for(const it of items){
         let s=STAMP[it.kn].draw(it.x,it.by,it.h,fill,it.sd,side);
-        // lean harakeke/flax inward toward the clearing for a softer, more natural framing
-        if(it.kn==='flax') s=`<g transform="rotate(${(-side*12)} ${it.x.toFixed(1)} ${it.by.toFixed(1)})">${s}</g>`;
+        // lean harakeke/flax inward (softer framing); give the tall nīkau palm a gentle inward
+        // lean too so its shuttlecock crown reads with character instead of a straight hidden trunk.
+        const tilt = it.kn==='flax' ? 12 : it.kn==='nikau' ? 6+(it.sd&3)*1.2 : 0;
+        if(tilt) s=`<g transform="rotate(${(-side*tilt).toFixed(1)} ${it.x.toFixed(1)} ${it.by.toFixed(1)})">${s}</g>`;
         g+=s;
       }
       return g;
@@ -968,10 +974,12 @@
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344]];
 
-    $('l-far').innerHTML    = tallBay(-1,360,182,kFar,'var(--far)',sub(8),86,1.5)    + tallBay(+1,840,182,kFar,'var(--far)',sub(9),86,1.5);
-    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),126,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),126,1.5);
-    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),220,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),220,1.6);
-    $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),200,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),200,1.7);
+    // vstep spaces the big trees apart — eased a touch so the far→margin walls don't crowd with
+    // large trunks (footer density comes from the small-treeline mounds below instead).
+    $('l-far').innerHTML    = tallBay(-1,360,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,840,182,kFar,'var(--far)',sub(9),118,1.5);
+    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),164,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),164,1.5);
+    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),272,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),272,1.6);
+    $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),248,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),248,1.7);
     let mfore = tallBay(-1,228,366,kFore,'var(--fore)',sub(5),250,1.8)+tallBay(+1,972,366,kFore,'var(--fore)',sub(6),250,1.8);
 
     // STACKED valley-floor mounds (receding light→dark, as on desktop): a low light mound per back
@@ -982,10 +990,11 @@
       const x0=cx-wd*2.3, x1=cx+wd*2.3; let d=`M${x0.toFixed(0)},${MOB_H+8}`;
       for(let i=0;i<=48;i++){const x=x0+(x1-x0)*i/48; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
       let h=`<path fill="${fill}" d="${d} L${x1.toFixed(0)},${MOB_H+8} Z"/>`;
-      const mbKinds=[['ponga',46,86],['nikau',50,92],['cabbage',48,88],['pohutukawa',44,80],['flax',38,68]], pick=kindPicker(r,mbKinds);
-      for(const fx of [332,420,508,596,684,772,860]){ if(fx>x0&&fx<x1&&r()<0.82){
-        const [kn,a,b]=pick(), ph=(a+(b-a)*r())*hMul, jx=fx+(r()-0.5)*30;
-        h+=STAMP[kn].draw(jx, cY(jx)+(kn==='flax'?34:6), ph, fill, (seed^(fx*7))|0, fx<596?-1:1); } }
+      const mbKinds=[['ponga',46,86],['cabbage',48,88],['pohutukawa',44,80],['flax',38,68],['toetoe',40,72]], pick=kindPicker(r,mbKinds);
+      // dense small treeline right across the mound (two passes) — packs the footer back layers.
+      for(let pass=0;pass<2;pass++) for(let fx=304+pass*19;fx<=888;fx+=34){ if(fx>x0&&fx<x1&&r()<0.9){
+        const [kn,a,b]=pick(), ph=(a+(b-a)*r())*hMul, jx=fx+(r()-0.5)*26;
+        h+=STAMP[kn].draw(jx, cY(jx)+(kn==='flax'?34:6), ph, fill, (seed^((fx*7+pass*1009)|0))|0, fx<596?-1:1); } }
       $(layer).innerHTML += h;
     };
     moundBand('l-far',   206,'var(--far)',   sub(31),0.8);
