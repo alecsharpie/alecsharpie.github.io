@@ -919,7 +919,7 @@
     // WIDENED central clearing for mobile — more breathing room for the text than desktop's
     // 378..822, plus a little extra clamp pad so a stray crown tip never reaches the copy. Flax
     // gets extra room because it leans inward (below), so its tilted fronds still clear the text.
-    const MCL=362, MCR=838, TOP_M=34;
+    const MCL=344, MCR=856, TOP_M=34;
     const mclampX=(x,h,kn,side)=>{ const w=((STAMP[kn].cw||0.5)+(kn==='flax'?0.18:kn==='nikau'?0.18:0))*h+8;
       return side<0 ? Math.min(x,MCL-w) : Math.max(x,MCR+w); };
 
@@ -978,7 +978,7 @@
 
     // vstep spaces the big trees apart — eased a touch so the far→margin walls don't crowd with
     // large trunks (footer density comes from the small-treeline mounds below instead).
-    $('l-far').innerHTML    = tallBay(-1,360,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,840,182,kFar,'var(--far)',sub(9),118,1.5);
+    $('l-far').innerHTML    = tallBay(-1,344,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,856,182,kFar,'var(--far)',sub(9),118,1.5);
     $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),164,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),164,1.5);
     $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),272,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),272,1.6);
     $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),248,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),248,1.7);
