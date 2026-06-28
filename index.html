@@ -174,10 +174,6 @@
     .edge{display:block;width:25vw}
     .intro,.content{padding-left:26vw;padding-right:26vw}
     .intro h1{font-size:clamp(2.1rem,9vw,4.8rem)}
-    /* lift the © line up into the open clearing so it floats ABOVE the dense forest-floor
-       foliage at the very bottom (which sits in front of it), instead of hiding behind it. */
-    .content{padding-bottom:12vh}
-    footer{padding-bottom:27vh}
   }
 </style>
 </head>
@@ -211,7 +207,6 @@
   </ul></section>
 </main>
 
-<footer>© <span id="year"></span> Alec Sharp</footer>
 
 <div class="stage stage-front">
   <div class="layer" data-depth="0.40"><svg id="l-margin" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
@@ -244,7 +239,6 @@
 
 <script src="js/stamps.js"></script>
 <script>
-  document.getElementById('year').textContent = new Date().getFullYear();
   const $=id=>document.getElementById(id);
 
   /* =====================================================================
