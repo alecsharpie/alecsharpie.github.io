@@ -968,11 +968,30 @@
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344]];
 
-    $('l-far').innerHTML    = tallBay(-1,360,182,kFar,'var(--far)',sub(8),100,1.5)   + tallBay(+1,840,182,kFar,'var(--far)',sub(9),100,1.5);
-    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),150,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),150,1.5);
+    $('l-far').innerHTML    = tallBay(-1,360,182,kFar,'var(--far)',sub(8),86,1.5)    + tallBay(+1,840,182,kFar,'var(--far)',sub(9),86,1.5);
+    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),126,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),126,1.5);
     $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),220,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),220,1.6);
     $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),200,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),200,1.7);
     let mfore = tallBay(-1,228,366,kFore,'var(--fore)',sub(5),250,1.8)+tallBay(+1,972,366,kFore,'var(--fore)',sub(6),250,1.8);
+
+    // STACKED valley-floor mounds (receding light→dark, as on desktop): a low light mound per back
+    // layer peeking up behind the dark fore mound — adds back-layer density across the footer and
+    // the bottom of the margins. Kept low (peaks well under the footer copy) with small treeline.
+    const moundBand=(layer,amp,fill,seed,hMul)=>{
+      const r=rng(seed), cx=596, wd=300, nz=noise(r,16), cY=x=>FLOOR-amp*Math.exp(-Math.pow((x-cx)/wd,2))+nz((x-300)/600)*0.5;
+      const x0=cx-wd*2.3, x1=cx+wd*2.3; let d=`M${x0.toFixed(0)},${MOB_H+8}`;
+      for(let i=0;i<=48;i++){const x=x0+(x1-x0)*i/48; d+=` L${x.toFixed(1)},${cY(x).toFixed(1)}`;}
+      let h=`<path fill="${fill}" d="${d} L${x1.toFixed(0)},${MOB_H+8} Z"/>`;
+      const mbKinds=[['ponga',46,86],['nikau',50,92],['cabbage',48,88],['pohutukawa',44,80],['flax',38,68]], pick=kindPicker(r,mbKinds);
+      for(const fx of [332,420,508,596,684,772,860]){ if(fx>x0&&fx<x1&&r()<0.82){
+        const [kn,a,b]=pick(), ph=(a+(b-a)*r())*hMul, jx=fx+(r()-0.5)*30;
+        h+=STAMP[kn].draw(jx, cY(jx)+(kn==='flax'?34:6), ph, fill, (seed^(fx*7))|0, fx<596?-1:1); } }
+      $(layer).innerHTML += h;
+    };
+    moundBand('l-far',   206,'var(--far)',   sub(31),0.8);
+    moundBand('l-mid',   172,'var(--mid)',   sub(32),1.0);
+    moundBand('l-bush',  144,'var(--bush)',  sub(33),1.25);
+    moundBand('l-margin',122,'var(--margin)',sub(34),1.45);
 
     // valley floor: a low central mound closing the foot of the clearing (connected to the base),
     // a small foreground thicket on it, then the focal kiwi — placed where the dark fore/margin/
