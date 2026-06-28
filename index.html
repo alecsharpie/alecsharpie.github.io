@@ -331,13 +331,20 @@
   // clean black silhouette against the lit ranges behind.
   const AURORA_DEPTH={light:1.22,sky:1.0,haze:0.85,deep:0.71,far:0.57,mid:0.43,bush:0.29,margin:0.15,fore:0.0};
   const AURORA_SHEETS=['sky','haze','deep','far','mid','bush','margin','fore'];
+  // SCENE_H — the layers' viewBox height. Desktop is the wide 1200×800 cover scene; a phone gets
+  // the TALL portrait canyon (viewBox 1200×1800, see the MB block). The marble pattern, its mask
+  // and its fill-rect must all span the FULL height or the diorama vanishes below 800 on mobile.
+  // Decided here (before any aurora build) because MB is declared further down.
+  const AURORA_W=1200, SCENE_H=matchMedia('(max-width:760px)').matches?1800:800;
   const clamp255=v=>Math.max(0,Math.min(255,Math.round(v)));
 
   // TWO shared grayscale value-noise fields (0..1), generated once. AURORA_NOISE is the
   // brightness mottle; AURORA_WARP is a low-frequency field that displaces the hue column
   // vertically per-x, so the colour bands WAVE up and down like real aurora curtains
   // instead of reading as one flat horizontal line.
-  const AURORA_NW=320, AURORA_NH=216;
+  // raster height tracks SCENE_H so the speckle grain stays square on the taller portrait canyon.
+  // Desktop keeps its original 216 verbatim (byte-identical); mobile scales up (1800→486).
+  const AURORA_NW=320, AURORA_NH=SCENE_H===800?216:Math.round(216*SCENE_H/800);
   function genNoise(octs,seedBase){
     const w=AURORA_NW,h=AURORA_NH,out=new Float32Array(w*h);
     // octs: [gridW, gridH, amplitude] — random grid bilinearly upsampled, summed.
@@ -415,8 +422,8 @@
     svg.setAttribute('aria-hidden','true');
     svg.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
     svg.innerHTML='<defs>'+AURORA_SHEETS.map(k=>
-      `<pattern id="aurora-${k}" patternUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">
-         <image href="${auroraSheetURL(AURORA_DEPTH[k])}" x="0" y="0" width="1200" height="800" preserveAspectRatio="none"/>
+      `<pattern id="aurora-${k}" patternUnits="userSpaceOnUse" x="0" y="0" width="${AURORA_W}" height="${SCENE_H}">
+         <image href="${auroraSheetURL(AURORA_DEPTH[k])}" x="0" y="0" width="${AURORA_W}" height="${SCENE_H}" preserveAspectRatio="none"/>
        </pattern>`).join('')+'</defs>';
     document.body.appendChild(svg);
   }
@@ -434,9 +441,9 @@
         const svg=$('l-'+k); if(!svg) continue;
         if(AURORA_ORIG[k]==null) AURORA_ORIG[k]=svg.innerHTML;
         // shapes render white (vars are #fff under aurora) → they mask in the marble rect.
-        svg.innerHTML=`<defs><mask id="amask-${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="800">`
+        svg.innerHTML=`<defs><mask id="amask-${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${AURORA_W}" height="${SCENE_H}">`
           +`<g fill="#fff">${AURORA_ORIG[k]}</g></mask></defs>`
-          +`<rect width="1200" height="800" fill="url(#aurora-${k})" mask="url(#amask-${k})"/>`;
+          +`<rect width="${AURORA_W}" height="${SCENE_H}" fill="url(#aurora-${k})" mask="url(#amask-${k})"/>`;
       }
     } else {
       for(const k of AURORA_SHEETS){
