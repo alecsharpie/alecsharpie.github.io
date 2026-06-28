@@ -940,7 +940,11 @@
           lastY=cy; lastX=x;
           const t=Math.max(0,Math.min(1,(cy-edgeY)/(FLOOR-edgeY)));   // 0 near top → 1 at the floor
           const [kn,a,b]=pick(); let h=(a+(b-a)*r())*(0.76+0.24*t);   // bolder toward the floor, still tall up top
-          const px=mclampX(x,h,kn,side), by=crest(px)+10;             // ROOT on the bank at the clamped x → never floats
+          let px=mclampX(x,h,kn,side), bury=12;
+          // tuck harakeke/flax further toward the frame edge and bury it deep, so its flat cut
+          // base hides under the ground / off-frame and only the blades read.
+          if(kn==='flax'){ px=side<0?Math.max(edge,px-34):Math.min(edge,px+34); bury=52; }
+          const by=crest(px)+bury;                                    // ROOT on the bank at the clamped x → never floats
           h=Math.min(h,(by-TOP_M)/(STAMP[kn].crown||1.1));            // cap height so crowns never clip the frame top
           items.push({x:px,by,h,kn,sd:(seed^(i*61))|0});
         }
@@ -956,8 +960,10 @@
     };
 
     // back→front: smaller + reaching closer to the centre behind, bolder + further out in front.
-    const kFar=[['ponga',150,250],['nikau',160,270],['pohutukawa',140,236],['cabbage',146,244],['flax',120,200],['toetoe',124,204],['frond',120,196]];
-    const kMid=[['ponga',230,360],['nikau',248,392],['pohutukawa',210,340],['cabbage',220,352],['flax',186,300],['frond',182,292]];
+    // NOTE: no lone `frond` in the airy far/mid layers — a single frond against the light reads as
+    // a floating leaf (it has no clustered base). Fronds live only in the dense foreground thicket.
+    const kFar=[['ponga',150,250],['nikau',160,270],['pohutukawa',140,236],['cabbage',146,244],['flax',120,200],['toetoe',124,204]];
+    const kMid=[['ponga',230,360],['nikau',248,392],['pohutukawa',210,340],['cabbage',220,352],['flax',186,300]];
     const kBush=[['ponga',330,500],['nikau',380,560],['pohutukawa',300,452],['cabbage',312,470]];
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344]];
@@ -977,18 +983,20 @@
      mfore += `<path fill="var(--fore)" d="${md} L920,${MOB_H+8} Z"/>`;
      // foreground thicket kept to the centre-RIGHT, leaving a clear pocket for the kiwi on the left.
      const footK=[['frond',150,220],['flax',150,214],['toetoe',150,206]], fr=rng(sub(14)), fpick=kindPicker(fr,footK);
-     for(const fx of [528,612,694,778]){ if(fr()<0.85){ const [kn,a,b]=fpick(), h=a+(b-a)*fr();
-       mfore += STAMP[kn].draw(fx+(fr()-0.5)*24, mcY(fx)+6, h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1); } }
+     for(const fx of [528,612,694,778]){ if(fr()<0.85){ const [kn,a,b]=fpick(), h=a+(b-a)*fr(), jx=fx+(fr()-0.5)*24;
+       // read the mound height at the JITTERED x (not fx) so the plant sits on the slope, never floats
+       mfore += STAMP[kn].draw(jx, mcY(jx)+(kn==='flax'?40:6), h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1); } }
      // FOCAL KIWI — on the low mound just inside the clearing, head & bill facing right into OPEN
      // deep (clear pocket to ~520), feet buried in the mound; its silhouette reads against the light.
      const kS=2.2, kx=372; mfore += kiwi(kx, mcY(kx)-47*kS, kS, 'var(--fore)');}
     // two pīwakawaka on a twig on the RIGHT, set where bush/margin/fore have dived away so they
     // read against the lighter far/deep backdrop; the twig roots to the base (connected sheet).
-    {const ftS=1.9, ftL=876, ftR=920, ftCy=FLOOR-374;
-     mfore += limb([[ftR+30,ftCy+34],[ftR+26,ftCy+150],[ftR+20,ftCy+320],[ftR+16,MOB_H+8]],[2,5,9,13],'var(--fore)',true)
-            + limb([[ftL-10,ftCy+26],[ftL+34,ftCy+52],[ftL+88,ftCy+80],[ftR+30,ftCy+34]],[1,3.2,5.5,7],'var(--fore)',true);
+    // two pīwakawaka spaced along a level twig (no longer bills-touching), the twig rooted down
+    // to the base (connected sheet); set against the lighter far/deep so the dark birds read.
+    {const ftS=1.9, ftL=846, ftR=952, ftCy=FLOOR-372;
+     mfore += limb([[ftL-22,ftCy+34],[ftL+50,ftCy+44],[ftR+2,ftCy+40],[ftR+26,ftCy+200],[ftR+18,MOB_H+8]],[1.3,3.4,5.5,9,13],'var(--fore)',true);
      mfore += fantail(ftL, ftCy, ftS, 'var(--fore)')
-            + `<g transform="translate(${(2*ftR).toFixed(1)} 0) scale(-1 1)">`+fantail(ftR, ftCy+6, ftS, 'var(--fore)')+`</g>`;}
+            + `<g transform="translate(${(2*ftR).toFixed(1)} 0) scale(-1 1)">`+fantail(ftR, ftCy+4, ftS, 'var(--fore)')+`</g>`;}
     $('l-fore').innerHTML=mfore;
   }
 
