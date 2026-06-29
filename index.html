@@ -37,9 +37,17 @@
 
   /* the back of the box: a single flat panel of even diffused light.
      this is the ONLY light. it shows through every hole cut in the cards. */
-  .glow{position:fixed;inset:0;z-index:0;background:var(--light)}
+  /* Pin the scene to a CONSTANT large-viewport height, not the live viewport. On iOS Safari a
+     `position:fixed; inset:0` box is re-sized to the *visual* viewport every time the bottom
+     URL/search bar grows or shrinks while scrolling; because the layer SVGs use
+     preserveAspectRatio="…slice", that height change re-fits (re-scales) the whole diorama on
+     each tick → the jittery jump. Anchoring to `100lvh` (the large viewport, a value that does
+     NOT change when the toolbar toggles) keeps the rendered SVG height — and so the slice scale —
+     fixed; the toolbar just reveals/covers the already-painted bottom strip. 100vh is the
+     equivalent fallback for browsers without lvh. Desktop is unaffected (lvh == vh). */
+  .glow{position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;z-index:0;background:var(--light)}
 
-  .stage{position:fixed;inset:0;pointer-events:none}
+  .stage{position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;pointer-events:none}
   .stage-back{z-index:1}
   .stage-front{z-index:20}
   .layer{position:absolute;inset:0;will-change:transform}
@@ -174,6 +182,8 @@
     .edge{display:block;width:25vw}
     .intro,.content{padding-left:26vw;padding-right:26vw}
     .intro h1{font-size:clamp(2.1rem,9vw,4.8rem)}
+    /* no box frame on phones — the portrait canyon bleeds edge-to-edge (both palettes) */
+    .frame{display:none}
   }
 </style>
 </head>
@@ -928,7 +938,11 @@
     // plants rooted ON the crest with their feet buried in the bank — one connected sheet, never
     // floating (RULES §6). The crest dives to the floor SHORT of the clearing, so the central
     // column keeps revealing the flat deep card and nothing dark crosses the text (RULES §7b).
-    const tallBay=(side,innerX,edgeY,kinds,fill,seed,vstep,divePow)=>{
+    // topClear: a viewBox-Y line above which this bay plants NOTHING — its crowns must all
+    // stay below it. Used to keep the nearer/darker walls (bush/margin/fore) out of the strip
+    // above the "Alec Sharp" hero, so the eye lands on the name first and only the further-back,
+    // lighter ranges (haze/deep/far) feather in over the top of the heading.
+    const tallBay=(side,innerX,edgeY,kinds,fill,seed,vstep,divePow,topClear=0)=>{
       const r=rng(seed), edge=side<0?0:1200, span=innerX-edge;
       const crest=makeCrest(edge,innerX,edgeY,FLOOR,r,34,divePow);
       const N=80; let d=`M${edge},${MOB_H+8} L${edge.toFixed(1)},${crest(edge).toFixed(1)}`;
@@ -951,6 +965,7 @@
           if(kn==='flax'){ px=side<0?Math.max(edge,px-34):Math.min(edge,px+34); bury=52; }
           const by=crest(px)+bury;                                    // ROOT on the bank at the clamped x → never floats
           h=Math.min(h,(by-TOP_M)/(STAMP[kn].crown||1.1));            // cap height so crowns never clip the frame top
+          if(topClear && by-h*(STAMP[kn].crown||1.1)<topClear) continue;  // skip plants that would poke above the hero
           items.push({x:px,by,h,kn,sd:(seed^(i*61))|0});
         }
       }
@@ -969,21 +984,27 @@
     // back→front: smaller + reaching closer to the centre behind, bolder + further out in front.
     // NOTE: no lone `frond` in the airy far/mid layers — a single frond against the light reads as
     // a floating leaf (it has no clustered base). Fronds live only in the dense foreground thicket.
-    // pōhutukawa (big heavy crimson crown) thinned across the mobile diorama: dropped from the far
-    // wall + the footer mounds, kept only in mid/bush so it still appears, just less often.
+    // pōhutukawa (big heavy crimson crown) thinned hard across the mobile diorama: dropped from the
+    // far wall, the bush wall + the footer mounds, kept ONLY in the lighter mid range so it still
+    // appears occasionally, just rarely (its own `rarity` re-roll thins it further within mid).
     const kFar=[['ponga',150,250],['nikau',160,270],['cabbage',146,244],['flax',120,200],['toetoe',124,204]];
     const kMid=[['ponga',230,360],['nikau',248,392],['pohutukawa',210,340],['cabbage',220,352],['flax',186,300]];
-    const kBush=[['ponga',330,500],['nikau',380,560],['pohutukawa',300,452],['cabbage',312,470]];
+    const kBush=[['ponga',330,500],['nikau',380,560],['cabbage',312,470]];
     const kMargin=[['ponga',260,392],['cabbage',262,396],['flax',214,326],['toetoe',214,318],['frond',224,338]];
     const kFore=[['frond',280,420],['flax',236,352],['toetoe',236,344]];
 
     // vstep spaces the big trees apart — eased a touch so the far→margin walls don't crowd with
     // large trunks (footer density comes from the small-treeline mounds below instead).
+    // The HERO STRIP (viewBox-y above ~the "Alec Sharp" heading) is kept open: each nearer wall's
+    // bank-top (edgeY) is pushed progressively lower and its crowns clipped (topClear) so above the
+    // name only the lighter, further-back ranges (haze/deep/far + a touch of mid) feather in — the
+    // dark bush/margin/fore walls start at/below the heading and build down toward the projects.
+    const HERO=470;   // viewBox-y of the heading band (≈23vh on a portrait phone)
     $('l-far').innerHTML    = tallBay(-1,344,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,856,182,kFar,'var(--far)',sub(9),118,1.5);
-    $('l-mid').innerHTML    = tallBay(-1,338,214,kMid,'var(--mid)',sub(10),164,1.5)  + tallBay(+1,862,214,kMid,'var(--mid)',sub(11),164,1.5);
-    $('l-bush').innerHTML   = tallBay(-1,304,254,kBush,'var(--bush)',sub(1),272,1.6) + tallBay(+1,896,254,kBush,'var(--bush)',sub(2),272,1.6);
-    $('l-margin').innerHTML = tallBay(-1,266,304,kMargin,'var(--margin)',sub(3),248,1.7)+tallBay(+1,934,304,kMargin,'var(--margin)',sub(4),248,1.7);
-    let mfore = tallBay(-1,228,366,kFore,'var(--fore)',sub(5),250,1.8)+tallBay(+1,972,366,kFore,'var(--fore)',sub(6),250,1.8);
+    $('l-mid').innerHTML    = tallBay(-1,338,300,kMid,'var(--mid)',sub(10),164,1.5,330)  + tallBay(+1,862,300,kMid,'var(--mid)',sub(11),164,1.5,330);
+    $('l-bush').innerHTML   = tallBay(-1,304,452,kBush,'var(--bush)',sub(1),272,1.6,HERO) + tallBay(+1,896,452,kBush,'var(--bush)',sub(2),272,1.6,HERO);
+    $('l-margin').innerHTML = tallBay(-1,266,512,kMargin,'var(--margin)',sub(3),248,1.7,HERO+40)+tallBay(+1,934,512,kMargin,'var(--margin)',sub(4),248,1.7,HERO+40);
+    let mfore = tallBay(-1,228,566,kFore,'var(--fore)',sub(5),250,1.8,HERO+90)+tallBay(+1,972,566,kFore,'var(--fore)',sub(6),250,1.8,HERO+90);
 
     // STACKED valley-floor mounds (receding light→dark, as on desktop): a low light mound per back
     // layer peeking up behind the dark fore mound — adds back-layer density across the footer and
@@ -1008,13 +1029,18 @@
     // valley floor: a low central mound closing the foot of the clearing (connected to the base),
     // a small foreground thicket on it, then the focal kiwi — placed where the dark fore/margin/
     // bush have dived away so its silhouette reads against the LIGHTER far/deep backdrop (as desktop).
+    // the central mound runs WIDE — from 200 to 1000 — so it overlaps the foot of both fore side
+    // banks (innerX 228 / 972) and the dark ground reads as one continuous footer with no notch /
+    // drop-off at the corners where the bank meets the floor.
     {const r=rng(sub(13)), amp=108, mcY=x=>FLOOR-amp*Math.exp(-Math.pow((x-560)/270,2))+noise(r,18)((x-300)/600)*0.6;
-     let md=`M280,${MOB_H+8}`;
-     for(let i=0;i<=44;i++){const x=280+640*i/44; md+=` L${x.toFixed(1)},${mcY(x).toFixed(1)}`;}
-     mfore += `<path fill="var(--fore)" d="${md} L920,${MOB_H+8} Z"/>`;
-     // foreground thicket kept to the centre-RIGHT, leaving a clear pocket for the kiwi on the left.
+     let md=`M200,${MOB_H+8}`;
+     for(let i=0;i<=44;i++){const x=200+800*i/44; md+=` L${x.toFixed(1)},${mcY(x).toFixed(1)}`;}
+     mfore += `<path fill="var(--fore)" d="${md} L1000,${MOB_H+8} Z"/>`;
+     // foreground thicket kept to the centre-RIGHT, clear of the kiwi: its long bill sweeps right to
+     // x≈643, so the thicket starts to the RIGHT of the bill tip (no stamp over the beak) while still
+     // filling the right of the footer.
      const footK=[['frond',150,220],['flax',150,214],['toetoe',150,206]], fr=rng(sub(14)), fpick=kindPicker(fr,footK);
-     for(const fx of [528,612,694,778]){ if(fr()<0.85){ const [kn,a,b]=fpick(), h=a+(b-a)*fr(), jx=fx+(fr()-0.5)*24;
+     for(const fx of [694,778,856]){ if(fr()<0.85){ const [kn,a,b]=fpick(), h=a+(b-a)*fr(), jx=fx+(fr()-0.5)*24;
        // read the mound height at the JITTERED x (not fx) so the plant sits on the slope, never floats
        mfore += STAMP[kn].draw(jx, mcY(jx)+(kn==='flax'?40:6), h, 'var(--fore)', (sub(14)^(fx*7))|0, fx<600?-1:1); } }
      // FOCAL KIWI — on the low mound just inside the clearing, head & bill facing right into OPEN

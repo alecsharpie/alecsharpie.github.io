@@ -1,6 +1,6 @@
 # Shadow box — the rules
 
-The scene in `prototypes/silhouette.html` is a literal simulation of a paper-cut
+The scene in `index.html` is a literal simulation of a paper-cut
 shadow box: a stack of thin black cards, spaced ~1cm apart, lit from behind by one
 diffused light. These rules are what keep it physically honest. Don't break them.
 

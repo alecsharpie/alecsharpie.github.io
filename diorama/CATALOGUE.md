@@ -7,8 +7,8 @@ library of reusable **stamps**. Each stamp is a single connected paper-cut — o
 Verify/refine them in isolation with [`catalogue.html`](./catalogue.html):
 
 ```bash
-node ~/.claude/skills/screenshot-verify/shoot.mjs prototypes/catalogue.html \
-  --config prototypes/catalogue.shoot.json --out shots/cat
+node ~/.claude/skills/screenshot-verify/shoot.mjs diorama/catalogue.html \
+  --config diorama/catalogue.shoot.json --out shots/cat
 ```
 
 ## Convention

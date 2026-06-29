@@ -6,9 +6,9 @@ outline alone, clean (no scraggly stray strokes), bold enough to cut from card
 (Rule 6: one connected shape per `<g>`), and true to the plant/animal's form.
 
 Verified in isolation with the catalogue grid:
-`node ~/.claude/skills/screenshot-verify/shoot.mjs prototypes/catalogue.html --config prototypes/catalogue.shoot.json --out shots/cat`
+`node ~/.claude/skills/screenshot-verify/shoot.mjs diorama/catalogue.html --config diorama/catalogue.shoot.json --out shots/cat`
 or a single stamp large via
-`node ~/.claude/skills/screenshot-verify/shoot.mjs 'prototypes/stamp.html?name=<stamp>' --config prototypes/stamp.shoot.json --out shots/one`.
+`node ~/.claude/skills/screenshot-verify/shoot.mjs 'diorama/stamp.html?name=<stamp>' --config diorama/stamp.shoot.json --out shots/one`.
 
 Reference photos live in `goal/`. Below is the **current realised design** of each
 catalogue stamp (the grid holds ten; `mamaku` and `koru` are scene-only).
@@ -78,7 +78,7 @@ fan steeper on the right and shallower on the left, the bird facing slightly rig
 
 ### Scene-only stamps
 - `mamaku` (alias `treeFern`) — tall slender bendy tree fern with a wide weeping
-  parasol crown, used in the shadow-box scene (`silhouette.html`).
+  parasol crown, used in the shadow-box scene (`index.html`).
 - `koru` — a single unfurling fiddlehead spiral, `dir` ±1.
 
 ### Working method

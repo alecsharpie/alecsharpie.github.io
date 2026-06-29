@@ -1,0 +1,7 @@
+{
+  "_comment": "Single-stamp focus. Pass the stamp via query, e.g.: node ~/.claude/skills/screenshot-verify/shoot.mjs 'diorama/stamp.html?name=koru' --config diorama/stamp.shoot.json --out shots/one",
+  "wait": 400,
+  "shots": [
+    { "name": "stamp", "w": 640, "h": 720, "scroll": 0 }
+  ]
+}

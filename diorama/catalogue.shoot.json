@@ -1,0 +1,7 @@
+{
+  "_comment": "Catalogue grid. Run from repo root: node ~/.claude/skills/screenshot-verify/shoot.mjs diorama/catalogue.html --config diorama/catalogue.shoot.json --out shots/cat",
+  "wait": 500,
+  "shots": [
+    { "name": "catalogue", "w": 1200, "h": 900, "fullPage": true }
+  ]
+}

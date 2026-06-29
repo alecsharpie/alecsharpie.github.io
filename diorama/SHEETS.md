@@ -1,6 +1,6 @@
 # Shadow box — sheet stack
 
-The full layer stack for `prototypes/silhouette.html`, back to front.
+The full layer stack for `index.html`, back to front.
 
 Every layer is **one flat sheet of black card** — a single flat colour, never a
 gradient. The **only** light is a flat panel at the very back; everything bright in

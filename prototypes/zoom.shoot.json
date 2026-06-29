@@ -1,8 +1,0 @@
-{
-  "_comment": "Zoom into the nikau crown edge + fruit panicle. node ~/.claude/skills/screenshot-verify/shoot.mjs 'prototypes/stamp.html?name=nikau' --config prototypes/zoom.shoot.json --out shots/nk_zoom",
-  "wait": 400,
-  "shots": [
-    { "name": "crown",   "w": 640, "h": 720, "scroll": 0, "dsf": 4, "clip": { "x": 220, "y": 55, "width": 210, "height": 175 } },
-    { "name": "panicle", "w": 640, "h": 720, "scroll": 0, "dsf": 4, "clip": { "x": 255, "y": 220, "width": 140, "height": 110 } }
-  ]
-}
