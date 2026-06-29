@@ -66,14 +66,14 @@
      light panel floods in last. Palette-agnostic — it only scales luminance, so
      tōtara and aurora reveal the same way. The per-sheet stagger (transition-delay)
      is set in JS from stack order, reversed (front sheets lead). */
-  .glow,.layer,.edge svg{transition:filter 1.35s ease}
-  body:not(.lit) .glow,body:not(.lit) .layer,body:not(.lit) .edge svg{filter:brightness(0)}
-  body.lit  .glow,body.lit  .layer,body.lit  .edge svg{filter:brightness(1)}
+  .glow,.layer{transition:filter 1.35s ease}
+  body:not(.lit) .glow,body:not(.lit) .layer{filter:brightness(0)}
+  body.lit  .glow,body.lit  .layer{filter:brightness(1)}
   /* page copy fades in late, as the lit clearing floods in behind the silhouettes */
   .intro,.content,footer{transition:opacity 1.1s ease .9s}
   body:not(.lit) .intro,body:not(.lit) .content,body:not(.lit) footer{opacity:0}
   @media (prefers-reduced-motion:reduce){
-    .glow,.layer,.edge svg,.intro,.content,footer{transition:none}
+    .glow,.layer,.intro,.content,footer{transition:none}
   }
 
   /* the box edge. the depth illusion comes from the real stacked sheets now,
@@ -140,23 +140,6 @@
   body.pal-aurora #l-deep,body.pal-aurora #l-far,body.pal-aurora #l-mid,
   body.pal-aurora #l-bush,body.pal-aurora #l-margin,body.pal-aurora #l-fore{filter:none}
 
-  /* DARK palettes (white copy on a deep, dim scene): re-light the hardcoded dark text
-     colours, and — like aurora — give every range a crisp air-gap shadow so the dim
-     green layers cleanly overlap instead of merging into one black mass. The white text
-     reads on the back sky/range tones with a soft dark halo (set per-palette via --halo). */
-  body.pal-dark .proj h3{color:#ffffff}
-  body.pal-dark .proj .meta{color:#cfe2d6}
-  body.pal-dark .proj p{color:#eef6f1}
-  body.pal-dark .proj a,body.pal-dark .cool a{color:#dbf0e2;border-bottom-color:rgba(219,240,226,.4)}
-  body.pal-dark .intro .links a,body.pal-dark .intro .subjects a{color:#eafff2;border-bottom-color:rgba(234,255,242,.45)}
-  body.pal-dark footer{color:#9fc2ac}
-  body.pal-dark #l-deep  {filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
-  body.pal-dark #l-far   {filter:drop-shadow(0 4px 5px rgba(0,0,0,.55))}
-  body.pal-dark #l-mid   {filter:drop-shadow(0 6px 7px rgba(0,0,0,.6))}
-  body.pal-dark #l-bush  {filter:drop-shadow(0 9px 10px rgba(0,0,0,.64))}
-  body.pal-dark #l-margin{filter:drop-shadow(0 13px 14px rgba(0,0,0,.68))}
-  body.pal-dark #l-fore  {filter:drop-shadow(0 17px 17px rgba(0,0,0,.72))}
-
   /* FLAT palettes: a clean cut-paper look with NO shadows of any kind — no air-gap drop
      shadows between sheets, no frame bevel, no text glow (--halo is transparent). Depth
      reads purely from the flat tonal ramp. */
@@ -164,22 +147,9 @@
   /* drop the inner bevel line (the "2nd" border) → a single clean frame. Aurora opts in too. */
   body.pal-flat .frame,body.pal-aurora .frame{box-shadow:none}
 
-  /* MOBILE: the slice crops the diorama to its central clearing (viewBox x~415-785), so the
-     desktop side bush/foreground/kiwi is off-frame and the margins read empty. Instead of
-     inventing new mobile bush, we reuse the SAME layers: two thin edge columns re-slice the
-     built scene against its left / right margins (preserveAspectRatio set in JS), framing the
-     reading column with the real desktop foliage. Narrow the copy so it clears those columns
-     (the light totara palette has no text halo → text must stay on the clear centre). */
-  .edge{position:fixed;top:0;bottom:0;z-index:20;pointer-events:none;overflow:hidden;display:none}
-  .edge svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-  /* No fade: the foreground is the nearest sheet and must sit opaque on top (RULES.md §5/§8).
-     The clone's viewBox (set in JS) ends just INSIDE the clearing, so the inner boundary is the
-     forest's own ragged silhouette tapering into open ground — clearing meets clearing, no seam.
-     The hard outer cut tucks under the 14px frame border. */
-  .edge-l{left:0}
-  .edge-r{right:0}
+  /* MOBILE: the portrait "forest canyon" build (see the MB block in JS) draws foliage walls up
+     both margins, so the reading column must stay in the clear centre and the box frame drops. */
   @media (max-width:760px){
-    .edge{display:block;width:25vw}
     .intro,.content{padding-left:26vw;padding-right:26vw}
     .intro h1{font-size:clamp(2.1rem,9vw,4.8rem)}
     /* no box frame on phones — the portrait canyon bleeds edge-to-edge (both palettes) */
@@ -222,11 +192,6 @@
   <div class="layer" data-depth="0.40"><svg id="l-margin" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
   <div class="layer" data-depth="0.70"><svg id="l-fore"   viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
 </div>
-
-<!-- MOBILE side frames: filled in JS with clones of the layers above, re-sliced against the
-     left / right margins so the desktop foliage frames the narrowed reading column. -->
-<div class="edge edge-l" id="edge-l"></div>
-<div class="edge edge-r" id="edge-r"></div>
 
 <div class="frame"></div>
 
@@ -341,11 +306,13 @@
   // clean black silhouette against the lit ranges behind.
   const AURORA_DEPTH={light:1.22,sky:1.0,haze:0.85,deep:0.71,far:0.57,mid:0.43,bush:0.29,margin:0.15,fore:0.0};
   const AURORA_SHEETS=['sky','haze','deep','far','mid','bush','margin','fore'];
+  // MB — phone (portrait canyon) vs desktop (wide cover scene). One source of truth for the
+  // 760px breakpoint, read here before any aurora build because SCENE_H depends on it.
+  const MB=matchMedia('(max-width:760px)').matches;
   // SCENE_H — the layers' viewBox height. Desktop is the wide 1200×800 cover scene; a phone gets
   // the TALL portrait canyon (viewBox 1200×1800, see the MB block). The marble pattern, its mask
   // and its fill-rect must all span the FULL height or the diorama vanishes below 800 on mobile.
-  // Decided here (before any aurora build) because MB is declared further down.
-  const AURORA_W=1200, SCENE_H=matchMedia('(max-width:760px)').matches?1800:800;
+  const AURORA_W=1200, SCENE_H=MB?1800:800;
   const clamp255=v=>Math.max(0,Math.min(255,Math.round(v)));
 
   // TWO shared grayscale value-noise fields (0..1), generated once. AURORA_NOISE is the
@@ -442,7 +409,7 @@
   // recoloured live via CSS vars) and the aurora masked-marble form. Originals are cached
   // so switching back is instant.
   const AURORA_ORIG={};
-  let AURORA_MASKED=false, SCENE_BUILT=false, CANYON=false;
+  let AURORA_MASKED=false, SCENE_BUILT=false;
   function auroraMaskify(on){
     if(!SCENE_BUILT || on===AURORA_MASKED) return;
     if(on){
@@ -475,10 +442,8 @@
     s.setProperty('--ink',p.ink); s.setProperty('--ink-soft',p.inkSoft);
     s.setProperty('--halo',p.halo||'rgba(255,244,222,.94)');
     document.body.classList.toggle('pal-aurora', name==='aurora');
-    document.body.classList.toggle('pal-dark', !!p.dark);   // white-copy palettes (deep, dim scene)
     document.body.classList.toggle('pal-flat', !!p.flat);   // shadowless flat cut-paper palettes
     auroraMaskify(name==='aurora');     // no-op until SCENE_BUILT; re-applied once after build
-    if(typeof refreshEdges==='function') refreshEdges();   // re-clone the mobile side frames in the new palette
     try{localStorage.setItem('palette',name)}catch(e){}
     const tt=document.getElementById('themeToggle');
     if(tt) tt.setAttribute('aria-pressed', name==='aurora');   // pressed = dark mode
@@ -553,7 +518,7 @@
     const sc=Math.max(innerWidth/1200, innerHeight/800);     // slice scale (cover)
     return Math.max(0, 400 - innerHeight/(2*sc)) + 14/sc + 10;
   }
-  let TOP_PAD=inset(), BOTTOM_PAD=800-inset();
+  const _inset=inset(); let TOP_PAD=_inset, BOTTOM_PAD=800-_inset;
   // tallest h whose crown still clears the visible top edge, given a base at viewBox-y `by`.
   const fitH=(h,by,kn)=>Math.min(h,(by-TOP_PAD)/(STAMP[kn].crown||1.1));
 
@@ -781,11 +746,8 @@
   // the furthest, softest ground.)
   const bushKinds=[['ponga',210,300],['nikau',240,330],['pohutukawa',185,255],['cabbage',180,245]];
   // On mobile the central footer mound is confined to the clearing (x420..780, inside CLEAR_L) so it
-  // never appears in the side-frame columns (which would split one hill across two views).
-  // On mobile the side columns cover the outer ~25vw each (≈ central-x 415-507 and 692-785), so
-  // the central footer must stay NARROW and inside that clear zone, or the columns' hard inner
-  // edge slices its plants. Confine the mound and pull the (sparser) thicket plant positions in.
-  const MB=matchMedia('(max-width:760px)').matches;
+  // stays in the clear reading column and out of the portrait canyon's foliage walls. Confine the
+  // mound and pull the (sparser) thicket plant positions in.
   const MOUND=MB?[515,685,75]:[290,910,310];
   const FOOTX_BUSH  =MB?[548,600,652]:[430,505,600,695,770];
   const FOOTX_MARGIN=MB?[556,605,648]:[455,520,585,650,715,760];
@@ -895,7 +857,6 @@
   // margins, a clear central column for the text, sky + moon above, foreground and the focal
   // kiwi at the base. Same paper-cut stamps, arranged TALL instead of wide.
   if(MB){
-    CANYON=true;                              // keep the (now superseded) side-frame cloner out
     const MOB_H=1800, FLOOR=MOB_H-24;         // tall portrait viewBox; valley floor just shy of the base
     for(const k of ['sky','haze','deep','far','mid','bush','margin','fore'])
       $('l-'+k).setAttribute('viewBox',`0 0 1200 ${MOB_H}`);
@@ -1057,61 +1018,9 @@
     $('l-fore').innerHTML=mfore;
   }
 
-  // MOBILE FRAMING — reuse the desktop layers as side frames. The centre stage is the full
-  // 1200x800 scene under "xMidYMid slice" (cover): on a portrait phone it over-zooms to cover
-  // the height, cropping width hard to the central clearing (~viewBox 415..785), so the rich
-  // margin foliage is off-frame and the sides read empty. Rather than draw new mobile-only
-  // bush, CLONE the built layer SVGs into two thin edge columns — but the columns must read as
-  // the SAME diorama, not pasted-on panels. So each column shows the forest margin sitting just
-  // OUTSIDE the centre crop, at the SAME scale (px-per-viewBox-unit) as the centre, butted
-  // against the crop edge: the silhouette, the air-gap shadows and the ground all continue at
-  // one scale into the clearing where the text reads. No compression, no feather. Recomputed on
-  // a real width change (orientation) and on palette change so the clones track the live scene.
-  // the clones must parallax in lockstep with the main scene, so each carries its source
-  // layer's depth; `edgeLayers` is transformed alongside `layers` in the rAF loop, and
-  // `lastAmp` lets a fresh clone (palette/resize re-clone) snap to the current scroll offset.
-  let edgeLayers=[], lastAmp=0;
-  function refreshEdges(){
-    if(!SCENE_BUILT || !matchMedia('(max-width:760px)').matches) return;
-    if(CANYON) return;                         // Tier 2 portrait canyon replaces the side-frame clones
-    const L=$('edge-l'), R=$('edge-r'); if(!L||!R) return;
-    L.innerHTML=''; R.innerHTML=''; edgeLayers=[];
-    // Reconstruct the centre stage's cover crop for THIS viewport so the columns can continue it.
-    const W=innerWidth, H=innerHeight;
-    const sc=Math.max(W/1200, H/800);          // cover scale (px per viewBox unit) — height-led on a phone
-    const xL=600-W/(2*sc), xR=600+W/(2*sc);    // centre crop's left / right viewBox edges
-    const yT=400-H/(2*sc), visH=H/sc;          // centre crop's vertical window (columns share it, full-height)
-    const colU=0.25*W/sc;                      // viewBox units a 25vw column spans at the centre's scale
-    const srcs=document.querySelectorAll('.stage .layer svg'), N=srcs.length;
-    srcs.forEach((orig,j)=>{
-      const depth=parseFloat(orig.parentElement.dataset.depth);
-      // match the reveal stagger: same reversed order as the main layers (front sheets lead,
-      // back sheets trail), so the columns bloom in step with the centre scene, not as a block.
-      const delay=((N-1-j)*0.11).toFixed(2)+'s';
-      const dl=orig.cloneNode(true), dr=orig.cloneNode(true);
-      for(const d of [dl,dr]){
-        d.removeAttribute('id');                            // keep getElementById pointing at the originals
-        d.dataset.depth=depth; d.style.willChange='transform'; d.style.transitionDelay=delay;
-      }
-      // LEFT: the colU-wide margin window ending exactly at the centre crop's left edge (xL),
-      // same vertical window — so it butts the centre seamlessly at the column's inner edge.
-      dl.setAttribute('viewBox',`${(xL-colU).toFixed(2)} ${yT.toFixed(2)} ${colU.toFixed(2)} ${visH.toFixed(2)}`);
-      // RIGHT: the colU-wide margin window starting exactly at the centre crop's right edge (xR).
-      dr.setAttribute('viewBox',`${xR.toFixed(2)} ${yT.toFixed(2)} ${colU.toFixed(2)} ${visH.toFixed(2)}`);
-      // viewBox aspect == column pixel aspect by construction, so slice == meet here (exact fill).
-      dl.setAttribute('preserveAspectRatio','xMidYMid slice');
-      dr.setAttribute('preserveAspectRatio','xMidYMid slice');
-      L.appendChild(dl); R.appendChild(dr);
-      edgeLayers.push({el:dl,depth},{el:dr,depth});
-    });
-    // snap the just-built clones to the current scroll offset so they don't pop on re-clone
-    for(const e of edgeLayers) e.el.style.transform=`translate3d(0,${(e.depth*lastAmp).toFixed(2)}px,0)`;
-  }
-
   // the scene now exists: enable aurora's masked-marble swap and apply it if active.
   SCENE_BUILT=true;
   if(document.body.classList.contains('pal-aurora')) auroraMaskify(true);
-  refreshEdges();   // populate the mobile side frames from the now-built layers
 
   /* ---------- load reveal: the backlight switches on ----------
      The scene is now built and the page is still black (CSS: body lacks .lit →
@@ -1168,29 +1077,27 @@
   function kick(){ if(!running && !reduce){ running=true; requestAnimationFrame(frame); } }
   function frame(){
     cur+=(target-cur)*0.12;                         // ease for buttery motion
-    const amp=(1-cur)*AMP; lastAmp=amp;
-    for(const L of layers)     L.el.style.transform=`translate3d(0,${L.depth*amp}px,0)`;
-    for(const L of edgeLayers) L.el.style.transform=`translate3d(0,${L.depth*amp}px,0)`;  // mobile side frames in sync
+    const amp=(1-cur)*AMP;
+    for(const L of layers) L.el.style.transform=`translate3d(0,${L.depth*amp}px,0)`;
     if(Math.abs(target-cur)>0.0004){ requestAnimationFrame(frame); }
     else { cur=target; running=false; }            // settled — stop until next scroll
   }
   addEventListener('scroll',readProgress,{passive:true});
   // Mobile Safari fires `resize` continuously WHILE scrolling, as the bottom URL/search
-  // bar grows and shrinks — a height-only change (the toolbar never changes width). Doing
-  // the full re-layout on every one of those ticks (re-cloning the edge frames + re-snapping
-  // the parallax from a shifted `max`) is what makes the whole scene jump as you scroll. So
-  // gate the heavy work on a REAL width change (orientation flip / desktop resize); for a
-  // toolbar-only height change just refresh the cached scroll range so the next genuine
-  // scroll stays accurate, and leave the scene untouched.
+  // bar grows and shrinks — a height-only change (the toolbar never changes width). Re-snapping
+  // the parallax from a shifted `max` on every one of those ticks is what makes the whole scene
+  // jump as you scroll. So gate the re-snap on a REAL width change (orientation flip / desktop
+  // resize); for a toolbar-only height change just refresh the cached scroll range so the next
+  // genuine scroll stays accurate, and leave the scene untouched.
   let lastW=window.innerWidth;
   addEventListener('resize',()=>{
     readMax();
-    if(window.innerWidth===lastW) return;   // URL-bar show/hide: don't rebuild or re-snap
+    if(window.innerWidth===lastW) return;   // URL-bar show/hide: don't re-snap
     lastW=window.innerWidth;
-    readProgress(); refreshEdges();
+    readProgress();
   });
   readMax(); readProgress();
-  if(reduce){ for(const L of [...layers,...edgeLayers]) L.el.style.transform='none'; }
+  if(reduce){ for(const L of layers) L.el.style.transform='none'; }
   else kick();
 </script>
 </body>
