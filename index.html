@@ -150,10 +150,17 @@
   /* MOBILE: the portrait "forest canyon" build (see the MB block in JS) draws foliage walls up
      both margins, so the reading column must stay in the clear centre and the box frame drops. */
   @media (max-width:760px){
-    .intro,.content{padding-left:26vw;padding-right:26vw}
+    .intro,.content{padding-left:22vw;padding-right:22vw}
     .intro h1{font-size:clamp(2.1rem,9vw,4.8rem)}
     /* no box frame on phones — the portrait canyon bleeds edge-to-edge (both palettes) */
     .frame{display:none}
+    /* smaller sun/moon switch on phones — the toggle is a fixed overlay, so it shouldn't
+       crowd the narrow column. Knob slide = width − knob − 2×3px inset = 52−20−6 = 26. */
+    .theme-toggle{top:16px;right:16px;width:52px;height:26px}
+    .tt-knob{width:20px;height:20px}
+    .theme-toggle[aria-pressed="true"] .tt-knob{transform:translateX(26px)}
+    .theme-toggle svg{width:11px;height:11px}
+    .tt-sun{left:7px}.tt-moon{right:7px}
   }
 </style>
 </head>
@@ -447,11 +454,13 @@
     const tt=document.getElementById('themeToggle');
     if(tt) tt.setAttribute('aria-pressed', name==='aurora');   // pressed = dark mode
   }
-  // precedence: explicit ?palette= → saved choice → OS dark/light preference → tōtara (light).
-  const osDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+  // precedence: explicit ?palette= → saved choice → tōtara (light) for EVERYONE. Light is the
+  // default for all visitors: aurora is the speckled-marble build that runs slow on some devices,
+  // so it stays strictly opt-in (the moon toggle / ?palette=aurora) and is never auto-selected
+  // from the OS dark preference.
   let curPal=new URLSearchParams(location.search).get('palette')
     || (()=>{try{return localStorage.getItem('palette')}catch(e){return null}})()
-    || (osDark ? 'aurora' : 'totara');
+    || 'totara';
   if(!PALETTES[curPal]) curPal='totara';
   // the sun↔moon switch flips between the two modes: tōtara (light) and aurora (dark).
   document.getElementById('themeToggle').addEventListener('click',()=>{
@@ -890,7 +899,7 @@
     // WIDENED central clearing for mobile — more breathing room for the text than desktop's
     // 378..822, plus a little extra clamp pad so a stray crown tip never reaches the copy. Flax
     // gets extra room because it leans inward (below), so its tilted fronds still clear the text.
-    const MCL=344, MCR=856, TOP_M=34;
+    const MCL=280, MCR=920, TOP_M=34;
     const mclampX=(x,h,kn,side)=>{ const w=((STAMP[kn].cw||0.5)+(kn==='flax'?0.18:kn==='nikau'?0.18:0))*h+8;
       return side<0 ? Math.min(x,MCL-w) : Math.max(x,MCR+w); };
 
@@ -960,11 +969,11 @@
     // name only the lighter, further-back ranges (haze/deep/far + a touch of mid) feather in — the
     // dark bush/margin/fore walls start at/below the heading and build down toward the projects.
     const HERO=470;   // viewBox-y of the heading band (≈23vh on a portrait phone)
-    $('l-far').innerHTML    = tallBay(-1,344,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,856,182,kFar,'var(--far)',sub(9),118,1.5);
-    $('l-mid').innerHTML    = tallBay(-1,338,300,kMid,'var(--mid)',sub(10),164,1.5,330)  + tallBay(+1,862,300,kMid,'var(--mid)',sub(11),164,1.5,330);
-    $('l-bush').innerHTML   = tallBay(-1,304,452,kBush,'var(--bush)',sub(1),272,1.6,HERO) + tallBay(+1,896,452,kBush,'var(--bush)',sub(2),272,1.6,HERO);
-    $('l-margin').innerHTML = tallBay(-1,266,512,kMargin,'var(--margin)',sub(3),248,1.7,HERO+40)+tallBay(+1,934,512,kMargin,'var(--margin)',sub(4),248,1.7,HERO+40);
-    let mfore = tallBay(-1,228,566,kFore,'var(--fore)',sub(5),250,1.8,HERO+90)+tallBay(+1,972,566,kFore,'var(--fore)',sub(6),250,1.8,HERO+90);
+    $('l-far').innerHTML    = tallBay(-1,280,182,kFar,'var(--far)',sub(8),118,1.5)   + tallBay(+1,920,182,kFar,'var(--far)',sub(9),118,1.5);
+    $('l-mid').innerHTML    = tallBay(-1,274,300,kMid,'var(--mid)',sub(10),164,1.5,330)  + tallBay(+1,926,300,kMid,'var(--mid)',sub(11),164,1.5,330);
+    $('l-bush').innerHTML   = tallBay(-1,240,452,kBush,'var(--bush)',sub(1),272,1.6,HERO) + tallBay(+1,960,452,kBush,'var(--bush)',sub(2),272,1.6,HERO);
+    $('l-margin').innerHTML = tallBay(-1,202,512,kMargin,'var(--margin)',sub(3),248,1.7,HERO+40)+tallBay(+1,998,512,kMargin,'var(--margin)',sub(4),248,1.7,HERO+40);
+    let mfore = tallBay(-1,164,566,kFore,'var(--fore)',sub(5),250,1.8,HERO+90)+tallBay(+1,1036,566,kFore,'var(--fore)',sub(6),250,1.8,HERO+90);
 
     // STACKED valley-floor mounds (receding light→dark, as on desktop): a low light mound per back
     // layer peeking up behind the dark fore mound — adds back-layer density across the footer and
@@ -989,13 +998,14 @@
     // valley floor: a low central mound closing the foot of the clearing (connected to the base),
     // a small foreground thicket on it, then the focal kiwi — placed where the dark fore/margin/
     // bush have dived away so its silhouette reads against the LIGHTER far/deep backdrop (as desktop).
-    // the central mound runs WIDE — from 200 to 1000 — so it overlaps the foot of both fore side
-    // banks (innerX 228 / 972) and the dark ground reads as one continuous footer with no notch /
-    // drop-off at the corners where the bank meets the floor.
-    {const r=rng(sub(13)), amp=108, mcY=x=>FLOOR-amp*Math.exp(-Math.pow((x-560)/270,2))+noise(r,18)((x-300)/600)*0.6;
-     let md=`M200,${MOB_H+8}`;
-     for(let i=0;i<=44;i++){const x=200+800*i/44; md+=` L${x.toFixed(1)},${mcY(x).toFixed(1)}`;}
-     mfore += `<path fill="var(--fore)" d="${md} L1000,${MOB_H+8} Z"/>`;
+    // the central mound runs WIDE — from 120 to 1080 — so it overlaps the foot of both fore side
+    // banks (innerX 164 / 1036) and the dark ground reads as one continuous footer with no notch /
+    // drop-off at the corners where the bank meets the floor. Its span MUST stay wider than the fore
+    // innerX (and past the visible viewBox edges) or a gap opens between footer and margin ground.
+    {const r=rng(sub(13)), amp=108, MX0=120, MX1=1080, mcY=x=>FLOOR-amp*Math.exp(-Math.pow((x-600)/300,2))+noise(r,18)((x-300)/600)*0.6;
+     let md=`M${MX0},${MOB_H+8}`;
+     for(let i=0;i<=52;i++){const x=MX0+(MX1-MX0)*i/52; md+=` L${x.toFixed(1)},${mcY(x).toFixed(1)}`;}
+     mfore += `<path fill="var(--fore)" d="${md} L${MX1},${MOB_H+8} Z"/>`;
      // foreground thicket kept to the centre-RIGHT, clear of the kiwi: its long bill sweeps right to
      // x≈643, so the thicket starts to the RIGHT of the bill tip (no stamp over the beak) while still
      // filling the right of the footer.
@@ -1065,6 +1075,12 @@
   const layers=[...document.querySelectorAll('.layer')].map(el=>({el,depth:parseFloat(el.dataset.depth)}));
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const AMP=150;                                   // px of spread at the very top
+  // Anchor the spread to the BACKMOST sheet (smallest depth). The .glow light panel is fixed
+  // (no parallax); if the back sky sheet itself slid down at the hero it would expose a thin
+  // strip of the bright panel above it (invisible in light mode, but a pale band under aurora).
+  // Subtracting the min depth pins that sky sheet flush to the top while preserving every
+  // layer's RELATIVE shift — the parallax looks identical, it just never uncovers the glow.
+  const baseDepth=Math.min(...layers.map(L=>L.depth));
   let target=0, cur=0, max=0, running=false;
   function readMax(){ max=document.documentElement.scrollHeight-window.innerHeight; }
   function readProgress(){
@@ -1077,7 +1093,7 @@
   function frame(){
     cur+=(target-cur)*0.12;                         // ease for buttery motion
     const amp=(1-cur)*AMP;
-    for(const L of layers) L.el.style.transform=`translate3d(0,${L.depth*amp}px,0)`;
+    for(const L of layers) L.el.style.transform=`translate3d(0,${(L.depth-baseDepth)*amp}px,0)`;
     if(Math.abs(target-cur)>0.0004){ requestAnimationFrame(frame); }
     else { cur=target; running=false; }            // settled — stop until next scroll
   }
